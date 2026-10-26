@@ -61,17 +61,19 @@ The destructive verbs confirm (`--yes` answers, otherwise a line from stdin) and
 
 The repo list is on the left; on the right are the selected repo's worktrees, its branches and the detail of the focused row. The worktree and branch lists follow the selection in the repo list (one read off the loop each time it moves).
 
+The keys follow the family key map (`~/hub/o-plans/plans/mtm-keys-and-ux-review-2.md`, "Key map"): `n` is new, `d d` removes or deletes, `enter` opens or switches.
+
 | Key | Where | Does |
 |---|---|---|
 | `j` `k` | a list | move (past the last row into the next list) |
 | `}` `{` `tab` `shift+tab` | anywhere | next or previous list |
 | `enter` | repo | show it and move to its worktrees |
-| `a` | worktrees | add a worktree (asks for the branch) |
-| `x` / `X` | worktree | remove it (confirm) / remove it even if dirty |
-| `a` | branches | create a branch (asks for the name) |
-| `s` | branch | switch to it |
-| `x` / `X` | branch | delete it (confirm) / delete it even if unmerged |
-| `R` | anywhere | read every repo again |
+| `n` | worktrees | add a worktree (asks for the branch) |
+| `d d` / `d D` | worktree | remove it (confirm) / remove it even if dirty |
+| `n` | branches | create a branch (asks for the name) |
+| `enter` | branch | switch to it |
+| `d d` / `d D` | branch | delete it (confirm) / delete it even if unmerged |
+| `R` | anywhere | read every repo again (by hand for now; the map wants refresh to be automatic) |
 | `:` | anywhere | the palette: any verb by name |
 | `?` | anywhere | every key the focus answers |
 | `q` | anywhere | quit |
