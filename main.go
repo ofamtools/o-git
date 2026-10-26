@@ -41,7 +41,7 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		return err
 	}
 	a.Stdin, a.Stdout, a.Stderr = stdin, stdout, stderr
-	app := oden.New("o-git", bareJSON(args), oden.WithBuiltins(), oden.WithStdio(stdin, stdout, stderr),
+	app := oden.New("o-git", args, oden.WithBuiltins(), oden.WithStdio(stdin, stdout, stderr),
 		oden.WithDefault(func(_ context.Context, args []string) error {
 			if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
 				return oden.ErrNotFound
