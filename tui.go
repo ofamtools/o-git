@@ -56,7 +56,7 @@ func runTUI(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	if *smoke {
 		// A failed read is shown, as the page would show it.
 		if err := a.Settle(); err != nil {
-			a.m.Status = err.Error()
+			a.r.UI().Status(err.Error())
 		}
 		a.m.Width, a.m.Height = *width, *height
 		_, err := fmt.Fprintln(stdout, strings.TrimRight(ansi.Strip(a.m.View().Content), "\n"))

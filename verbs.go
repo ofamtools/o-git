@@ -241,11 +241,11 @@ func (a *App) branchList(c ochazuke.Ctx) ochazuke.Result {
 // changed is the Then of a verb that changed a repository: the TUI reads
 // it again and says what happened.
 func (a *App) changed(say func(any) string) func(ochazuke.Ctx, any, error) {
-	return func(_ ochazuke.Ctx, v any, err error) {
+	return func(ctx ochazuke.Ctx, v any, err error) {
 		if err != nil || !a.tui {
 			return
 		}
-		a.m.Status = say(v)
+		ctx.Status(say(v))
 		a.refresh()
 	}
 }
