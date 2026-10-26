@@ -23,9 +23,9 @@ func (a *App) registerVerbs() {
 	r := a.r
 	r.Define("repo").
 		Verb("list", a.repoList, "every repository o-proj lists, plus --path directories, with its status: rows {noun, id: repo/DIR, label, data: {name, path, state, branch, head, upstream, ahead, behind, staged, unstaged, untracked, conflicts}, cells}").Rows("repo").Quiet().Positional("path").
-		Verb("status", a.repoStatus, "one repository's status: {name, path, state, branch, head, detached, upstream, gone, ahead, behind, staged, unstaged, untracked, conflicts}").Positional("repo").
+		Verb("status", a.repoStatus, "one repository's status: {name, path, state, branch, head, detached, upstream, gone, ahead, behind, staged, unstaged, untracked, conflicts}").Quiet().Positional("repo").
 		Verb("show", a.repoShow, "one repository's status, worktrees and branches: {repo, worktrees, branches}; the TUI shows them and moves to its worktrees").Quiet().Positional("repo").
-		Verb("state", a.repoState, "every list's rows in one answer, JSON Lines {noun, id, label, data, cells}: each repository, then every repository's worktrees, then its branches (the catalog's state)").State().Positional("path")
+		Verb("state", a.repoState, "every list's rows in one answer, JSON Lines {noun, id, label, data, cells}: each repository, then every repository's worktrees, then its branches (the catalog's state)").State().Quiet().Positional("path")
 	r.Define("worktree").
 		Verb("list", a.worktreeList, "a repository's worktrees, the main one first: rows {noun, id: worktree/PATH, label, data: {repo, path, head, branch, detached, bare, main, locked, prunable, state, changes}, cells}").Rows("worktree").Quiet().Positional("repo").
 		Verb("add", a.worktreeAdd, "add a worktree for BRANCH (created from --from, else HEAD, when it does not exist) at PATH, default REPO-BRANCH beside the main worktree").Positional("branch", "path").
