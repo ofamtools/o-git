@@ -117,7 +117,7 @@ func TestPageFollowsTheSelectedRepo(t *testing.T) {
 func TestPageWorktreeAddAndRemove(t *testing.T) {
 	dir := newRepo(t, "r")
 	a := open(t, dir)
-	keys(t, a, "enter", "a")
+	keys(t, a, "enter", "n")
 	if a.r.TopModal() == "" || !strings.Contains(screen(a), "New worktree for branch") {
 		t.Fatalf("no prompt\n%s", screen(a))
 	}
@@ -133,7 +133,7 @@ func TestPageWorktreeAddAndRemove(t *testing.T) {
 
 	focusRow(t, a, a.worktrees, worktreeID(wt))
 	write(t, wt, "dirt", "x\n")
-	keys(t, a, "x")
+	keys(t, a, "d", "d")
 	if !strings.Contains(screen(a), "Remove worktree") {
 		t.Fatalf("no confirm\n%s", screen(a))
 	}
@@ -143,12 +143,12 @@ func TestPageWorktreeAddAndRemove(t *testing.T) {
 	if _, err := os.Stat(wt); err != nil {
 		t.Fatal("refused remove removed it")
 	}
-	// n declines; X forces.
-	keys(t, a, "X", "n")
+	// n declines; d D forces.
+	keys(t, a, "d", "D", "n")
 	if _, err := os.Stat(wt); err != nil {
 		t.Fatal("declined remove removed it")
 	}
-	keys(t, a, "X", "y")
+	keys(t, a, "d", "D", "y")
 	if _, err := os.Stat(wt); !os.IsNotExist(err) || a.worktrees.Len() != 1 {
 		t.Fatalf("forced remove: %v %d", err, a.worktrees.Len())
 	}
@@ -160,32 +160,32 @@ func TestPageBranches(t *testing.T) {
 	if err := a.branches.Focus(); err != nil {
 		t.Fatal(err)
 	}
-	keys(t, a, "a")
+	keys(t, a, "n")
 	typeText(t, a, "topic")
 	keys(t, a, "enter")
 	if ok, _ := BranchExists(t.Context(), dir, "topic"); !ok || a.branches.Len() != 2 {
 		t.Fatalf("created: %v %d", ok, a.branches.Len())
 	}
 	focusRow(t, a, a.branches, branchID(dir, "topic"))
-	keys(t, a, "s")
+	keys(t, a, "enter")
 	if s, _ := ReadStatus(t.Context(), dir); s.Branch != "topic" {
 		t.Fatalf("switched to %s", s.Branch)
 	}
 	commit(t, dir, "t", "topic work")
 	keys(t, a, "R")
 	focusRow(t, a, a.branches, branchID(dir, "topic"))
-	keys(t, a, "x")
+	keys(t, a, "d", "d")
 	if err := keyErr(a, "y"); err == nil || !strings.Contains(err.Error(), "checked out") {
 		t.Fatalf("delete current: %v", err)
 	}
 	focusRow(t, a, a.branches, branchID(dir, "main"))
-	keys(t, a, "s")
+	keys(t, a, "enter")
 	focusRow(t, a, a.branches, branchID(dir, "topic"))
-	keys(t, a, "x")
+	keys(t, a, "d", "d")
 	if err := keyErr(a, "y"); err == nil || !strings.Contains(err.Error(), "not fully merged") {
 		t.Fatalf("delete unmerged: %v", err)
 	}
-	keys(t, a, "X", "y")
+	keys(t, a, "d", "D", "y")
 	if ok, _ := BranchExists(t.Context(), dir, "topic"); ok || a.branches.Len() != 1 {
 		t.Fatalf("forced delete: %v %d", ok, a.branches.Len())
 	}
@@ -198,10 +198,44 @@ func TestPromptCancel(t *testing.T) {
 	if err := a.branches.Focus(); err != nil {
 		t.Fatal(err)
 	}
-	keys(t, a, "a", "esc")
-	keys(t, a, "a", "enter")
+	keys(t, a, "n", "esc")
+	keys(t, a, "n", "enter")
 	if a.r.TopModal() != "" || a.branches.Len() != 1 {
 		t.Fatalf("modal %q branches %d", a.r.TopModal(), a.branches.Len())
+	}
+}
+
+// The page follows the family key map: a, x, X and s answer nowhere on
+// the page (n, d d, d D and enter replaced them).
+func TestRetiredKeysAreUnbound(t *testing.T) {
+	dir := newRepo(t, "r")
+	sh(t, dir, "branch", "topic")
+	a := open(t, dir)
+	wt, ok := a.worktrees.Selected()
+	if !ok {
+		t.Fatal("no worktree row")
+	}
+	for _, focus := range []func(){
+		func() { _ = a.repos.Focus() },
+		func() { focusRow(t, a, a.worktrees, wt.ID) },
+		func() { focusRow(t, a, a.branches, branchID(dir, "topic")) },
+	} {
+		focus()
+		for _, key := range []string{"a", "x", "X", "s"} {
+			handled, err := a.r.Dispatch(ochazuke.MacroKey{Key: key})
+			if handled || err != nil || a.r.TopModal() != "" {
+				t.Fatalf("%s at %s: handled %v, %v, modal %q", key, a.r.Focus, handled, err, a.r.TopModal())
+			}
+		}
+	}
+	if err := a.Settle(); err != nil {
+		t.Fatal(err)
+	}
+	if ok, _ := BranchExists(t.Context(), dir, "topic"); !ok || a.worktrees.Len() != 1 {
+		t.Fatal("a retired key changed something")
+	}
+	if s, _ := ReadStatus(t.Context(), dir); s.Branch != "main" {
+		t.Fatalf("switched to %s", s.Branch)
 	}
 }
 

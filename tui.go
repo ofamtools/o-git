@@ -20,7 +20,7 @@ func viewCommand(stdin io.Reader, stdout, stderr io.Writer) oden.Command {
 	return oden.Command{
 		Name: "view", Summary: "open the Git page: repos on the left, the selected repo's worktrees, branches and the focused row's detail on the right",
 		Usage: "[--path DIR,...] [--smoke] [--width N] [--height N]", Source: "o-git",
-		Details: "o-git with no command opens it too. Keys: ? on the page lists them; README.md has the table.",
+		Details: "o-git with no command opens it too. Keys (the family key map): enter shows a repo or switches to a branch, n adds a worktree or branch, d d removes or deletes (confirm), d D forces, R reloads, q quits; ? on the page lists them all.",
 		Run: func(_ context.Context, args []string) error {
 			return runTUI(args, stdin, stdout, stderr)
 		},
