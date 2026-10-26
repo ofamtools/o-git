@@ -27,13 +27,13 @@ func (a *App) registerVerbs() {
 		Verb("state", a.repoState, "every list's rows in one answer, JSON Lines {noun, id, label, data, cells}: each repository, then every repository's worktrees, then its branches (the catalog's state)").State().Quiet().Positional("path")
 	r.Define("worktree").
 		Verb("list", a.worktreeList, "a repository's worktrees, the main one first: rows {noun, id: worktree/PATH, label, data: {repo, path, head, branch, detached, bare, main, locked, prunable, state, changes}, cells}").Rows("worktree").Quiet().Positional("repo").
-		Verb("add", a.worktreeAdd, "add a worktree for BRANCH (created from --from, else HEAD, when it does not exist) at PATH, default REPO-BRANCH beside the main worktree").Quiet().Positional("branch", "path").
-		Verb("remove", a.worktreeRemove, "remove the targeted worktree; refuses the main one, and a dirty one unless --force").Quiet().Confirm("Remove worktree {{label}}?")
+		Verb("add", a.worktreeAdd, "add a worktree for BRANCH (created from --from, else HEAD, when it does not exist) at PATH, default REPO-BRANCH beside the main worktree").Positional("branch", "path").
+		Verb("remove", a.worktreeRemove, "remove the targeted worktree; refuses the main one, and a dirty one unless --force").Confirm("Remove worktree {{label}}?")
 	r.Define("branch").
 		Verb("list", a.branchList, "a repository's local branches, newest commit first: rows {noun, id: branch/REPO:NAME, label, data: {repo, name, current, worktree, upstream, gone, ahead, behind, merged, commit, subject, author, date}, cells}").Rows("branch").Quiet().Positional("repo").
-		Verb("create", a.branchCreate, "create branch NAME at FROM (default HEAD) without checking it out; --switch checks it out").Quiet().Positional("name", "from").
-		Verb("switch", a.branchSwitch, "check out NAME (default: the targeted branch) in REPO's worktree").Quiet().Positional("name").
-		Verb("delete", a.branchDelete, "delete the targeted branch; refuses the checked-out one, and an unmerged one unless --force").Quiet().Confirm("Delete branch {{label}}?")
+		Verb("create", a.branchCreate, "create branch NAME at FROM (default HEAD) without checking it out; --switch checks it out").Positional("name", "from").
+		Verb("switch", a.branchSwitch, "check out NAME (default: the targeted branch) in REPO's worktree").Positional("name").
+		Verb("delete", a.branchDelete, "delete the targeted branch; refuses the checked-out one, and an unmerged one unless --force").Confirm("Delete branch {{label}}?")
 
 	repo := ochazuke.Parameter{Type: "string", Description: "a repository directory or a name o-proj lists (default: the row's, else the current directory)"}
 	paths := ochazuke.Parameter{Type: "string", Description: "extra repository directories, comma-separated, listed after o-proj's"}
