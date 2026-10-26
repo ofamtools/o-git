@@ -11,10 +11,9 @@ import (
 	ocli "github.com/unixsuperhero/ochazuke/cli"
 )
 
-// The verbs. Every one that reads or changes a repository is pending work:
-// git runs off the event loop, and the value reaches the command line as
-// it is (a synchronous result is round-tripped through a JSON map, which
-// sorts a record's keys). A row verb acts on the row it targets (the
+// The verbs. Every one that reads or changes a repository is pending work,
+// so git runs off the event loop. Every verb is Quiet: no jobs ticker
+// entry, and no "job #N ... done" line on the command line. A row verb acts on the row it targets (the
 // focused row, or --target ID on the command line); a REPO word is a
 // directory or a name o-proj lists, and defaults to the row's repository,
 // then the one the TUI shows, then the current directory.
