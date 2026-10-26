@@ -16,18 +16,12 @@ func (a *App) bind() error {
 	r.Define("git").Mode("normal").
 		Bind("R", ochazuke.Do("repo.list")).
 		Bind("q", ochazuke.Do("app.quit"))
-	// Nothing here acts on marked rows: space would run the list's
-	// list.mark.
-	ignore := ochazuke.Do("key.ignore").Hide()
 	r.Define("repo").Mode("normal").
-		Bind("enter", ochazuke.Do("repo.show")).
-		Bind("space", ignore)
+		Bind("enter", ochazuke.Do("repo.show"))
 	r.Define("worktree").Mode("normal").
-		Bind("space", ignore).
 		Bind("d d", ochazuke.Do("worktree.remove")).
 		Bind("d D", ochazuke.Do("worktree.remove", ochazuke.Arguments{"force": true}).Hinted("force remove"))
 	r.Define("branch").Mode("normal").
-		Bind("space", ignore).
 		Bind("enter", ochazuke.Do("branch.switch")).
 		Bind("d d", ochazuke.Do("branch.delete")).
 		Bind("d D", ochazuke.Do("branch.delete", ochazuke.Arguments{"force": true}).Hinted("force delete"))

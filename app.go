@@ -61,13 +61,13 @@ func New() (*App, error) {
 	a := &App{r: r, Now: time.Now, Stdin: os.Stdin, Stdout: os.Stdout, Stderr: os.Stderr}
 	r.Instance(pageID, ochazuke.Kind("git"))
 	var err error
-	if a.repos, err = r.AddList(reposID, nil, ochazuke.Parent(pageID), ochazuke.Columns(columns["repo"]...)); err != nil {
+	if a.repos, err = r.AddList(reposID, nil, ochazuke.Parent(pageID), ochazuke.Columns(columns["repo"]...), ochazuke.NoMarks()); err != nil {
 		return nil, err
 	}
-	if a.worktrees, err = r.AddList(worktreesID, nil, ochazuke.Parent(pageID), ochazuke.Columns(columns["worktree"]...)); err != nil {
+	if a.worktrees, err = r.AddList(worktreesID, nil, ochazuke.Parent(pageID), ochazuke.Columns(columns["worktree"]...), ochazuke.NoMarks()); err != nil {
 		return nil, err
 	}
-	if a.branches, err = r.AddList(branchesID, nil, ochazuke.Parent(pageID), ochazuke.Columns(columns["branch"]...)); err != nil {
+	if a.branches, err = r.AddList(branchesID, nil, ochazuke.Parent(pageID), ochazuke.Columns(columns["branch"]...), ochazuke.NoMarks()); err != nil {
 		return nil, err
 	}
 	for noun, cols := range columns {

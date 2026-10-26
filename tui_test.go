@@ -264,3 +264,31 @@ func TestSmoke(t *testing.T) {
 		t.Fatalf("empty\n%s", out)
 	}
 }
+
+// Nothing acts on marked rows: space marks no row in any list, and no
+// hint offers list.mark.
+func TestListsTakeNoMarks(t *testing.T) {
+	dir := newRepo(t, "r")
+	sh(t, dir, "branch", "topic")
+	a := open(t, dir)
+	wt, ok := a.worktrees.Selected()
+	if !ok {
+		t.Fatal("no worktree row")
+	}
+	for _, focus := range []func(){
+		func() { _ = a.repos.Focus() },
+		func() { focusRow(t, a, a.worktrees, wt.ID) },
+		func() { focusRow(t, a, a.branches, branchID(dir, "topic")) },
+	} {
+		focus()
+		_, _ = a.r.Dispatch(ochazuke.MacroKey{Key: "space"})
+		for _, list := range []*ochazuke.List{a.repos, a.worktrees, a.branches} {
+			if marked := list.Marked(); len(marked) != 0 {
+				t.Fatalf("space at %s marked %v", a.r.Focus, marked)
+			}
+		}
+		if s := screen(a); strings.Contains(s, "list.mark") {
+			t.Fatalf("a hint offers list.mark at %s\n%s", a.r.Focus, s)
+		}
+	}
+}
