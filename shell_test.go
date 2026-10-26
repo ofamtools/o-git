@@ -187,7 +187,14 @@ func TestWorktreeAddRemove(t *testing.T) {
 	if _, _, err := try("", "worktree", "remove", dir, "--yes", "--force"); err == nil || !strings.Contains(err.Error(), "main worktree") {
 		t.Fatalf("main: %v", err)
 	}
-	if _, _, err := try("", "worktree", "remove", "--yes"); err == nil || !strings.Contains(err.Error(), "path is required") {
+	// A host's row id (--target) names the worktree too.
+	if _, errOut, err := try("n\n", "worktree", "remove", "--target", "worktree/"+dir); err == nil || !strings.Contains(errOut, "Remove worktree "+tilde(dir)+"?") {
+		t.Fatalf("--target confirm: %v %q", err, errOut)
+	}
+	if _, _, err := try("", "worktree", "remove", "--target", "worktree/"+dir, "--yes"); err == nil || !strings.Contains(err.Error(), "main worktree") {
+		t.Fatalf("--target main: %v", err)
+	}
+	if _, _, err := try("", "worktree", "remove", "--yes"); err == nil || !strings.Contains(err.Error(), "a worktree is required") {
 		t.Fatalf("no target: %v", err)
 	}
 }
@@ -225,6 +232,9 @@ func TestBranchVerbs(t *testing.T) {
 	run(t, "", "branch", "switch", "main")
 	if _, errOut, err := try("\n", "branch", "delete", "topic"); err == nil || !strings.Contains(errOut, "Delete branch topic?") {
 		t.Fatalf("declined: %v %q", err, errOut)
+	}
+	if _, errOut, err := try("\n", "branch", "delete", "--target", "branch/topic"); err == nil || !strings.Contains(errOut, "Delete branch topic?") {
+		t.Fatalf("--target confirm: %v %q", err, errOut)
 	}
 	if res := decode[BranchResult](t, run(t, "", "branch", "delete", "topic", "--yes")); !res.Deleted {
 		t.Fatalf("delete merged %+v", res)

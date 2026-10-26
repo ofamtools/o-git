@@ -16,8 +16,9 @@ import (
 // entry); the mutations show on the ticker and print their
 // "job #N VERB done" line on the CLI's stderr. The destructive verbs take plain
 // arguments (worktree remove PATH, branch delete NAME), which the TUI's rows
-// fill from the focused row (FromRow); the other row verbs act on the row
-// they target (the focused row, or --target ID on the command line); a REPO word is a
+// fill from the focused row (FromRow), or act on the row --target names (a
+// host's row id); the other row verbs act on the row they target (the
+// focused row, or --target ID on the command line); a REPO word is a
 // directory or a name o-proj lists, and defaults to the row's repository,
 // then the one the TUI shows, then the current directory.
 
@@ -60,7 +61,7 @@ func (a *App) registerVerbs() {
 		"from":   {Type: "string", Description: "the commit a new branch starts at (default HEAD)"},
 	})
 	set("worktree.remove", "{repo, removed, force}", map[string]ochazuke.Parameter{
-		"path":  {Type: "string", Required: true, Description: "the worktree's directory (the TUI passes the focused row's)"},
+		"path":  {Type: "string", Description: "the worktree's directory (default: the --target row's; the TUI passes the focused row's)"},
 		"force": force("remove it even with uncommitted changes or untracked files"),
 	})
 	set("branch.list", "row[]", map[string]ochazuke.Parameter{"repo": repo})
@@ -76,7 +77,7 @@ func (a *App) registerVerbs() {
 	})
 	set("branch.delete", "{repo, deleted, force}", map[string]ochazuke.Parameter{
 		"repo":  repo,
-		"name":  {Type: "string", Required: true, Description: "the branch (the TUI passes the focused row's)"},
+		"name":  {Type: "string", Description: "the branch (default: the --target row's; the TUI passes the focused row's)"},
 		"force": force("delete it even when it is not merged"),
 	})
 }
@@ -304,7 +305,13 @@ type RemoveResult struct {
 }
 
 func (a *App) worktreeRemove(c ochazuke.Ctx) ochazuke.Result {
-	w := WorktreeRow{Worktree: Worktree{Path: absPath(ochazuke.StringArg(c.Args, "path", ""))}}
+	w, ok := rowData[WorktreeRow](c)
+	if path := ochazuke.StringArg(c.Args, "path", ""); path != "" {
+		w, ok = WorktreeRow{Worktree: Worktree{Path: absPath(path)}}, true
+	}
+	if !ok {
+		return ochazuke.Failed(errors.New("a worktree is required: worktree remove PATH (worktree list prints them)"))
+	}
 	force, _ := c.Args["force"].(bool)
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
 		main, err := mainWorktree(ctx, w.Path)
@@ -397,7 +404,13 @@ func (a *App) branchSwitch(c ochazuke.Ctx) ochazuke.Result {
 }
 
 func (a *App) branchDelete(c ochazuke.Ctx) ochazuke.Result {
-	b := BranchRow{Repo: a.repoWord(c), Branch: Branch{Name: ochazuke.StringArg(c.Args, "name", "")}}
+	b, ok := rowData[BranchRow](c)
+	if name := ochazuke.StringArg(c.Args, "name", ""); name != "" {
+		b, ok = BranchRow{Repo: a.repoWord(c), Branch: Branch{Name: name}}, true
+	}
+	if !ok {
+		return ochazuke.Failed(errors.New("a branch is required: branch delete NAME [--repo REPO]"))
+	}
 	force, _ := c.Args["force"].(bool)
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
 		_, dir, err := resolve(ctx, b.Repo)

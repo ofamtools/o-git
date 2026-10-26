@@ -50,7 +50,7 @@ Delete branch topic? [y/N] n
 o-git: declined: Delete branch topic?
 ```
 
-The destructive verbs take plain arguments, the same ones the page's `d d` passes from the focused row, and confirm by name (`Remove worktree PATH?`, `Delete branch NAME?`; `--yes` answers, otherwise a line from stdin). They refuse what git would lose without `--force`:
+The destructive verbs take plain arguments, the same ones the page's `d d` passes from the focused row (a host's `--target worktree/PATH` or `--target branch/REPO:NAME` row id works too), and confirm by name (`Remove worktree PATH?`, `Delete branch NAME?`; `--yes` answers, otherwise a line from stdin). They refuse what git would lose without `--force`:
 
 - `worktree remove` refuses the main worktree always, and a worktree with any change, untracked files included, unless `--force`.
 - `branch delete` refuses the branch checked out in the repo's worktree always (switch first), and a branch not merged into its upstream or HEAD unless `--force`.
