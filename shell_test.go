@@ -6,9 +6,13 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
+
+// jobLine is the line the shell prints for a job that is not Quiet.
+var jobLine = regexp.MustCompile(`(?m)^job #\d+ (worktree|branch)\.\w+ done\n`)
 
 // run runs one command line and fails on an error or stray stderr.
 func run(t *testing.T, stdin string, args ...string) string {
@@ -17,7 +21,8 @@ func run(t *testing.T, stdin string, args ...string) string {
 	if err != nil {
 		t.Fatalf("%v: %v\n%s", args, err, errOut)
 	}
-	if errOut != "" {
+	// A mutation is not Quiet: its job line is the only stderr allowed.
+	if rest := jobLine.ReplaceAllString(errOut, ""); rest != "" {
 		t.Fatalf("%v wrote to stderr: %q", args, errOut)
 	}
 	return out

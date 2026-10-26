@@ -13,8 +13,8 @@ import (
 
 // The verbs. Every one that reads or changes a repository is pending work,
 // so git runs off the event loop. The reads are Quiet (no jobs ticker
-// entry); the mutations show on the ticker, and quietJobs (shell.go)
-// keeps their "job #N ... done" lines off the CLI's stderr. A row verb acts on the row it targets (the
+// entry); the mutations show on the ticker and print their
+// "job #N VERB done" line on the CLI's stderr. A row verb acts on the row it targets (the
 // focused row, or --target ID on the command line); a REPO word is a
 // directory or a name o-proj lists, and defaults to the row's repository,
 // then the one the TUI shows, then the current directory.
