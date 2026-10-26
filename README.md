@@ -30,6 +30,8 @@ o-git NOUN --help                         # a noun's verbs and parameters
 | `worktree` | `worktree/PATH` | branch, state, path, head |
 | `branch` | `branch/REPO:NAME` (`branch/NAME` is the current directory's) | branch, sync, age, upstream, merged, subject |
 
+`--format table|markdown|toon` prints a list verb's rows (and `repo state`'s, one table per noun) as those columns, the cells the page draws; the branch cell keeps the page's `* ` mark on the checked-out branch (`data.current` in JSON). Verbs that answer one object (`repo status`, `repo show`, the mutations) print JSON with a note.
+
 `sync` is `-` without an upstream, `gone`, `=` when even, else `↑ahead ↓behind`; `changes` is `clean` or `+staged ~unstaged ?untracked !conflicts`.
 
 ```sh

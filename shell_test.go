@@ -299,3 +299,23 @@ func TestCatalog(t *testing.T) {
 		}
 	}
 }
+
+// --format prints a list verb's rows as the table the page draws: the
+// noun's declared columns over the rows' cells, one table per noun.
+func TestListFormats(t *testing.T) {
+	dir := newRepo(t, "r")
+	out := run(t, "", "worktree", "list", dir, "--format", "toon")
+	if want := "worktree[1]{branch,state,path,head}:\n  main,clean main," + tilde(dir) + ","; !strings.HasPrefix(out, want) {
+		t.Fatalf("worktree toon:\n%s", out)
+	}
+	out = run(t, "", "branch", "list", dir, "--format", "markdown")
+	if !strings.HasPrefix(out, "| branch | sync | age | upstream | merged | subject |\n| --- | --- | ---: |") || !strings.Contains(out, "| * main | - |") {
+		t.Fatalf("branch markdown:\n%s", out)
+	}
+	out = run(t, "", "repo", "state", "--path", dir, "--format", "table")
+	for _, head := range []string{"repo  branch", "branch  state", "branch  sync"} {
+		if !strings.Contains(out, head) {
+			t.Fatalf("state table has no %q:\n%s", head, out)
+		}
+	}
+}
