@@ -59,6 +59,8 @@ The destructive verbs take plain arguments, the same ones the page's `d d` passe
 
 ## The Git page
 
+The catalog declares it as a data page (`pages` in `o-git catalog`: layout `split`, the lists Repositories, Branches and Worktrees, and a detail of the selected row's record), so a host such as mtm draws this layout from the rows instead of a generic page. The host fills the lists from `repo state`, so there its branch and worktree lists hold every repository's rows; o-git's own page below shows one repository's at a time.
+
 `o-git` (or `o-git view [--path DIR,...]`) opens it; `--smoke` renders one frame and exits.
 
 The repo list is on the left; on the right are the selected repo's worktrees, its branches and the detail of the focused row. The worktree and branch lists follow the selection in the repo list (one read off the loop each time it moves).
