@@ -14,8 +14,10 @@ import (
 // The verbs. Every one that reads or changes a repository is pending work,
 // so git runs off the event loop. The reads are Quiet (no jobs ticker
 // entry); the mutations show on the ticker and print their
-// "job #N VERB done" line on the CLI's stderr. A row verb acts on the row it targets (the
-// focused row, or --target ID on the command line); a REPO word is a
+// "job #N VERB done" line on the CLI's stderr. The destructive verbs take plain
+// arguments (worktree remove PATH, branch delete NAME), which the TUI's rows
+// fill from the focused row (FromRow); the other row verbs act on the row
+// they target (the focused row, or --target ID on the command line); a REPO word is a
 // directory or a name o-proj lists, and defaults to the row's repository,
 // then the one the TUI shows, then the current directory.
 
@@ -29,12 +31,12 @@ func (a *App) registerVerbs() {
 	r.Define("worktree").
 		Verb("list", a.worktreeList, "a repository's worktrees, the main one first: rows {noun, id: worktree/PATH, label, data: {repo, path, head, branch, detached, bare, main, locked, prunable, state, changes}, cells}").Rows("worktree").Quiet().Positional("repo").
 		Verb("add", a.worktreeAdd, "add a worktree for BRANCH (created from --from, else HEAD, when it does not exist) at PATH, default REPO-BRANCH beside the main worktree").Positional("branch", "path").
-		Verb("remove", a.worktreeRemove, "remove the targeted worktree; refuses the main one, and a dirty one unless --force").Confirm("Remove worktree {{label}}?")
+		Verb("remove", a.worktreeRemove, "remove the worktree at PATH; refuses the main one, and a dirty one unless --force").Confirm("Remove worktree {{label}}?").Positional("path")
 	r.Define("branch").
 		Verb("list", a.branchList, "a repository's local branches, newest commit first: rows {noun, id: branch/REPO:NAME, label, data: {repo, name, current, worktree, upstream, gone, ahead, behind, merged, commit, subject, author, date}, cells}").Rows("branch").Quiet().Positional("repo").
 		Verb("create", a.branchCreate, "create branch NAME at FROM (default HEAD) without checking it out; --switch checks it out").Positional("name", "from").
 		Verb("switch", a.branchSwitch, "check out NAME (default: the targeted branch) in REPO's worktree").Positional("name").
-		Verb("delete", a.branchDelete, "delete the targeted branch; refuses the checked-out one, and an unmerged one unless --force").Confirm("Delete branch {{label}}?")
+		Verb("delete", a.branchDelete, "delete branch NAME in REPO; refuses the checked-out one, and an unmerged one unless --force").Confirm("Delete branch {{label}}?").Positional("name")
 
 	repo := ochazuke.Parameter{Type: "string", Description: "a repository directory or a name o-proj lists (default: the row's, else the current directory)"}
 	paths := ochazuke.Parameter{Type: "string", Description: "extra repository directories, comma-separated, listed after o-proj's"}
@@ -57,7 +59,10 @@ func (a *App) registerVerbs() {
 		"path":   {Type: "string", Description: "the new worktree's directory (default: REPO-BRANCH beside the main worktree)"},
 		"from":   {Type: "string", Description: "the commit a new branch starts at (default HEAD)"},
 	})
-	set("worktree.remove", "{repo, removed, force}", map[string]ochazuke.Parameter{"force": force("remove it even with uncommitted changes or untracked files")})
+	set("worktree.remove", "{repo, removed, force}", map[string]ochazuke.Parameter{
+		"path":  {Type: "string", Required: true, Description: "the worktree's directory (the TUI passes the focused row's)"},
+		"force": force("remove it even with uncommitted changes or untracked files"),
+	})
 	set("branch.list", "row[]", map[string]ochazuke.Parameter{"repo": repo})
 	set("branch.create", "{repo, branch, from, switched}", map[string]ochazuke.Parameter{
 		"repo":   repo,
@@ -69,7 +74,11 @@ func (a *App) registerVerbs() {
 		"repo": repo,
 		"name": {Type: "string", Description: "the branch (default: the targeted row's)"},
 	})
-	set("branch.delete", "{repo, deleted, force}", map[string]ochazuke.Parameter{"force": force("delete it even when it is not merged")})
+	set("branch.delete", "{repo, deleted, force}", map[string]ochazuke.Parameter{
+		"repo":  repo,
+		"name":  {Type: "string", Required: true, Description: "the branch (the TUI passes the focused row's)"},
+		"force": force("delete it even when it is not merged"),
+	})
 }
 
 // repoWord is the REPO a worktree or branch verb acts in: --repo, else the
@@ -295,10 +304,7 @@ type RemoveResult struct {
 }
 
 func (a *App) worktreeRemove(c ochazuke.Ctx) ochazuke.Result {
-	w, ok := rowData[WorktreeRow](c)
-	if !ok {
-		return ochazuke.Failed(errors.New("worktree remove acts on a worktree row: pass --target worktree/PATH (worktree list prints the ids)"))
-	}
+	w := WorktreeRow{Worktree: Worktree{Path: absPath(ochazuke.StringArg(c.Args, "path", ""))}}
 	force, _ := c.Args["force"].(bool)
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
 		main, err := mainWorktree(ctx, w.Path)
@@ -376,7 +382,7 @@ func (a *App) branchSwitch(c ochazuke.Ctx) ochazuke.Result {
 		word = a.repoWord(c)
 	}
 	if name == "" {
-		return ochazuke.Failed(errors.New("a branch is required: branch switch NAME, or --target branch/REPO:NAME"))
+		return ochazuke.Failed(errors.New("a branch is required: branch switch NAME [--repo REPO]"))
 	}
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
 		_, dir, err := resolve(ctx, word)
@@ -391,10 +397,7 @@ func (a *App) branchSwitch(c ochazuke.Ctx) ochazuke.Result {
 }
 
 func (a *App) branchDelete(c ochazuke.Ctx) ochazuke.Result {
-	b, ok := rowData[BranchRow](c)
-	if !ok {
-		return ochazuke.Failed(errors.New("branch delete acts on a branch row: pass --target branch/REPO:NAME (branch list prints the ids)"))
-	}
+	b := BranchRow{Repo: a.repoWord(c), Branch: Branch{Name: ochazuke.StringArg(c.Args, "name", "")}}
 	force, _ := c.Args["force"].(bool)
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
 		_, dir, err := resolve(ctx, b.Repo)

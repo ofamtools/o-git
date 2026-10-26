@@ -157,9 +157,8 @@ func TestWorktreeAddRemove(t *testing.T) {
 		t.Fatalf("list %+v", rows)
 	}
 
-	target := "worktree/" + want
 	// Declining the confirm changes nothing and fails.
-	if _, errOut, err := try("n\n", "worktree", "remove", "--target", target); err == nil || !strings.Contains(errOut, "Remove worktree") {
+	if _, errOut, err := try("n\n", "worktree", "remove", want); err == nil || !strings.Contains(errOut, "Remove worktree "+want+"?") {
 		t.Fatalf("declined: %v %q", err, errOut)
 	}
 	if _, err := os.Stat(want); err != nil {
@@ -167,14 +166,14 @@ func TestWorktreeAddRemove(t *testing.T) {
 	}
 	// A dirty worktree is refused without --force.
 	write(t, want, "scratch", "x\n")
-	if _, _, err := try("", "worktree", "remove", "--target", target, "--yes"); err == nil || !strings.Contains(err.Error(), "has changes (?1); --force") {
+	if _, _, err := try("", "worktree", "remove", want, "--yes"); err == nil || !strings.Contains(err.Error(), "has changes (?1); --force") {
 		t.Fatalf("dirty remove: %v", err)
 	}
 	if _, err := os.Stat(want); err != nil {
 		t.Fatal("refused remove removed the worktree")
 	}
 	// Answering y on stdin is --yes.
-	out, errOut, err := try("y\n", "worktree", "remove", "--target", target, "--force")
+	out, errOut, err := try("y\n", "worktree", "remove", want, "--force")
 	if err != nil || !strings.Contains(errOut, "Remove worktree "+want+"? [y/N]") {
 		t.Fatalf("confirmed: %v %q", err, errOut)
 	}
@@ -185,10 +184,10 @@ func TestWorktreeAddRemove(t *testing.T) {
 		t.Fatalf("still there: %v", err)
 	}
 	// The main worktree is never removed.
-	if _, _, err := try("", "worktree", "remove", "--target", "worktree/"+dir, "--yes", "--force"); err == nil || !strings.Contains(err.Error(), "main worktree") {
+	if _, _, err := try("", "worktree", "remove", dir, "--yes", "--force"); err == nil || !strings.Contains(err.Error(), "main worktree") {
 		t.Fatalf("main: %v", err)
 	}
-	if _, _, err := try("", "worktree", "remove", "--yes"); err == nil || !strings.Contains(err.Error(), "--target worktree/PATH") {
+	if _, _, err := try("", "worktree", "remove", "--yes"); err == nil || !strings.Contains(err.Error(), "path is required") {
 		t.Fatalf("no target: %v", err)
 	}
 }
@@ -220,20 +219,20 @@ func TestBranchVerbs(t *testing.T) {
 	if res := decode[BranchResult](t, run(t, "", "branch", "switch", "--target", "branch/topic")); res.Branch != "topic" {
 		t.Fatalf("switch row %+v", res)
 	}
-	if _, _, err := try("", "branch", "delete", "--target", "branch/topic", "--yes"); err == nil || !strings.Contains(err.Error(), "checked out") {
+	if _, _, err := try("", "branch", "delete", "topic", "--yes"); err == nil || !strings.Contains(err.Error(), "checked out") {
 		t.Fatalf("delete current: %v", err)
 	}
 	run(t, "", "branch", "switch", "main")
-	if _, errOut, err := try("\n", "branch", "delete", "--target", "branch/topic"); err == nil || !strings.Contains(errOut, "Delete branch topic?") {
+	if _, errOut, err := try("\n", "branch", "delete", "topic"); err == nil || !strings.Contains(errOut, "Delete branch topic?") {
 		t.Fatalf("declined: %v %q", err, errOut)
 	}
-	if res := decode[BranchResult](t, run(t, "", "branch", "delete", "--target", "branch/topic", "--yes")); !res.Deleted {
+	if res := decode[BranchResult](t, run(t, "", "branch", "delete", "topic", "--yes")); !res.Deleted {
 		t.Fatalf("delete merged %+v", res)
 	}
-	if _, _, err := try("", "branch", "delete", "--target", "branch/"+dir+":work", "--yes"); err == nil || !strings.Contains(err.Error(), "not fully merged; --force") {
+	if _, _, err := try("", "branch", "delete", "work", "--repo", dir, "--yes"); err == nil || !strings.Contains(err.Error(), "not fully merged; --force") {
 		t.Fatalf("delete unmerged: %v", err)
 	}
-	if res := decode[BranchResult](t, run(t, "", "branch", "delete", "--target", "branch/"+dir+":work", "--yes", "--force")); !res.Force {
+	if res := decode[BranchResult](t, run(t, "", "branch", "delete", "work", "--repo", dir, "--yes", "--force")); !res.Force {
 		t.Fatalf("forced %+v", res)
 	}
 	if ok, _ := BranchExists(t.Context(), dir, "work"); ok {

@@ -13,11 +13,11 @@ o-git repo show [REPO]                    # {repo, worktrees, branches}
 o-git repo state [--path DIR,...]         # every list's rows as JSON Lines (the catalog's state)
 o-git worktree list [REPO]
 o-git worktree add BRANCH [PATH] [--repo REPO] [--from REF]
-o-git worktree remove --target worktree/PATH [--force] [--yes]
+o-git worktree remove PATH [--force] [--yes]
 o-git branch list [REPO]
 o-git branch create NAME [FROM] [--repo REPO] [--switch]
 o-git branch switch NAME [--repo REPO]    # or --target branch/REPO:NAME
-o-git branch delete --target branch/REPO:NAME [--force] [--yes]
+o-git branch delete NAME [--repo REPO] [--force] [--yes]
 o-git catalog
 o-git NOUN --help                         # a noun's verbs and parameters
 ```
@@ -43,12 +43,12 @@ $ o-git worktree add feat
 $ o-git repo state --path . | head -2
 {"noun":"repo","id":"repo//Users/me/proj/app","label":"app","data":{"name":"app","path":"/Users/me/proj/app","state":"dirty",...},"cells":["app","main","-","?1","~/proj/app"]}
 {"noun":"worktree","id":"worktree//Users/me/proj/app","label":"~/proj/app","data":{...},"cells":["main","dirty 1 main","~/proj/app","66fa358"]}
-$ o-git branch delete --target branch/topic
+$ o-git branch delete topic
 Delete branch topic? [y/N] n
 o-git: declined: Delete branch topic?
 ```
 
-The destructive verbs confirm (`--yes` answers, otherwise a line from stdin) and refuse what git would lose without `--force`:
+The destructive verbs take plain arguments, the same ones the page's `d d` passes from the focused row, and confirm by name (`Remove worktree PATH?`, `Delete branch NAME?`; `--yes` answers, otherwise a line from stdin). They refuse what git would lose without `--force`:
 
 - `worktree remove` refuses the main worktree always, and a worktree with any change, untracked files included, unless `--force`.
 - `branch delete` refuses the branch checked out in the repo's worktree always (switch first), and a branch not merged into its upstream or HEAD unless `--force`.

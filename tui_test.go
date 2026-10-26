@@ -134,7 +134,7 @@ func TestPageWorktreeAddAndRemove(t *testing.T) {
 	focusRow(t, a, a.worktrees, worktreeID(wt))
 	write(t, wt, "dirt", "x\n")
 	keys(t, a, "d", "d")
-	if !strings.Contains(screen(a), "Remove worktree") {
+	if top := a.r.Instances[a.r.TopModal()]; top == nil || top.Payload.Prompt != "Remove worktree "+tilde(wt)+"?" {
 		t.Fatalf("no confirm\n%s", screen(a))
 	}
 	if err := keyErr(a, "y"); err == nil || !strings.Contains(err.Error(), "has changes") {
