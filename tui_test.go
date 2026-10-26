@@ -292,3 +292,49 @@ func TestListsTakeNoMarks(t *testing.T) {
 		}
 	}
 }
+
+// > and < move the divider between the repo list and the rest, = puts it
+// back (ochazuke's pane keys, through PaneLayout); stacked, the same keys
+// move the repo list's bottom edge.
+func TestPaneKeysResizeTheRepoList(t *testing.T) {
+	dir := newRepo(t, "r")
+	a := open(t, dir)
+	divider := func() int {
+		for _, line := range strings.Split(screen(a), "\n") {
+			if i := strings.Index(line, "Worktrees"); i >= 0 {
+				return ansi.StringWidth(line[:i])
+			}
+		}
+		t.Fatalf("no worktrees panel\n%s", screen(a))
+		return 0
+	}
+	before := divider()
+	keys(t, a, ">")
+	if grown := divider(); grown <= before {
+		t.Fatalf("> did not grow the repo list: %d -> %d", before, grown)
+	}
+	keys(t, a, "<", "<")
+	if shrunk := divider(); shrunk >= before {
+		t.Fatalf("< did not shrink the repo list: %d", shrunk)
+	}
+	keys(t, a, "=")
+	if reset := divider(); reset != before {
+		t.Fatalf("= did not reset: %d, want %d", reset, before)
+	}
+	// Stacked: the worktrees panel starts lower when the repo list grows.
+	a.m.Width = 60
+	row := func() int {
+		for i, line := range strings.Split(screen(a), "\n") {
+			if strings.Contains(line, "Worktrees") {
+				return i
+			}
+		}
+		t.Fatalf("no worktrees panel\n%s", screen(a))
+		return 0
+	}
+	top := row()
+	keys(t, a, "3", ">")
+	if lower := row(); lower <= top {
+		t.Fatalf("3> did not grow the stacked repo list: %d -> %d", top, lower)
+	}
+}

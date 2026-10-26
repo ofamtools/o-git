@@ -75,6 +75,7 @@ The keys follow the family key map (`~/hub/o-plans/plans/mtm-keys-and-ux-review-
 | `n` | branches | create a branch (asks for the name) |
 | `enter` | branch | switch to it |
 | `d d` / `d D` | branch | delete it (confirm) / delete it even if unmerged |
+| `>` `<` `=` | anywhere | widen or narrow the repo list (taller or shorter when stacked; counts repeat, `3>`), `=` resets; remembered in `~/.local/state/o-git/panes.json` |
 | `R` | anywhere | read every repo again (by hand for now; the map wants refresh to be automatic) |
 | `:` | anywhere | the palette: any verb by name |
 | `?` | anywhere | every key the focus answers |

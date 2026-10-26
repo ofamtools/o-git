@@ -12,14 +12,17 @@ import (
 // The Git page: a status line, then the repo list on the left and, on the
 // right, the shown repository's worktrees, its branches and the detail of
 // the focused row (stacked below stackWidth columns). The panel holding
-// the focus has the accent border.
+// the focus has the accent border. The divider between the repo list and
+// the rest follows the page's pane keys (> and < move it, = resets;
+// ochazuke's Runtime.PaneLayout): the repo list's width side by side, its
+// height stacked, the other panels sharing what is left as before.
 
 // stackWidth is the page width below which the panels stack.
 const stackWidth = 70
 
 func (a *App) render(r *ochazuke.Runtime, width, height int) ochazuke.Block {
 	s := ochazuke.NewStyles(*a.m.Appearance)
-	l := ochazuke.Layout{Width: width, Height: height, Styles: s}
+	l := r.PaneLayout(pageID, ochazuke.Layout{Width: width, Height: height, Styles: s})
 	status := s.Muted.Render(ansi.Truncate(a.statusLine(), width, "…"))
 	bh := max(0, height-1)
 	if bh < 8 || width < 20 {
@@ -38,7 +41,10 @@ func (a *App) render(r *ochazuke.Runtime, width, height int) ochazuke.Block {
 		name = " " + name
 	}
 	if width < stackWidth {
-		rh, wh, brh := bh*3/10, bh/5, bh/4
+		rh0 := bh * 3 / 10
+		rh := l.Divide(rh0, bh, ochazuke.PaneMinHeight)
+		// The worktrees and branches keep their share of the rest.
+		wh, brh := bh/5*(bh-rh)/(bh-rh0), bh/4*(bh-rh)/(bh-rh0)
 		blocks := []ochazuke.Block{
 			panel(fmt.Sprintf("Repos %d", a.repos.Len()), a.repos, width, rh),
 			panel("Worktrees"+name, a.worktrees, width, wh),
@@ -51,7 +57,7 @@ func (a *App) render(r *ochazuke.Runtime, width, height int) ochazuke.Block {
 		}
 		return ochazuke.Text(status + "\n" + strings.Join(texts, "\n"))
 	}
-	lw := min(max(30, width*2/5), width-40)
+	lw := l.Divide(min(max(30, width*2/5), width-40), width-1, ochazuke.PaneMinWidth)
 	rw := width - lw - 1
 	left := panel(fmt.Sprintf("Repos %d", a.repos.Len()), a.repos, lw, bh)
 	wh := max(4, bh/4)

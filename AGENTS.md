@@ -18,7 +18,7 @@ Family plans, todos and the roadmap live in `~/hub/o-plans/` (`README.md` is the
 | `App`, `New` (runtime, lists, page, model), the shell, following the selection, refresh | `app.go` |
 | Verbs | `verbs.go` |
 | Key rows | `bindings.go` |
-| The page | `view.go` |
+| The page (the repo list's divider follows ochazuke's pane keys through `Runtime.PaneLayout`) | `view.go` |
 | The name prompt (from o-csv) | `prompt.go` |
 | `view`, flags, `--smoke`, the model wrapper | `tui.go` |
 | `main`, oden dispatch | `main.go` |
