@@ -1,0 +1,74 @@
+package main
+
+import (
+	"testing"
+
+	"github.com/unixsuperhero/ochazuke"
+	ocli "github.com/unixsuperhero/ochazuke/cli"
+)
+
+// frameworkOperations are the operations ochazuke registers on its own for
+// the parts o-git builds on (the runtime and the model): every other
+// operation is a verb o-git defines.
+func frameworkOperations() map[string]bool {
+	r := ochazuke.NewRuntime()
+	ochazuke.NewModel(r)
+	out := map[string]bool{}
+	for key := range r.Operations {
+		out[key] = true
+	}
+	return out
+}
+
+// Every verb o-git defines declares its history kind (Operation.HistoryKind)
+// rather than leaving it to the default, and the catalog's history is that
+// kind. A new verb without one fails here. The TUI and the command line
+// share one runtime, so walking the catalog covers every verb.
+func TestEveryVerbDeclaresItsHistory(t *testing.T) {
+	framework := frameworkOperations()
+	a, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc := decode[ocli.CatalogDoc](t, run(t, "", "catalog"))
+	seen := map[string]bool{}
+	for _, noun := range doc.Nouns {
+		for _, v := range noun.Verbs {
+			key := noun.Name + "." + v.Name
+			if framework[key] {
+				continue
+			}
+			seen[key] = true
+			if declared := a.r.Operations[key].HistoryKind; declared == "" || v.History != declared {
+				t.Errorf("catalog verb %s: history %q, declared %q", key, v.History, declared)
+			}
+		}
+	}
+	for key := range a.r.Operations {
+		if !framework[key] && !seen[key] {
+			t.Errorf("verb %s is not in the catalog", key)
+		}
+	}
+	if len(seen) != 13 {
+		t.Fatalf("the catalog has %d o-git verbs, want 13", len(seen))
+	}
+}
+
+// A spot check of the kinds: reads are fetches, repository changes are
+// changes, the prompt's keys are actions.
+func TestVerbHistoryKinds(t *testing.T) {
+	a, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for key, want := range map[string]string{
+		"repo.list": ochazuke.HistoryFetch, "repo.status": ochazuke.HistoryFetch, "repo.show": ochazuke.HistoryFetch,
+		"repo.state": ochazuke.HistoryFetch, "branch.list": ochazuke.HistoryFetch,
+		"worktree.add": ochazuke.HistoryChange, "branch.switch": ochazuke.HistoryChange, "branch.delete": ochazuke.HistoryChange,
+		"field.commit": ochazuke.HistoryAction, "field.cancel": ochazuke.HistoryAction,
+	} {
+		if got := a.r.Operations[key].HistoryKind; got != want {
+			t.Errorf("%s: %q, want %q", key, got, want)
+		}
+	}
+}

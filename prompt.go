@@ -52,6 +52,8 @@ func (a *App) registerPrompt() {
 		Mode("insert").
 		Bind("enter", ochazuke.Do("field.commit")).
 		Bind("esc", ochazuke.Do("field.cancel"))
+	// Both close the prompt; the verb commit runs records its own kind.
+	setHistory(r, ochazuke.HistoryAction, "field.commit", "field.cancel")
 	a.field = ochazuke.NewInput(fieldID, "", false)
 	a.m.ModalViews[promptFrame] = ochazuke.ModalView{Title: "Prompt", Render: func(r *ochazuke.Runtime, body *ochazuke.Instance, w, h int) ochazuke.Block {
 		field := ochazuke.InputBlock(a.field, max(1, w), 1)
