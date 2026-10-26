@@ -1,1 +1,4 @@
 .DS_Store
+/o-git
+go.work
+go.work.sum
