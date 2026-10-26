@@ -115,6 +115,7 @@ func (a *App) repoList(c ochazuke.Ctx) ochazuke.Result {
 		}
 		return rowsOf(repoItems(repos)), nil
 	}).Replacing("repos").Then(func(_ ochazuke.Ctx, v any, err error) {
+		a.listErr = err
 		if err == nil {
 			a.setRepos(v.([]ocli.Row))
 		}
@@ -133,17 +134,25 @@ func (a *App) repoStatus(c ochazuke.Ctx) ochazuke.Result {
 }
 
 func (a *App) repoShow(c ochazuke.Ctx) ochazuke.Result {
-	return a.show(a.repoWord(c), true)
+	name := ""
+	if r, ok := rowData[Repo](c); ok && ochazuke.StringArg(c.Args, "repo", "") == "" {
+		name = r.Name
+	}
+	return a.show(a.repoWord(c), name, true)
 }
 
 // show reads one repository's detail and, on the loop, makes it the one
-// the worktree and branch lists show; focus moves to its worktrees.
-func (a *App) show(word string, focus bool) ochazuke.Result {
+// the worktree and branch lists show; focus moves to its worktrees. name,
+// when set, is the repo row's name (o-proj's), else the directory's.
+func (a *App) show(word, name string, focus bool) ochazuke.Result {
 	a.loading = word
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
-		name, dir, err := resolve(ctx, word)
+		base, dir, err := resolve(ctx, word)
 		if err != nil {
 			return nil, err
+		}
+		if name == "" {
+			name = base
 		}
 		return detail(ctx, name, dir)
 	}).Replacing("show").Then(func(_ ochazuke.Ctx, v any, err error) {
@@ -224,7 +233,7 @@ func (a *App) branchList(c ochazuke.Ctx) ochazuke.Result {
 // it again and says what happened.
 func (a *App) changed(say func(any) string) func(ochazuke.Ctx, any, error) {
 	return func(_ ochazuke.Ctx, v any, err error) {
-		if err != nil || a.m == nil {
+		if err != nil || !a.tui {
 			return
 		}
 		a.m.Status = say(v)
@@ -243,6 +252,9 @@ type AddResult struct {
 func (a *App) worktreeAdd(c ochazuke.Ctx) ochazuke.Result {
 	branch := ochazuke.StringArg(c.Args, "branch", "")
 	if branch == "" {
+		if a.tui {
+			return a.prompt(c, "New worktree for branch", "worktree", "add", "branch")
+		}
 		return ochazuke.Failed(errors.New("a branch is required: worktree add BRANCH [PATH]"))
 	}
 	word, path, from := a.repoWord(c), ochazuke.StringArg(c.Args, "path", ""), ochazuke.StringArg(c.Args, "from", "")
@@ -325,6 +337,9 @@ type BranchResult struct {
 func (a *App) branchCreate(c ochazuke.Ctx) ochazuke.Result {
 	name := ochazuke.StringArg(c.Args, "name", "")
 	if name == "" {
+		if a.tui {
+			return a.prompt(c, "New branch", "branch", "create", "name")
+		}
 		return ochazuke.Failed(errors.New("a name is required: branch create NAME [FROM]"))
 	}
 	word, from := a.repoWord(c), ochazuke.StringArg(c.Args, "from", "")

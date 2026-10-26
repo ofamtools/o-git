@@ -27,7 +27,7 @@ const Version = "0.1.0"
 // App is o-git's state.
 type App struct {
 	r *ochazuke.Runtime
-	m *ochazuke.Model // the TUI's model; nil on the command line
+	m *ochazuke.Model
 
 	repos, worktrees, branches *ochazuke.List
 
@@ -42,13 +42,20 @@ type App struct {
 	current, currentName string
 	shown                *Repo // its status as last read
 	loading              string
+	listErr              error  // the last repo list's failure
+	following            string // the repo row the lists last followed
+	tui                  bool   // a person is at the keys: prompts, and reads after a change
+	ask                  *question
+	field                *ochazuke.Input
 
 	Stdin          io.Reader
 	Stdout, Stderr io.Writer
 }
 
-// New builds the runtime: the Git instance holding the three lists, the
-// nouns with their columns, verbs and bindings. The lists start empty.
+// New builds the runtime: the Git page holding the three lists, the nouns
+// with their columns, verbs and bindings, the prompt and the model. The
+// command line uses the same runtime (its catalog lists the page and the
+// key rows). The lists start empty.
 func New() (*App, error) {
 	r := ochazuke.NewRuntime()
 	a := &App{r: r, Now: time.Now, Stdin: os.Stdin, Stdout: os.Stdout, Stderr: os.Stderr}
@@ -67,6 +74,18 @@ func New() (*App, error) {
 		r.Define(noun).Columns(cols...)
 	}
 	a.registerVerbs()
+	a.m = ochazuke.NewModel(r)
+	a.m.Title = "o-git"
+	a.registerPrompt()
+	if err := a.bind(); err != nil {
+		return nil, err
+	}
+	if _, err := r.AddPage(pageID, "Git", a.render, ochazuke.Focus(reposID)); err != nil {
+		return nil, err
+	}
+	if err := r.OpenPage(pageID); err != nil {
+		return nil, err
+	}
 	return a, nil
 }
 
@@ -106,10 +125,11 @@ func items(rows []ocli.Row) []ochazuke.ListItem {
 	return out
 }
 
-// setRepos fills the repo list; the first read also shows the first
-// repository.
+// setRepos fills the repo list, keeping the selection by id; the lists
+// then follow the selected repository again (it may have changed).
 func (a *App) setRepos(rows []ocli.Row) {
 	_ = a.repos.SetItems(items(rows))
+	a.following = ""
 }
 
 // setDetail makes a repository the one the worktree and branch lists show.
@@ -123,6 +143,32 @@ func (a *App) setDetail(d RepoDetail, focus bool) {
 	}
 }
 
-// refresh reads the repositories and the shown one again (the TUI, after
-// a change).
-func (a *App) refresh() {}
+// follow makes the worktree and branch lists show the selected repo row's
+// repository when the selection moved (any motion, a search, a reload):
+// one replacing read off the loop. It reports whether it started one.
+func (a *App) follow() bool {
+	item, ok := a.repos.Selected()
+	if !ok || item.ID == a.following {
+		return false
+	}
+	a.following = item.ID
+	repo, _ := item.Data.(Repo)
+	return a.launch(reposID, "repo.show", a.show(repo.Path, repo.Name, false))
+}
+
+// refresh reads the repositories and the shown one again (after a change).
+func (a *App) refresh() {
+	a.launch(reposID, "repo.list", a.repoList(ochazuke.Ctx{Args: ochazuke.Arguments{}}))
+	if a.current != "" {
+		a.launch(reposID, "repo.show", a.show(a.current, a.currentName, false))
+	}
+}
+
+// launch starts pending work owned by an instance, outside a key's verb.
+func (a *App) launch(owner, verb string, res ochazuke.Result) bool {
+	_, err := a.r.Launch(owner, verb, res, ochazuke.Ctx{Runtime: a.r, Context: a.r.Context(), Args: ochazuke.Arguments{}, Instance: a.r.Instances[owner]})
+	if err != nil {
+		a.m.Status = err.Error()
+	}
+	return err == nil
+}
