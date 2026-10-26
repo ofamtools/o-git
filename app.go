@@ -91,7 +91,7 @@ func New() (*App, error) {
 
 // Shell is the NOUN VERB command line over the runtime.
 func (a *App) Shell() *ocli.Shell {
-	sh := ocli.New(a.r, "o-git", a.Stdin, a.Stdout, quietJobs{a.Stderr})
+	sh := ocli.New(a.r, "o-git", a.Stdin, a.Stdout, a.Stderr)
 	sh.Usage = ocli.DefaultUsage("o-git")
 	sh.Version = Version
 	// A --target names a row no list holds yet: make it exist from its
