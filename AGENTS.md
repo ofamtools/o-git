@@ -27,7 +27,7 @@ Family plans, todos and the roadmap live in `~/hub/o-plans/` (`README.md` is the
 ## Invariants
 
 - Local only: no fetch, pull, push or tag, and no network. Every git call goes through `git` in `git.go` with a timeout and the GIT_DIR-style variables removed.
-- Git runs off the event loop: every verb that reads or changes a repository is `Pending`, and the page's follow reads are launched jobs. The verbs must stay pending so git never runs on the loop. (Under ochazuke v0.2.0 an immediate result keeps its key order and `ochazuke.Lines`; that is no longer a reason.) Every verb is `Quiet`, so the CLI prints no `job #N ... done` line on stderr.
+- Git runs off the event loop: every verb that reads or changes a repository is `Pending`, and the page's follow reads are launched jobs. The verbs must stay pending so git never runs on the loop. (Under ochazuke v0.2.0 an immediate result keeps its key order and `ochazuke.Lines`; that is no longer a reason.) The reads are `Quiet`; the mutations (worktree add/remove, branch create/switch/delete) show on the jobs ticker, and `quietJobs` (`shell.go`) keeps their `job #N ... done` lines off the CLI's stderr.
 - Destructive verbs (`worktree.remove`, `branch.delete`) carry a confirm, act on a row (the focus, or `--target`), check first and refuse what git would lose without `--force`. They are tested on temp repos only.
 - o-proj is reached through its command line (`o-proj list`); o-git never reads or writes the manifest.
 - Tests create every repository under `t.TempDir()`, shut out the owner's git config (`GIT_CONFIG_GLOBAL`), and set `O_GIT_PROJ` (none, or a fake script); no test touches a real repository or `~/hub/repos.json`.
