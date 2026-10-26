@@ -80,9 +80,13 @@ func New() (*App, error) {
 	if err := a.bind(); err != nil {
 		return nil, err
 	}
-	if _, err := r.AddPage(pageID, "Git", a.render, ochazuke.Focus(reposID)); err != nil {
+	// The page is declared as a data page (dataPage), so a host's
+	// catalog draws its lists; o-git's own TUI keeps drawing it itself.
+	if err := ocli.DeclarePage(r, dataPage()); err != nil {
 		return nil, err
 	}
+	page := r.PageOf(pageID)
+	page.Render, page.Focus, page.Remembered = a.render, reposID, reposID
 	if err := r.OpenPage(pageID); err != nil {
 		return nil, err
 	}

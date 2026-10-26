@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/x/ansi"
 	"github.com/unixsuperhero/ochazuke"
+	ocli "github.com/unixsuperhero/ochazuke/cli"
 )
 
 // The Git page: a status line, then the repo list on the left and, on the
@@ -16,6 +17,31 @@ import (
 // the rest follows the page's pane keys (> and < move it, = resets;
 // ochazuke's Runtime.PaneLayout): the repo list's width side by side, its
 // height stacked, the other panels sharing what is left as before.
+
+// dataPage is the Git page as the catalog declares it (ocli.DeclarePage),
+// so a host (mtm, nabe) draws it from o-git's rows through ocli.MountPage:
+// the repo, branch and worktree lists split beside the selected row's
+// record. The host fills every list from the state verb (repo.state), so
+// its branch and worktree lists hold the rows of every repository, not of
+// a selected one as the TUI's do. Detail fields are one order for all
+// three nouns; a field a row lacks is left out.
+func dataPage() ocli.CatalogPage {
+	return ocli.CatalogPage{
+		ID: pageID, Title: "Git", Layout: ocli.LayoutSplit,
+		Lists: []ocli.CatalogList{
+			{ID: reposID, Noun: "repo", Title: "Repositories"},
+			{ID: branchesID, Noun: "branch", Title: "Branches"},
+			{ID: worktreesID, Noun: "worktree", Title: "Worktrees"},
+		},
+		Detail: &ocli.CatalogDetail{Fields: []string{
+			"name", "repo", "path", "branch", "state", "error", "head",
+			"commit", "subject", "author", "date",
+			"current", "worktree", "main", "upstream", "gone", "ahead", "behind", "merged",
+			"staged", "unstaged", "untracked", "conflicts", "changes",
+			"detached", "bare", "locked", "prunable",
+		}},
+	}
+}
 
 // stackWidth is the page width below which the panels stack.
 const stackWidth = 70

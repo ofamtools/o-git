@@ -6,9 +6,12 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strings"
 	"testing"
+
+	ocli "github.com/unixsuperhero/ochazuke/cli"
 )
 
 // jobLine is the line the shell prints for a job that is not Quiet.
@@ -326,6 +329,47 @@ func TestListFormats(t *testing.T) {
 	for _, head := range []string{"repo  branch", "branch  state", "branch  sync"} {
 		if !strings.Contains(out, head) {
 			t.Fatalf("state table has no %q:\n%s", head, out)
+		}
+	}
+}
+
+// The catalog declares the Git page as a data page, so a host draws its
+// lists: split, the repo, branch and worktree lists over their nouns'
+// row sources, and a detail whose fields name the rows' records.
+func TestCatalogDeclaresTheDataPage(t *testing.T) {
+	cat := decode[ocli.CatalogDoc](t, run(t, "", "catalog"))
+	if len(cat.Pages) != 1 {
+		t.Fatalf("pages %+v", cat.Pages)
+	}
+	p := cat.Pages[0]
+	if p.ID != pageID || p.Title != "Git" || !p.IsData() || p.Layout != ocli.LayoutSplit {
+		t.Fatalf("page %+v", p)
+	}
+	var lists []string
+	for _, l := range p.Lists {
+		if verb, rows := cat.RowSource(l.Noun); verb != "list" || rows != l.Noun || l.Title == "" {
+			t.Fatalf("list %+v: row source %s of %s", l, verb, rows)
+		}
+		lists = append(lists, l.ID+"="+l.Noun)
+	}
+	if got, want := strings.Join(lists, " "), reposID+"=repo "+branchesID+"=branch "+worktreesID+"=worktree"; got != want {
+		t.Fatalf("lists %q, want %q", got, want)
+	}
+	if p.Detail == nil || len(p.Detail.Fields) == 0 || len(p.Widgets) != 0 {
+		t.Fatalf("detail %+v widgets %+v", p.Detail, p.Widgets)
+	}
+	// Every detail field is a field of some row's record.
+	known := map[string]bool{}
+	for _, v := range []any{Repo{}, WorktreeRow{}, BranchRow{}} {
+		for _, f := range reflect.VisibleFields(reflect.TypeOf(v)) {
+			if name, _, _ := strings.Cut(f.Tag.Get("json"), ","); name != "" && name != "-" {
+				known[name] = true
+			}
+		}
+	}
+	for _, f := range p.Detail.Fields {
+		if !known[f] {
+			t.Errorf("detail field %q is in no row's record", f)
 		}
 	}
 }
