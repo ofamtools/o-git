@@ -39,7 +39,7 @@ func TestEveryVerbDeclaresItsHistory(t *testing.T) {
 				continue
 			}
 			seen[key] = true
-			if declared := a.r.Operations[key].HistoryKind; declared == "" || v.History != declared {
+			if declared := a.r.Operations[a.r.CanonicalKey(key)].HistoryKind; declared == "" || v.History != declared {
 				t.Errorf("catalog verb %s: history %q, declared %q", key, v.History, declared)
 			}
 		}
@@ -67,7 +67,7 @@ func TestVerbHistoryKinds(t *testing.T) {
 		"worktree.add": ochazuke.HistoryChange, "branch.switch": ochazuke.HistoryChange, "branch.delete": ochazuke.HistoryChange,
 		"field.commit": ochazuke.HistoryAction, "field.cancel": ochazuke.HistoryAction,
 	} {
-		if got := a.r.Operations[key].HistoryKind; got != want {
+		if got := a.r.Operations[a.r.CanonicalKey(key)].HistoryKind; got != want {
 			t.Errorf("%s: %q, want %q", key, got, want)
 		}
 	}
