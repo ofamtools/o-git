@@ -124,10 +124,10 @@ func TestPageWorktreeAddAndRemove(t *testing.T) {
 	typeText(t, a, "feat")
 	keys(t, a, "enter")
 	wt := filepath.Join(filepath.Dir(dir), "r-feat")
-	if _, err := os.Stat(wt); err != nil || a.worktrees.Len() != 2 || !strings.Contains(a.m.Status, "added worktree") {
-		t.Fatalf("added: %v %d %q", err, a.worktrees.Len(), a.m.Status)
+	if _, err := os.Stat(wt); err != nil || a.worktrees.Len() != 2 || !strings.Contains(a.m.Info, "added worktree") || a.m.Status != "" {
+		t.Fatalf("added: %v %d info %q error %q", err, a.worktrees.Len(), a.m.Info, a.m.Status)
 	}
-	if s := screen(a); !strings.Contains(s, "feat") {
+	if s := screen(a); !strings.Contains(s, "feat") || strings.Contains(s, "Error: added") {
 		t.Fatalf("screen\n%s", s)
 	}
 

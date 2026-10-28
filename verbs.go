@@ -247,7 +247,7 @@ func (a *App) changed(say func(any) string) func(ochazuke.Ctx, any, error) {
 		if err != nil || !a.tui {
 			return
 		}
-		ctx.Status(say(v))
+		ctx.Info(say(v))
 		a.refresh()
 	}
 }
