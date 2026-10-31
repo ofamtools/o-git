@@ -309,7 +309,7 @@ func TestCatalog(t *testing.T) {
 	want := map[string]string{
 		"repo":     "compare fetch list=repo show state status",
 		"endpoint": "compare copy list=endpoint resolve show",
-		"compare":  "close commit-open commits=commit copy fetch file-open files=change list=compare open reload save set show swap",
+		"compare":  "close commit-open commits=commit copy fetch file-open files=change list=compare open pair-files reload save set show swap",
 		"worktree": "add compare list=worktree remove!",
 		"branch":   "compare create delete! list=branch switch",
 		"commit":   "compare copy diff files=change list=commit show",

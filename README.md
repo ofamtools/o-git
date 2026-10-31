@@ -183,6 +183,8 @@ Pairs sit on the left with from/to, ahead/behind, file counts, fetched age and s
 
 A replacing read off the event loop follows pair selection, filling Commits with native Ahead/Behind sections (or interleaved rows when `compare.commits.split=false`) and Files with statuses, paths, numstats and totals. While Commits has focus, Files follows the selected commit against its first parent, or the empty tree for a root commit. `enter` focuses those files. The Files title identifies that commit; Escape in Files or focusing Pairs restores comparison files. Detail follows the focused pair, commit, file or totals row. Fetch ages update in compact units, with the last-fetch age also shown in pair Detail. Raw endpoint diagnostics remain in JSON `detail`; fetch failures have a plain reason and next step, with raw diagnostics available through `--verbose`.
 
+`compare pair-files` returns Files from a drilled-into commit to the selected comparison; Escape in Files invokes this verb.
+
 `enter` on a file opens its structured diff beside a file list in a modal. The same path works for commit files. Diffview owns rendering, hunk/line scrolling and file-navigation keys; its `diff.file` callback loads the next or previous actual file without visiting totals. `q` or Escape closes the diff and restores its file selection. The app calls the merged Go readers directly; no subprocess invokes o-git itself. Fetch remains explicit only.
 
 | Key | Where | Does |
