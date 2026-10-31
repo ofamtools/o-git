@@ -1,0 +1,141 @@
+package main
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/unixsuperhero/ochazuke"
+)
+
+func (a *App) registerDiffVerbs() error {
+	if err := declareDiffSettings(a.r); err != nil {
+		return err
+	}
+	// compare-lists also declares these nouns; Define extends a shared noun.
+	a.r.Define("change").Verb("diff", a.changeDiff, "content diff of a literal repository-relative PATH; default pair is compare.default-pair").Fetch().Quiet().Positional("path")
+	a.r.Define("commit").Verb("diff", a.commitDiff, "content diff of SHA against its first parent (empty tree for a root commit)").Fetch().Quiet().Positional("sha")
+	for _, key := range []string{"change.diff", "commit.diff"} {
+		op := a.r.Operations[key]
+		op.Parameters = map[string]ochazuke.Parameter{
+			"repo":    {Type: "string", Description: "repository directory or o-proj name; default current repository"},
+			"context": {Type: "integer", Description: "context lines; defaults to compare.diff.context"},
+			"output":  {Type: "string", Enum: []string{"json", "plain"}, Description: "structured JSON (API default) or exact unified patch text"},
+		}
+		if key == "change.diff" {
+			op.Parameters["path"] = ochazuke.Parameter{Type: "string", Required: true, Description: "literal path relative to repository root (either rename path)"}
+			for _, name := range []string{"pair", "from", "to"} {
+				op.Parameters[name] = ochazuke.Parameter{Type: "string", Description: "comparison selector; use --pair or --from/--to"}
+			}
+		} else {
+			op.Parameters["sha"] = ochazuke.Parameter{Type: "string", Required: true, Description: "commit SHA or ref"}
+		}
+		op.Result = "{comparison, reversed, files: diffview.File[]} or unified text"
+		a.r.Operations[key] = op
+	}
+	return nil
+}
+
+// The v0.66 shell consumes bare --json before dispatch, and its default output
+// is JSON. This CLI adapter selects plain output only for the two patch verbs;
+// the registered handlers stay structured for host/API calls. No shell fork.
+func diffCLIArgs(args []string) []string {
+	if len(args) < 2 || args[1] != "diff" || (args[0] != "change" && args[0] != "commit") {
+		return args
+	}
+	for _, arg := range args[2:] {
+		name, _, _ := strings.Cut(arg, "=")
+		if name == "--json" || name == "--format" || name == "--output" {
+			return args
+		}
+	}
+	return append(append([]string{}, args...), "--output=plain")
+}
+
+func (a *App) diffOptions(c ochazuke.Ctx) DiffOptions {
+	return DiffOptions{Path: ochazuke.StringArg(c.Args, "path", ""), Context: ochazuke.IntArg(c.Args, "context", a.r.Settings().Int("compare.diff.context")), MaxLines: a.r.Settings().Int("compare.diff.max-lines"), Plain: ochazuke.StringArg(c.Args, "output", "json") == "plain"}
+}
+
+func diffOutput(results []DiffResult, plain bool) any {
+	if plain {
+		var text strings.Builder
+		for _, d := range results {
+			text.WriteString(d.Unified)
+		}
+		return ochazuke.Verbatim(text.String())
+	}
+	if len(results) == 1 {
+		return results[0]
+	}
+	return results
+}
+
+func (a *App) changeDiff(c ochazuke.Ctx) ochazuke.Result {
+	pair, from, to, err := comparisonArgs(c)
+	if err != nil {
+		return ochazuke.Failed(err)
+	}
+	opt := a.diffOptions(c)
+	return a.comparisonRead(c, func(r *EndpointResolver) (any, error) {
+		results := []DiffResult{}
+		for _, p := range r.Show(pair, from, to) {
+			d, err := BuildDiff(r.ctx, p, opt)
+			if err != nil {
+				return nil, err
+			}
+			results = append(results, d)
+		}
+		return diffOutput(results, opt.Plain), nil
+	})
+}
+
+func (a *App) commitDiff(c ochazuke.Ctx) ochazuke.Result {
+	sha, opt := ochazuke.StringArg(c.Args, "sha", ""), a.diffOptions(c)
+	return a.comparisonRead(c, func(r *EndpointResolver) (any, error) {
+		ends := r.Resolve(sha, "HEAD")
+		results := []DiffResult{}
+		for _, to := range ends {
+			if !to.Available {
+				p := makeComparison(r.dir, sha, sha, sha, to, to)
+				results = append(results, DiffResult{Comparison: p, Files: []DiffFile{}})
+				continue
+			}
+			if isMutable(to) || to.Kind == "empty" {
+				return nil, fmt.Errorf("%s is not a commit", sha)
+			}
+			// Read stored parents rather than rev-list's shallow-boundary view:
+			// a missing parent must not silently turn a shallow commit into a root.
+			out, err := git(r.ctx, readTimeout, r.dir, "cat-file", "commit", to.SHA)
+			if err != nil {
+				return nil, err
+			}
+			headers, _, _ := strings.Cut(string(out), "\n\n")
+			parent := ""
+			for _, line := range strings.Split(headers, "\n") {
+				if value, ok := strings.CutPrefix(line, "parent "); ok {
+					parent = value
+					break
+				}
+			}
+			from := Endpoint{Kind: "commit", Available: true, Repo: r.dir}
+			if parent != "" {
+				from.SHA, from.Spec = parent, parent
+			} else {
+				out, err := git(r.ctx, readTimeout, r.dir, "hash-object", "-t", "tree", "/dev/null")
+				if err != nil {
+					return nil, err
+				}
+				from.Kind, from.SHA, from.Spec = "empty", strings.TrimSpace(string(out)), "(empty tree)"
+			}
+			p := makeComparison(r.dir, sha, from.Spec, sha, from, to)
+			if parent == "" {
+				p.State = "root commit: empty tree"
+			}
+			d, err := BuildDiff(r.ctx, p, opt)
+			if err != nil {
+				return nil, err
+			}
+			results = append(results, d)
+		}
+		return diffOutput(results, opt.Plain), nil
+	})
+}

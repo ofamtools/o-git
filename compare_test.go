@@ -459,7 +459,7 @@ func TestCompareSettingsAndCLI(t *testing.T) {
 		t.Fatalf("%+v", cfg)
 	}
 	for _, s := range a.r.Settings().Declared() {
-		if strings.HasPrefix(s.Name, "compare.commits.") || strings.HasPrefix(s.Name, "compare.diff.") {
+		if strings.HasPrefix(s.Name, "compare.commits.") {
 			t.Fatal(s.Name)
 		}
 	}

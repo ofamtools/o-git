@@ -81,6 +81,9 @@ func New() (*App, error) {
 	}
 	a.registerVerbs()
 	a.registerCompareVerbs()
+	if err := a.registerDiffVerbs(); err != nil {
+		return nil, err
+	}
 	a.m = ochazuke.NewModel(r)
 	a.m.Title = "o-git"
 	a.registerPrompt()

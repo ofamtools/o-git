@@ -59,7 +59,7 @@ The destructive verbs take plain arguments, the same ones the page's `d d` passe
 
 ## Compare command line
 
-The `endpoint` and `compare` nouns provide the data layer for comparisons. The Compare page, commit/file lists and diffs follow in later lanes.
+The `endpoint` and `compare` nouns provide the data layer for comparisons. Content diffs are available through `change diff` and `commit diff`; the Compare page and commit/file lists follow in later lanes.
 
 | Command | Result |
 |---|---|
@@ -91,6 +91,42 @@ Endpoints are `HEAD`, `WORKTREE`, `INDEX`, a ref/SHA, `{main}`, `{branch}`, `{up
 Fetch age is the latest of the ref's reflog update, its remote's last successful explicit o-git fetch, and `FETCH_HEAD`'s mtime when its source URL uniquely identifies that remote. Successful fetches refresh age even when no ref moved; a different remote's fetch does not freshen it. Per-remote timestamps live under `compare-fetch/` in o-git's state directory, keyed by the shared Git directory, remote name and URL; URLs are hashed rather than stored. Aliases sharing a URL use explicit per-remote records because `FETCH_HEAD` cannot distinguish them. It describes the last local information; list and show never fetch. Fetch runs in a detached session, disables terminal/askpass and credential-manager interactivity, and defaults to `ssh -o BatchMode=yes` while preserving `GIT_SSH_COMMAND` or `core.sshCommand` overrides. Failures are reported and fetch appears on the jobs ticker. Divergence counts are memoised by repository, SHA pair and shallow boundary; fork points also track the reflog stamp. Successful counts from a shallow clone are labelled "counts limited by shallow clone". No worktree scan or commit/file list is needed for these summaries.
 
 Compared with Vim: endpoint and comparison resolution are git domain operations without a Vim command counterpart. The shared registers retain ochazuke's Vim-style yank behavior; this lane adds no keys or motions.
+
+### Content diffs
+
+`change diff PATH [--pair NAME | --from E --to E] [--context N] [--repo R]`
+prints the unified patch for a literal path relative to the repository root.
+Either path selects a rename and preserves both names. The default pair is
+`compare.default-pair` (`dirty=HEAD..WORKTREE`). `commit diff SHA [--context N]
+[--repo R]` compares a commit with its first parent, or the empty tree for a root
+commit. Merge commits use the first parent, yielding an ordinary unified patch.
+
+Plain CLI output is byte-for-byte Git patch text with pinned
+`core.quotePath=false`, `diff.noprefix=false`, `--no-color`, `--no-ext-diff`,
+`--no-textconv`, `--no-relative`, `-M` and `GIT_PAGER=cat`. External diff programs,
+textconv and pagers are disabled. Commit, index and worktree pairs work in either
+direction; mutable-left patches use `-R`. Untracked files use read-only
+`git diff --no-index -- /dev/null PATH` semantics and are appended in Git's
+`ls-files --others --exclude-standard` order. No index or object is written.
+
+`--json` returns `{comparison, reversed, files}` (an array of results for remote
+expansion). Each file uses the ochazuke diffview model's JSON names: `oldPath`,
+`newPath`, `status`, `binary`, `oldSize`, `newSize`, `truncated`, `added`, `removed`,
+`hunks`; hunks use `oldStart`, `oldCount`, `newStart`, `newCount`, `header`, `lines`.
+Line `kind` is numeric: context 0, addition 1, deletion 2; `old`, `new`, `text`
+and `noNewline` preserve source locations and missing final newlines. Binary
+sizes come from object sizes or file stat; -1 means unknown. Unavailable and
+equal comparisons retain their state with an empty `files` array.
+
+`compare.diff.context` defaults to 3; `--context 0` is supported.
+`compare.diff.max-lines` defaults to 20000 source lines per file. Structured
+hunks also have a fixed 2 MiB per-file byte limit. Exceeding either limit clears
+that file's hunks and marks `truncated: true`, keeping complete `added`/`removed`
+counts. Plain patch text is complete. Host/API calls default to structured data;
+`--output json|plain` explicitly selects either result in both CLI and API calls.
+
+Compared with Vim: these commands read Git content and add no editor, hunk
+motions or bindings. The future diff page owns the Vim `]c`/`[c` interaction.
 
 ## The Git page
 
