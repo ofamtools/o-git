@@ -1,0 +1,39 @@
+  ◆ o-git                                                        INSERT
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────╮
+  ┃ pair          from   ↑  ↓  state       3› ┃ │ Phase B: commits not load… │
+  ┃ dirty         HEAD   -  -  the            ┃ │ (empty list)               │
+  ┃                            working        ┃ │                            │
+  ┃                            tree is        ┃ │                            │
+  ┃                            not a          ┃ │                            │
+  ┃                            commit         ┃ │                            │
+  ┃ upstream      {ups…  -  -  no             ┃ │                            │
+  ┃     ╭──────────────────────────────────────────────────────────────╮     │
+  ┃ main│ Pick to · [Endpoints] Log All Refs Graph Worktrees           │     │
+  ┃ merg│ ›                              fuzzy │ HEAD                  │─────╯
+  ┃ base│   head        HEAD        ready      │                       │─────╮
+  ┃ fork│   worktree    WORKTREE    ready      │                       │ded  │
+  ┃ poin│   index       INDEX       ready      │                       │     │
+  ┃ orig│   main        main        ready      │                       │     │
+  ┃ ain │   upstream    {upstream}  no upstre… │                       │     │
+  ┃     │   origin/ma…  origin/ma…  no ref na… │                       │     │
+  ┃     │   {remote}/…  {remote}/…  no remotes │                       │     │
+  ┃ {rem│   {remote}/…  {remote}/…  no remotes │                       │     │
+  ┃ /mai│   merge-base  main        ready      │                       │     │
+  ┃ {rem│   fork-point  main        ready      │                       │     │
+  ┃ /bra│ tab chooser.next-source · shift+tab chooser.previous-source… │─────╯
+  ┃     ╰──────────────────────────────────────────────────────────────╯─────╮
+  ┃                                           ┃ │ dirty                      │
+  ┃                                           ┃ │ from  HEAD                 │
+  ┃                                           ┃ │   HEAD                     │
+  ┃                                           ┃ │ to    WORKTREE             │
+  ┃                                           ┃ │   WORKTREE                 │
+  ┃                                           ┃ │ ↑- ↓-                      │
+  ┃                                           ┃ │ the working tree is not a  │
+  ┃                                           ┃ │ commit                     │
+  ┃                                           ┃ │                            │
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────╯
+  ────────────────────────────────────────────────────────────────────────────
+  tab chooser.next-source · shift+tab chooser.previous-source · enter chooser…

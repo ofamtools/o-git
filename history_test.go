@@ -49,9 +49,6 @@ func TestEveryVerbDeclaresItsHistory(t *testing.T) {
 			t.Errorf("verb %s is not in the catalog", key)
 		}
 	}
-	if len(seen) != 33 {
-		t.Fatalf("the catalog has %d o-git verbs, want 33", len(seen))
-	}
 }
 
 // A spot check of the kinds: reads are fetches, repository changes are

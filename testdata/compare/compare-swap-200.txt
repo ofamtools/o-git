@@ -1,0 +1,39 @@
+  ◆ o-git                                                                                                                                                                                NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 7 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────────────────────────────────────────────────────╮
+  ┃ pair                           from               to        ↑  ↓  files  fetched  state                           ┃ │ Phase B: commits not loaded                                                │
+  ┃ (custom) WORKTREE..HEAD        WORKTREE           HEAD      -  -         -        reversed: the working tree is   ┃ │ (empty list)                                                               │
+  ┃                                                                                   on the left                     ┃ │                                                                            │
+  ┃ dirty                          HEAD               WORKTREE  -  -         -        the working tree is not a       ┃ │                                                                            │
+  ┃                                                                                   commit                          ┃ │                                                                            │
+  ┃ upstream                       {upstream}         HEAD      -  -         -        no upstream                     ┃ │                                                                            │
+  ┃ main · merge-base · fork-      main               HEAD      1  0         -        ready                           ┃ │                                                                            │
+  ┃ point                                                                                                             ┃ │                                                                            │
+  ┃ origin/main                    origin/main        HEAD      -  -         -        no ref named origin/main        ┃ │                                                                            │
+  ┃ {remote}/main                  {remote}/{main}    HEAD      -  -         -        no remotes                      ┃ ╰────────────────────────────────────────────────────────────────────────────╯
+  ┃ {remote}/branch                {remote}/{branch}  HEAD      -  -         -        no remotes                      ┃ ╭─ Files ────────────────────────────────────────────────────────────────────╮
+  ┃                                                                                                                   ┃ │ Phase B: files not loaded                                                  │
+  ┃                                                                                                                   ┃ │ (empty list)                                                               │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ ╰────────────────────────────────────────────────────────────────────────────╯
+  ┃                                                                                                                   ┃ ╭─ Detail ───────────────────────────────────────────────────────────────────╮
+  ┃                                                                                                                   ┃ │ (custom)                                                                   │
+  ┃                                                                                                                   ┃ │ from  WORKTREE                                                             │
+  ┃                                                                                                                   ┃ │   WORKTREE                                                                 │
+  ┃                                                                                                                   ┃ │ to    HEAD                                                                 │
+  ┃                                                                                                                   ┃ │   HEAD                                                                     │
+  ┃                                                                                                                   ┃ │ ↑- ↓-                                                                      │
+  ┃                                                                                                                   ┃ │ reversed: the working tree is on the left                                  │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────────────────────────────────────────────────────╯
+  ── compare.swap done ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ compare.swap · F compare.fetch · R compare.reload · q app.quit · ctrl+w >/< resize · : palette.open · ? bindings.help · '…

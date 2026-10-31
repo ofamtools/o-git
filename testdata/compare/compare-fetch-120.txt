@@ -1,0 +1,39 @@
+  ◆ o-git                                                                                                NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────────────────────╮
+  ┃ pair         from     to       ↑  ↓  files  fetched  state        ┃ │ Phase B: commits not loaded                │
+  ┃ (custom)     origin…  WORKTR…  -  -         0s ago   the working  ┃ │ (empty list)                               │
+  ┃ origin/main                                          tree is not  ┃ │                                            │
+  ┃ ..WORKTREE                                           a commit     ┃ │                                            │
+  ┃ dirty        HEAD     WORKTR…  -  -         -        the working  ┃ │                                            │
+  ┃                                                      tree is not  ┃ │                                            │
+  ┃                                                      a commit     ┃ │                                            │
+  ┃ upstream     {upstr…  HEAD     -  -         -        no upstream  ┃ │                                            │
+  ┃ main ·       main     HEAD     1  0         -        ready        ┃ │                                            │
+  ┃ merge-base                                                        ┃ ╰────────────────────────────────────────────╯
+  ┃ origin/main  origin…  HEAD     0  0         0s ago   same commit: ┃ ╭─ Files ────────────────────────────────────╮
+  ┃ · fork-                                              nothing      ┃ │ Phase B: files not loaded                  │
+  ┃ point                                                differs      ┃ │ (empty list)                               │
+  ┃ origin/bran  origin…  HEAD     -  -         -        origin has   ┃ │                                            │
+  ┃ ch                                                   no topic     ┃ │                                            │
+  ┃                                                      branch (not  ┃ │                                            │
+  ┃                                                      pushed, or   ┃ │                                            │
+  ┃                                                      not fetched) ┃ │                                            │
+  ┃                                                                   ┃ │                                            │
+  ┃                                                                   ┃ │                                            │
+  ┃                                                                   ┃ ╰────────────────────────────────────────────╯
+  ┃                                                                   ┃ ╭─ Detail ───────────────────────────────────╮
+  ┃                                                                   ┃ │ (custom)                                   │
+  ┃                                                                   ┃ │ from  origin/main                          │
+  ┃                                                                   ┃ │   origin/main                              │
+  ┃                                                                   ┃ │ to    WORKTREE                             │
+  ┃                                                                   ┃ │   WORKTREE                                 │
+  ┃                                                                   ┃ │ ↑- ↓-                                      │
+  ┃                                                                   ┃ │ the working tree is not a commit           │
+  ┃                                                                   ┃ │                                            │
+  ┃                                                                   ┃ │                                            │
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────────────────────╯
+  ── compare.fetch done · compare.set done ───────────────────────────────────────────────────────────────────────────
+  enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ compare.swap · F compare.fetch · R compar…

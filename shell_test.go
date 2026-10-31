@@ -307,11 +307,11 @@ func TestCatalog(t *testing.T) {
 		got[n.Name] = strings.Join(verbs, " ")
 	}
 	want := map[string]string{
-		"repo":     "fetch list=repo show state status",
-		"endpoint": "copy list=endpoint resolve show",
-		"compare":  "commits=commit copy fetch files=change list=compare show",
-		"worktree": "add list=worktree remove!",
-		"branch":   "create delete! list=branch switch",
+		"repo":     "compare fetch list=repo show state status",
+		"endpoint": "compare copy list=endpoint resolve show",
+		"compare":  "commits=commit copy fetch files=change list=compare open reload save set show swap",
+		"worktree": "add compare list=worktree remove!",
+		"branch":   "compare create delete! list=branch switch",
 		"commit":   "copy diff files=change list=commit show",
 		"change":   "copy diff list=change show",
 	}
@@ -347,8 +347,11 @@ func TestListFormats(t *testing.T) {
 // row sources, and a detail whose fields name the rows' records.
 func TestCatalogDeclaresTheDataPage(t *testing.T) {
 	cat := decode[ocli.CatalogDoc](t, run(t, "", "catalog"))
-	if len(cat.Pages) != 1 {
+	if len(cat.Pages) != 2 {
 		t.Fatalf("pages %+v", cat.Pages)
+	}
+	if p := cat.Pages[1]; p.ID != comparePageID || p.Title != "Compare" || p.IsData() {
+		t.Fatalf("Compare should remain TUI-only: %+v", p)
 	}
 	p := cat.Pages[0]
 	if p.ID != pageID || p.Title != "Git" || !p.IsData() || p.Layout != ocli.LayoutSplit {

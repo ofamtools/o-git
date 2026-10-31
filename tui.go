@@ -19,7 +19,7 @@ import (
 func viewCommand(stdin io.Reader, stdout, stderr io.Writer) oden.Command {
 	return oden.Command{
 		Name: "view", Summary: "open the Git page: repos on the left, the selected repo's worktrees, branches and the focused row's detail on the right",
-		Usage: "[--path DIR,...] [--smoke] [--width N] [--height N]", Source: "o-git",
+		Usage: "[--page git|compare] [--path DIR,...] [--smoke] [--width N] [--height N]", Source: "o-git",
 		Details: "o-git with no command opens it too. Keys (the family key map): enter shows a repo or switches to a branch, n adds a worktree or branch, d d removes or deletes (confirm), d D forces, R reloads, q quits; ? on the page lists them all.",
 		Run: func(_ context.Context, args []string) error {
 			return runTUI(args, stdin, stdout, stderr)
@@ -31,6 +31,7 @@ func viewCommand(stdin io.Reader, stdout, stderr io.Writer) oden.Command {
 func runTUI(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	flags := flag.NewFlagSet("o-git view", flag.ContinueOnError)
 	flags.SetOutput(stderr)
+	page := flags.String("page", "git", "page to open: git or compare")
 	paths := flags.String("path", "", "extra repository directories, comma-separated, listed after o-proj's")
 	smoke := flags.Bool("smoke", false, "read the repositories, render one frame to stdout and exit")
 	width := flags.Int("width", 100, "--smoke frame width")
@@ -52,6 +53,17 @@ func runTUI(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	a.Paths, a.Stdin, a.Stdout, a.Stderr = extra, stdin, stdout, stderr
 	if _, err := a.r.Execute(ochazuke.Request{Noun: "repo", Verb: "list", Target: pageID}); err != nil {
 		return err
+	}
+	if *page != "git" && *page != "compare" {
+		return fmt.Errorf("unknown page %q", *page)
+	}
+	if *page == "compare" {
+		if err := a.Settle(); err != nil {
+			return err
+		}
+		if err := a.r.OpenPage(comparePageID); err != nil {
+			return err
+		}
 	}
 	if *smoke {
 		// A failed read is shown, as the page would show it.

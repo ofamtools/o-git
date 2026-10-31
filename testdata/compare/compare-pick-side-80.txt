@@ -1,0 +1,39 @@
+  ◆ o-git                                                        NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 7 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────╮
+  ┃ pair          from   ↑  ↓  state       3› ┃ │ Phase B: commits not load… │
+  ┃ (custom)      topic  -  -  the            ┃ │ (empty list)               │
+  ┃ merge-                     working        ┃ │                            │
+  ┃ base(top                   tree is        ┃ │                            │
+  ┃ ic)..                      not a          ┃ │                            │
+  ┃ WORKTREE                   commit;        ┃ │                            │
+  ┃                            relative       ┃ │                            │
+  ┃                            to the         ┃ │                            │
+  ┃                            worktree's     ┃ │                            │
+  ┃                            HEAD           ┃ ╰────────────────────────────╯
+  ┃ dirty         HEAD   -  -  the            ┃ ╭─ Files ────────────────────╮
+  ┃                            working        ┃ │ Phase B: files not loaded  │
+  ┃                            tree is        ┃ │ (empty list)               │
+  ┃                            not a          ┃ │                            │
+  ┃                            commit         ┃ │                            │
+  ┃ upstream      {ups…  -  -  no             ┃ │                            │
+  ┃                            upstream       ┃ │                            │
+  ┃ main ·        main   1  0  ready          ┃ │                            │
+  ┃ merge-                                    ┃ │                            │
+  ┃ base ·                                    ┃ │                            │
+  ┃ fork-                                     ┃ ╰────────────────────────────╯
+  ┃ point                                     ┃ ╭─ Detail ───────────────────╮
+  ┃ origin/m      orig…  -  -  no ref         ┃ │ (custom)                   │
+  ┃ ain                        named          ┃ │ from  merge-base(topic)    │
+  ┃                            origin/mai     ┃ │   topic                    │
+  ┃                            n              ┃ │ to    WORKTREE             │
+  ┃ {remote}      {rem…  -  -  no remotes     ┃ │   WORKTREE                 │
+  ┃ /main                                     ┃ │ ↑- ↓-                      │
+  ┃ {remote}      {rem…  -  -  no remotes     ┃ │ the working tree is not a  │
+  ┃ /branch                                   ┃ │ commit; relative to the wo │
+  ┃                                           ┃ │ … 2 more                   │
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────╯
+  ── chooser.pick done ───────────────────────────────────────────────────────
+  enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ c…

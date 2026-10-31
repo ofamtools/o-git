@@ -37,6 +37,7 @@ type App struct {
 	// Now is the clock branch ages read.
 	Now func() time.Time
 
+	compare      *comparePage
 	compareCache CompareCache
 	fetchRun     gitRunner
 
@@ -91,6 +92,9 @@ func New() (*App, error) {
 	a.m = ochazuke.NewModel(r)
 	a.m.Title = "o-git"
 	a.registerPrompt()
+	if err := a.registerComparePage(); err != nil {
+		return nil, err
+	}
 	if err := a.bind(); err != nil {
 		return nil, err
 	}
@@ -165,6 +169,9 @@ func (a *App) setDetail(d RepoDetail, focus bool) {
 // repository when the selection moved (any motion, a search, a reload):
 // one replacing read off the loop. It reports whether it started one.
 func (a *App) follow() bool {
+	if a.r.Page == comparePageID {
+		return a.followCompare()
+	}
 	item, ok := a.repos.Selected()
 	if !ok || item.ID == a.following {
 		return false

@@ -1,0 +1,39 @@
+  ◆ o-git                                                        NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────╮
+  ┃ pair          from   ↑  ↓  state       3› ┃ │ Phase B: commits not load… │
+  ┃ dirty         HEAD   -  -  the            ┃ │ (empty list)               │
+  ┃                            working        ┃ │                            │
+  ┃                            tree is        ┃ │                            │
+  ┃                            not a          ┃ │                            │
+  ┃                            commit         ┃ │                            │
+  ┃ upstream      {ups…  -  -  no             ┃ │                            │
+  ┃                            upstream       ┃ │                            │
+  ┃ main ·        main   1  0  ready          ┃ │                            │
+  ┃ merge-                                    ┃ ╰────────────────────────────╯
+  ┃ base ·                                    ┃ ╭─ Files ────────────────────╮
+  ┃ fork-                                     ┃ │ Phase B: files not loaded  │
+  ┃ point                                     ┃ │ (empty list)               │
+  ┃ origin/m      orig…  -  -  no ref         ┃ │                            │
+  ┃ ain                        named          ┃ │                            │
+  ┃                            origin/mai     ┃ │                            │
+  ┃                            n              ┃ │                            │
+  ┃ {remote}      {rem…  -  -  no remotes     ┃ │                            │
+  ┃ /main                                     ┃ │                            │
+  ┃ {remote}      {rem…  -  -  no remotes     ┃ │                            │
+  ┃ /branch                                   ┃ ╰────────────────────────────╯
+  ┃                                           ┃ ╭─ Detail ───────────────────╮
+  ┃                                           ┃ │ dirty                      │
+  ┃                                           ┃ │ from  HEAD                 │
+  ┃                                           ┃ │   HEAD                     │
+  ┃                                           ┃ │ to    WORKTREE             │
+  ┃                                           ┃ │   WORKTREE                 │
+  ┃                                           ┃ │ ↑- ↓-                      │
+  ┃                                           ┃ │ the working tree is not a  │
+  ┃                                           ┃ │ commit                     │
+  ┃                                           ┃ │                            │
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────╯
+  ────────────────────────────────────────────────────────────────────────────
+  enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ c…

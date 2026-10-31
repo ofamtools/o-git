@@ -59,7 +59,7 @@ The destructive verbs take plain arguments, the same ones the page's `d d` passe
 
 ## Compare command line
 
-The `endpoint`, `compare`, `commit` and `change` nouns provide comparison data, commit/file lists and content diffs through `change diff` and `commit diff`. The Compare page follows in a later lane.
+The `endpoint`, `compare`, `commit` and `change` nouns provide comparison data, commit/file lists and content diffs. The Compare page is available in o-git's TUI.
 
 | Command | Result |
 |---|---|
@@ -174,6 +174,28 @@ The keys follow the family key map (`~/hub/o-plans/plans/mtm-keys-and-ux-review-
 | `:` | anywhere | the palette: any verb by name |
 | `?` | anywhere | every key the focus answers |
 | `q` | anywhere | quit |
+
+## The Compare page
+
+`o-git view --page compare [--path DIR]` opens Compare. The noun-only `o-git compare` remains the CLI noun's help; use the view flag to open the page. `c` on a repository, worktree or branch opens it with that row as the `to` side. The page is local to o-git's TUI; host mounting is a later plan.
+
+Pairs sit on the left with from/to, ahead/behind, files, fetched age and state. Identical endpoints collapse according to `compare.collapse`; their names remain in the detail. Unavailable pairs remain dimmed with their reason. The initial selection is `compare.default-pair` (`dirty`). Pair selection follows through a replacing read off the event loop. Commits and Files currently show labelled Phase B placeholders; the files count stays blank until that data lane lands.
+
+| Key | Where | Does |
+|---|---|---|
+| `f` / `t` | Compare | choose the from / to endpoint |
+| `tab` / `shift+tab` | side chooser | next / previous source: Endpoints, Log, All, Refs, Graph, Worktrees |
+| `enter` | side chooser | take the highlighted row, including the typed ref/spec create row |
+| `~` | Compare | swap the two sides |
+| `F` | Compare | fetch only remotes used by the selected pair, as an explicit job; re-resolve on completion |
+| `F` | Git rows | fetch that repository's configured remotes |
+| `enter` | pair | focus Commits |
+| `y y` | pair | copy its resolved range through the shared unnamed register |
+| `R` | Compare | resolve the pairs again |
+
+The chooser's Log/All/Graph sources preserve git's order. Graph connector lines stay attached to the commit in its preview; ochazuke v0.68.0 chooser cells have no `Wrap` column API yet. A typed ref, SHA, `merge-base(...)` or `fork-point(...)` becomes an ad hoc `(custom) A..B` row at the top, including an unavailable spec and its reason. Edits are remembered per repository in `compare.json` in o-git's state directory, without changing settings. `compare save NAME` appends the selected comparison to `compare.pairs` through the settings API. `pages.hidden` containing `compare` hides the page from the tabs and cycling; direct opening remains available, following the framework's behavior. Bindings are individually replaceable or removable through `bindings.json`.
+
+Compared with Vim: Vim's `f`/`t` (`:help f`, `:help t`) find characters in text; these lists have no text cursor, so the keys pick from/to. Vim's `~` (`:help ~`) changes character case; Compare uses it to swap endpoints. List `j`/`k` retain the framework's visual row motion and spill rules. No staging or diff-get/put action is added.
 
 ## Build
 

@@ -1,0 +1,39 @@
+  ◆ o-git                                                                                                NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 7 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────────────────────╮
+  ┃ pair         from     to       ↑  ↓  files  fetched  state        ┃ │ Phase B: commits not loaded                │
+  ┃ (custom)     topic    WORKTR…  -  -         -        the working  ┃ │ (empty list)                               │
+  ┃ merge-                                               tree is not  ┃ │                                            │
+  ┃ base(topic)                                          a commit;    ┃ │                                            │
+  ┃ ..WORKTREE                                           relative to  ┃ │                                            │
+  ┃                                                      the          ┃ │                                            │
+  ┃                                                      worktree's   ┃ │                                            │
+  ┃                                                      HEAD         ┃ │                                            │
+  ┃ dirty        HEAD     WORKTR…  -  -         -        the working  ┃ │                                            │
+  ┃                                                      tree is not  ┃ ╰────────────────────────────────────────────╯
+  ┃                                                      a commit     ┃ ╭─ Files ────────────────────────────────────╮
+  ┃ upstream     {upstr…  HEAD     -  -         -        no upstream  ┃ │ Phase B: files not loaded                  │
+  ┃ main ·       main     HEAD     1  0         -        ready        ┃ │ (empty list)                               │
+  ┃ merge-base                                                        ┃ │                                            │
+  ┃ · fork-                                                           ┃ │                                            │
+  ┃ point                                                             ┃ │                                            │
+  ┃ origin/main  origin…  HEAD     -  -         -        no ref named ┃ │                                            │
+  ┃                                                      origin/main  ┃ │                                            │
+  ┃ {remote}/ma  {remot…  HEAD     -  -         -        no remotes   ┃ │                                            │
+  ┃ in                                                                ┃ │                                            │
+  ┃ {remote}/br  {remot…  HEAD     -  -         -        no remotes   ┃ ╰────────────────────────────────────────────╯
+  ┃ anch                                                              ┃ ╭─ Detail ───────────────────────────────────╮
+  ┃                                                                   ┃ │ (custom)                                   │
+  ┃                                                                   ┃ │ from  merge-base(topic)                    │
+  ┃                                                                   ┃ │   topic                                    │
+  ┃                                                                   ┃ │ to    WORKTREE                             │
+  ┃                                                                   ┃ │   WORKTREE                                 │
+  ┃                                                                   ┃ │ ↑- ↓-                                      │
+  ┃                                                                   ┃ │ the working tree is not a commit; relative │
+  ┃                                                                   ┃ │  to the worktree's HEAD                    │
+  ┃                                                                   ┃ │                                            │
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────────────────────╯
+  ── chooser.pick done ───────────────────────────────────────────────────────────────────────────────────────────────
+  enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ compare.swap · F compare.fetch · R compar…
