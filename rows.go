@@ -10,7 +10,7 @@ import (
 	ocli "github.com/unixsuperhero/ochazuke/cli"
 )
 
-// Rows: every list noun (repo, worktree, branch) has an id scheme, a
+// Rows: every list noun has an id scheme, a
 // label, table columns and one cell per column. The same rows fill the
 // TUI's lists, a list verb's answer and the state's JSON Lines, so a host
 // draws them as o-git does.
@@ -26,6 +26,13 @@ func branchID(repo, name string) string  { return "branch/" + repo + ":" + name 
 func worktreeLabel(w WorktreeRow) string { return tilde(w.Path) }
 
 var columns = map[string][]ochazuke.Column{
+	"endpoint": {
+		{Title: "endpoint"}, {Title: "spec"}, {Title: "kind"}, {Title: "ref"}, {Title: "sha"}, {Title: "fetched"}, {Title: "state"},
+	},
+	"compare": {
+		{Title: "pair"}, {Title: "from"}, {Title: "to"}, {Title: "ahead", Align: ochazuke.AlignRight},
+		{Title: "behind", Align: ochazuke.AlignRight}, {Title: "fetched"}, {Title: "state"},
+	},
 	"repo": {
 		{Title: "repo", Min: 10}, {Title: "branch", Priority: 1}, {Title: "sync", Priority: 2},
 		{Title: "changes", Priority: 3}, {Title: "path", Priority: 4},

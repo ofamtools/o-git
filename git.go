@@ -13,7 +13,7 @@ import (
 )
 
 // The git layer: every call runs the git CLI (no libgit2) with a timeout,
-// never prompts, never touches the network, and ignores the caller's
+// never prompts, fetches only on an explicit fetch verb, and ignores the caller's
 // GIT_DIR-style variables so a call means the directory it names. Callers
 // run it off the event loop (pending work); nothing here knows ochazuke.
 
@@ -32,12 +32,12 @@ func gitEnv() []string {
 	for _, value := range os.Environ() {
 		key, _, _ := strings.Cut(value, "=")
 		switch key {
-		case "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_PREFIX", "LC_ALL", "LANG":
+		case "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_PREFIX", "LC_ALL", "LANG", "GIT_TERMINAL_PROMPT", "GIT_ASKPASS", "SSH_ASKPASS", "SSH_ASKPASS_REQUIRE", "GIT_OPTIONAL_LOCKS", "GIT_NO_LAZY_FETCH":
 			continue
 		}
 		env = append(env, value)
 	}
-	return append(env, "GIT_TERMINAL_PROMPT=0", "GIT_OPTIONAL_LOCKS=0", "LC_ALL=C")
+	return append(env, "GIT_TERMINAL_PROMPT=0", "GIT_ASKPASS=/usr/bin/false", "SSH_ASKPASS=/usr/bin/false", "SSH_ASKPASS_REQUIRE=force", "GIT_OPTIONAL_LOCKS=0", "GIT_NO_LAZY_FETCH=1", "LC_ALL=C")
 }
 
 // GitError is a failed git call: the arguments, git's stderr and the exit
@@ -233,7 +233,7 @@ func parseWorktrees(out []byte) []Worktree {
 		}
 		switch key {
 		case "HEAD":
-			cur.Head = value[:min(len(value), 12)]
+			cur.Head = value
 		case "branch":
 			cur.Branch = strings.TrimPrefix(value, "refs/heads/")
 		case "detached":

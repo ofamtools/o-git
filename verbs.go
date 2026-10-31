@@ -101,6 +101,10 @@ func (a *App) repoWord(c ochazuke.Ctx) string {
 			return d.Path
 		case BranchRow:
 			return d.Repo
+		case Endpoint:
+			return d.Repo
+		case Comparison:
+			return d.Repo
 		}
 	}
 	return a.current

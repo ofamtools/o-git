@@ -1,6 +1,6 @@
 # o-git
 
-`o-git` (so `o git`) is the family's git extension: the repositories o-proj knows, plus any directory you name, with their status, worktrees and branches. It has a command line that prints JSON (for people, scripts and a host such as mtm that mounts the bin through `o-git catalog`) and a TUI page, Git. Everything goes through the `git` CLI with timeouts. It is local only: it never fetches, pulls, pushes or tags.
+`o-git` (so `o git`) is the family's git extension: the repositories o-proj knows, plus any directory you name, with their status, worktrees, branches and comparisons. It has a command line that prints JSON (for people, scripts and a host such as mtm that mounts the bin through `o-git catalog`) and a TUI page, Git. Everything goes through the `git` CLI with timeouts. It fetches only through an explicit `repo fetch` or `compare fetch`; it never pulls, pushes or tags.
 
 o-proj keeps the repositories on disk (the manifest `~/hub/repos.json`, clone, sync, the family-wide status report); o-git looks inside one repository at a time and changes its worktrees and branches. It reads o-proj's list by running `o-proj list` (`$O_GIT_PROJ` names another bin; `none` turns it off), never the manifest file itself.
 
@@ -56,6 +56,41 @@ The destructive verbs take plain arguments, the same ones the page's `d d` passe
 - `branch delete` refuses the branch checked out in the repo's worktree always (switch first), and a branch not merged into its upstream or HEAD unless `--force`.
 
 `worktree add` checks out an existing branch, or creates it from `--from` (default HEAD); the default path is `REPO-BRANCH` beside the main worktree (`feat/x` becomes `app-feat-x`).
+
+## Compare command line
+
+The `endpoint` and `compare` nouns provide the data layer for comparisons. The Compare page, commit/file lists and diffs follow in later lanes.
+
+| Command | Result |
+|---|---|
+| `endpoint list [REPO]` | Named endpoint rows: spec, kind, ref, SHA, fetched age and state |
+| `endpoint resolve SPEC [--other E] [REPO]` | A resolved endpoint; `show` has the same behavior. `--other` defaults to `HEAD` |
+| `compare list [REPO]` | Saved pair rows: from, to, ahead, behind, fetched age and state |
+| `compare show [--pair NAME \| --from E --to E] [REPO]` | Both endpoints and counts; defaults to `compare.default-pair` |
+| `endpoint copy SPEC [--other E] [REPO]` | Resolved SHA through the shared unnamed register |
+| `compare copy [--pair NAME \| --from E --to E] [REPO]` | Resolved `A..B` range through that register |
+| `repo fetch [REPO] [--remote R]` | An explicit `git fetch --prune` job, one remote or all configured remotes |
+| `compare fetch [--pair NAME \| --from E --to E] [REPO]` | Fetch only the remote endpoints the pair uses, then resolve it again |
+
+The list commands accept `--format table`, `markdown` and `toon`. Resolve/show return one object for one result and an array when `{remote}` expands to multiple results. Copy joins multiple results with newlines. `--repo R` is available everywhere; it has the same meaning as the positional `REPO`.
+
+Endpoints are `HEAD`, `WORKTREE`, `INDEX`, a ref/SHA, `{main}`, `{branch}`, `{upstream}`, `{remote}`, `worktree:PATH`, `merge-base(X)` or `fork-point(X)`. `A | B` takes the first available alternative. Named endpoints from `compare.endpoints` work anywhere an endpoint is accepted, including inside relative specs; fully qualified refs disambiguate names that match a named endpoint. `{remote}` expands to one result per configured remote, with both sides of a pair using the same remote. `worktree:PATH` uses a registered worktree's full HEAD SHA; relative paths start at REPO.
+
+`{main}` detects the branch name from `origin/HEAD`, then the only remote's HEAD, then `compare.main-names` locally and on remotes. It uses the local branch when present, otherwise the detected remote-tracking ref. `compare.main` overrides detection. A relative endpoint uses the other side's commit, or that worktree's HEAD for `WORKTREE` and `INDEX`. Fork-point requires a reflog and never substitutes a merge-base. Unborn HEAD is the empty tree. Unavailable endpoints and pairs remain visible with reasons; reversed and non-commit pairs carry explanatory state instead of failing.
+
+| Setting | Default |
+|---|---|
+| `compare.endpoints` | `head=HEAD`, `worktree=WORKTREE`, `index=INDEX`, `main={main}`, `upstream={upstream}`, `origin/main=origin/{main}`, `{remote}/main={remote}/{main}`, `{remote}/branch={remote}/{branch}`, `merge-base=merge-base({main})`, `fork-point=fork-point(origin/{main} \| {main})` |
+| `compare.pairs` | `dirty=HEAD..WORKTREE`, `upstream={upstream}..HEAD`, `main={main}..HEAD`, `origin/main=origin/{main}..HEAD`, `{remote}/main={remote}/{main}..HEAD`, `{remote}/branch={remote}/{branch}..HEAD`, `merge-base=merge-base({main})..HEAD`, `fork-point=fork-point(origin/{main} \| {main})..HEAD` |
+| `compare.main` | Empty: detect |
+| `compare.main-names` | `main`, `master`, in order |
+| `compare.collapse` | `true`: join identical available pairs' labels, keeping every name/spec in `members` |
+| `compare.default-pair` | `dirty` |
+| `compare.stale-after` | `24h`; `0` disables stale marking |
+
+Fetch age comes from the remote-tracking ref's last reflog update, otherwise `FETCH_HEAD`'s mtime. It describes the last local information; list and show never fetch. Fetch disables terminal and askpass credential prompts, reports failures, and appears on the jobs ticker. Divergence counts are memoised by repository, SHA pair and shallow boundary; fork points also track the reflog stamp. No worktree scan or commit/file list is needed for these summaries.
+
+Compared with Vim: endpoint and comparison resolution are git domain operations without a Vim command counterpart. The shared registers retain ochazuke's Vim-style yank behavior; this lane adds no keys or motions.
 
 ## The Git page
 

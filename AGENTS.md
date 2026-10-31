@@ -25,7 +25,7 @@ Family plans, todos and the roadmap live in `~/hub/o-plans/` (`README.md` is the
 
 ## Invariants
 
-- Local only: no fetch, pull, push or tag, and no network. Every git call goes through `git` in `git.go` with a timeout and the GIT_DIR-style variables removed.
+- Fetches only on an explicit fetch verb (`repo.fetch` or `compare.fetch`); never pull, push or tag. All other operations are local reads or mutations. Every git call goes through `git` in `git.go` with a timeout, prompts disabled and the GIT_DIR-style variables removed.
 - Git runs off the event loop: every verb that reads or changes a repository is `Pending`, and the page's follow reads are launched jobs. The verbs must stay pending so git never runs on the loop. The reads are `Quiet`; the mutations (worktree add/remove, branch create/switch/delete) show on the jobs ticker and print `job #N VERB done` on the CLI's stderr (stdout stays the JSON result).
 - Every verb declares its history kind (`Operation.HistoryKind`), none left to the default: the reads are `.Fetch()`, the mutations `change` and the prompt keys `action` (`setHistory` in `verbs.go`). `TestEveryVerbDeclaresItsHistory` walks the catalog.
 - Destructive verbs (`worktree.remove`, `branch.delete`) carry a confirm, take plain arguments (`worktree remove PATH`, `branch delete NAME [--repo R]`; the TUI's rows fill them with `Binding.FromRow`, so the confirm reads the same on both) or a host's `--target` row id (the arguments stay optional for that: `Required` would refuse a `--target` call), check first and refuse what git would lose without `--force`. They are tested on temp repos only.

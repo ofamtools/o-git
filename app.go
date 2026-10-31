@@ -9,7 +9,7 @@ import (
 	ocli "github.com/unixsuperhero/ochazuke/cli"
 )
 
-// The application: one ochazuke runtime holding the three list nouns and
+// The application: one ochazuke runtime holding the Git lists, compare nouns and
 // their verbs, used by the command line (the shell runs one verb and
 // settles it) and by the TUI. The runtime holds interaction state only;
 // what o-git read from git is the lists' rows and the fields below.
@@ -22,7 +22,7 @@ const (
 )
 
 // Version is the catalog's version.
-const Version = "0.1.0"
+const Version = "0.2.0"
 
 // App is o-git's state.
 type App struct {
@@ -36,6 +36,9 @@ type App struct {
 	Paths []string
 	// Now is the clock branch ages read.
 	Now func() time.Time
+
+	compareCache CompareCache
+	fetchRun     gitRunner
 
 	// The repository the worktree and branch lists show: its name and
 	// toplevel, "" before the first is read.
@@ -58,7 +61,7 @@ type App struct {
 // key rows). The lists start empty.
 func New() (*App, error) {
 	r := ochazuke.NewRuntime()
-	a := &App{r: r, Now: time.Now, Stdin: os.Stdin, Stdout: os.Stdout, Stderr: os.Stderr}
+	a := &App{r: r, Now: time.Now, fetchRun: git, Stdin: os.Stdin, Stdout: os.Stdout, Stderr: os.Stderr}
 	r.Instance(pageID, ochazuke.Kind("git"))
 	var err error
 	if a.repos, err = r.AddList(reposID, nil, ochazuke.Parent(pageID), ochazuke.Columns(columns["repo"]...), ochazuke.NoMarks()); err != nil {
@@ -73,7 +76,11 @@ func New() (*App, error) {
 	for noun, cols := range columns {
 		r.Define(noun).Columns(cols...)
 	}
+	if err := declareCompareSettings(r); err != nil {
+		return nil, err
+	}
 	a.registerVerbs()
+	a.registerCompareVerbs()
 	a.m = ochazuke.NewModel(r)
 	a.m.Title = "o-git"
 	a.registerPrompt()

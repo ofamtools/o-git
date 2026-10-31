@@ -1,6 +1,6 @@
 // Command o-git is the family's git extension: the repositories o-proj
 // knows (and any directory named), their worktrees and their branches,
-// through the git CLI. Local only: it never fetches, pushes or tags.
+// through the git CLI. Fetches only on explicit request; never pulls, pushes or tags.
 //
 //	o-git repo list|status|show|state [REPO] [--path DIR,...]
 //	o-git worktree list [REPO] | add BRANCH [PATH] [--repo R] [--from REF] | remove PATH [--force] [--yes]

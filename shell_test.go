@@ -15,7 +15,7 @@ import (
 )
 
 // jobLine is the line the shell prints for a job that is not Quiet.
-var jobLine = regexp.MustCompile(`(?m)^job #\d+ (worktree|branch)\.\w+ done\n`)
+var jobLine = regexp.MustCompile(`(?m)^job #\d+ (worktree|branch|repo|compare)\.\w+ done\n`)
 
 // run runs one command line and fails on an error or stray stderr.
 func run(t *testing.T, stdin string, args ...string) string {
@@ -302,7 +302,9 @@ func TestCatalog(t *testing.T) {
 		got[n.Name] = strings.Join(verbs, " ")
 	}
 	want := map[string]string{
-		"repo":     "list=repo show state status",
+		"repo":     "fetch list=repo show state status",
+		"endpoint": "copy list=endpoint resolve show",
+		"compare":  "copy fetch list=compare show",
 		"worktree": "add list=worktree remove!",
 		"branch":   "create delete! list=branch switch",
 	}
