@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/unixsuperhero/ochazuke"
+	"ofam.dev/ochazuke"
 )
 
 func (a *App) registerDiffVerbs() error {

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/unixsuperhero/ochazuke"
+	"ofam.dev/ochazuke"
 )
 
 func listPair(t *testing.T, dir, from, to string) Comparison {

@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/unixsuperhero/ochazuke"
-	ocli "github.com/unixsuperhero/ochazuke/cli"
+	"ofam.dev/ochazuke"
+	ocli "ofam.dev/ochazuke/cli"
 )
 
 // The verbs. Every one that reads or changes a repository is pending work,

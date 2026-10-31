@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/unixsuperhero/ochazuke"
-	ocli "github.com/unixsuperhero/ochazuke/cli"
+	"ofam.dev/ochazuke"
+	ocli "ofam.dev/ochazuke/cli"
 )
 
 func (a *App) registerCompareVerbs() {

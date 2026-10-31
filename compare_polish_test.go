@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/unixsuperhero/ochazuke"
+	"ofam.dev/ochazuke"
 )
 
 func TestComparePolishStories(t *testing.T) {

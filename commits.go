@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/unixsuperhero/ochazuke"
+	"ofam.dev/ochazuke"
 )
 
 // Commit retains full object ids in data while the row uses git's short id.

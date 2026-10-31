@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/unixsuperhero/ochazuke"
-	ocli "github.com/unixsuperhero/ochazuke/cli"
+	"ofam.dev/ochazuke"
+	ocli "ofam.dev/ochazuke/cli"
 )
 
 // Rows: every list noun has an id scheme, a

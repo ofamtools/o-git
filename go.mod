@@ -1,4 +1,4 @@
-module github.com/unixsuperhero/o-git
+module ofam.dev/o-git
 
 go 1.27.1
 
@@ -6,8 +6,8 @@ require (
 	charm.land/bubbletea/v2 v2.1.0
 	charm.land/lipgloss/v2 v2.0.6
 	github.com/charmbracelet/x/ansi v0.11.9
-	github.com/unixsuperhero/ochazuke v0.72.1
-	github.com/unixsuperhero/oden v0.1.1
+	ofam.dev/ochazuke v0.72.1
+	ofam.dev/oden v0.1.1
 )
 
 require (

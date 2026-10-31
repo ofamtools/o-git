@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/unixsuperhero/ochazuke"
+	"ofam.dev/ochazuke"
 )
 
 // Independent git invocations are the oracle for exact unified text, including

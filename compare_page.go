@@ -12,8 +12,8 @@ import (
 
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
-	"github.com/unixsuperhero/ochazuke"
-	"github.com/unixsuperhero/ochazuke/diffview"
+	"ofam.dev/ochazuke"
+	"ofam.dev/ochazuke/diffview"
 )
 
 const comparePageID = "compare"

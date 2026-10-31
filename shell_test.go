@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	ocli "github.com/unixsuperhero/ochazuke/cli"
+	ocli "ofam.dev/ochazuke/cli"
 )
 
 // jobLine is the line the shell prints for a job that is not Quiet.

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/unixsuperhero/ochazuke"
+	"ofam.dev/ochazuke"
 )
 
 // Change keeps paths unquoted and separate, including a rename/copy source.

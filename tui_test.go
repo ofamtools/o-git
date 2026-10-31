@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/charmbracelet/x/ansi"
-	"github.com/unixsuperhero/ochazuke"
-	"github.com/unixsuperhero/ochazuke/keytest"
+	"ofam.dev/ochazuke"
+	"ofam.dev/ochazuke/keytest"
 )
 
 // The page's tests send keys through the runtime's stack walk (what the

@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/unixsuperhero/ochazuke"
-	"github.com/unixsuperhero/ochazuke/diffview"
+	"ofam.dev/ochazuke"
+	"ofam.dev/ochazuke/diffview"
 )
 
 // These are app-page stories: o-story's pages fixture builds synthetic pages,

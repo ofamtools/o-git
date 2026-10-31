@@ -1,6 +1,6 @@
 package main
 
-import "github.com/unixsuperhero/ochazuke"
+import "ofam.dev/ochazuke"
 
 // bind installs the key rows, following the family key map
 // (~/hub/o-plans/plans/mtm-keys-and-ux-review-2.md, "Key map"): n is new,
