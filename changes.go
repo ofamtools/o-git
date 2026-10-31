@@ -42,6 +42,7 @@ type ChangeList struct {
 	Files    []Change     `json:"files"`
 	Totals   ChangeTotals `json:"totals"`
 	Reason   string       `json:"reason,omitempty"`
+	Detail   string       `json:"detail,omitempty"`
 	Reversed bool         `json:"reversed"`
 }
 
@@ -120,8 +121,16 @@ func readListDiff(ctx context.Context, dir string, args ...string) ([]Change, er
 	return parseRawNumstat(out, dir)
 }
 
-func readCommitChanges(ctx context.Context, dir string, args ...string) ([]Change, error) {
-	return readListDiff(ctx, dir, append([]string{"-C", "--find-copies-harder"}, args...)...)
+func commitChangeArgs(findCopiesHarder bool, args ...string) []string {
+	flags := []string{"-C"}
+	if findCopiesHarder {
+		flags = append(flags, "--find-copies-harder")
+	}
+	return append(flags, args...)
+}
+
+func readCommitChanges(ctx context.Context, dir string, findCopiesHarder bool, args ...string) ([]Change, error) {
+	return readListDiff(ctx, dir, commitChangeArgs(findCopiesHarder, args...)...)
 }
 
 // parseChangeStatus extends parseStatus's NUL-record approach with the paths
@@ -203,10 +212,11 @@ func xyChanges(staged, unstaged []Change) []Change {
 // ReadChanges uses status itself as the HEAD..WORKTREE row authority, so its
 // letters, rename paths, conflict states and ordering cannot drift from git.
 // Counts on XY rows are the sum of the two layers, also retained separately.
-func ReadChanges(ctx context.Context, dir string, pair Comparison) (ChangeList, error) {
+func ReadChanges(ctx context.Context, dir string, pair Comparison, findCopiesHarder bool) (ChangeList, error) {
 	result := ChangeList{Files: []Change{}, Reversed: pair.Reversed}
 	if !pair.Available {
 		result.Reason = pair.Reason
+		result.Detail = pair.Detail
 		return result, nil
 	}
 	f, t := pair.From, pair.To
@@ -217,7 +227,7 @@ func ReadChanges(ctx context.Context, dir string, pair Comparison) (ChangeList, 
 	var err error
 	switch {
 	case !isMutable(f) && !isMutable(t):
-		result.Files, err = readCommitChanges(ctx, dir, f.SHA, t.SHA)
+		result.Files, err = readCommitChanges(ctx, dir, findCopiesHarder, f.SHA, t.SHA)
 	case isMutable(f) && !isMutable(t):
 		if f.Path != "" {
 			dir = f.Path

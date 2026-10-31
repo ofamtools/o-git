@@ -30,6 +30,7 @@ type Commit struct {
 type CommitList struct {
 	Items  []ochazuke.ListItem `json:"items"`
 	Reason string              `json:"reason,omitempty"`
+	Detail string              `json:"detail,omitempty"`
 }
 
 // NUL separates fields; git commit messages cannot contain NULs. A fixed
@@ -90,10 +91,14 @@ func ReadCommits(ctx context.Context, dir string, pair Comparison, limit int, sp
 	}
 	if !pair.Available {
 		result.Reason = pair.Reason
+		result.Detail = pair.Detail
 		return result, nil
 	}
 	if isMutable(pair.From) || isMutable(pair.To) {
-		result.Reason = "the working tree is not a commit"
+		result.Reason = pair.CommitsReason
+		if result.Reason == "" {
+			result.Reason = "the working tree is not a commit"
+		}
 		return result, nil
 	}
 	if endpointKey(pair.From) == endpointKey(pair.To) {

@@ -8,6 +8,7 @@ import (
 
 func declareListsSettings(r *ochazuke.Runtime) error {
 	return r.DeclareSetting(
+		ochazuke.Setting{Name: "compare.files.find-copies-harder", Type: ochazuke.SettingBoolean, Default: false, Description: "Search unmodified files for copies in commit comparisons; can be slow on large repositories"},
 		ochazuke.Setting{Name: "compare.commits.split", Type: ochazuke.SettingBoolean, Default: true, Description: "Group commit rows into Ahead and Behind sections; false shows < or > instead"},
 		ochazuke.Setting{Name: "compare.commits.limit", Type: ochazuke.SettingInteger, Default: 500, Description: "Maximum commit rows per side, followed by an N more row", Validate: func(v any) error {
 			if v.(int) < 0 {

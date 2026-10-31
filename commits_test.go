@@ -230,3 +230,27 @@ func TestCommitSettingsFormatsAndCopies(t *testing.T) {
 		t.Fatalf("limit override %+v", rows)
 	}
 }
+
+func TestCompareListsCoreReasonsAndDetails(t *testing.T) {
+	isolateCompare(t)
+	dir := newRepo(t, "r")
+	pair := listPair(t, dir, "missing", "HEAD")
+	if pair.Available || pair.Detail == "" || strings.Contains(pair.Reason, "fatal:") {
+		t.Fatalf("core diagnostic: %+v", pair)
+	}
+	commits, err := ReadCommits(context.Background(), dir, pair, 500, true, time.Now())
+	if err != nil || commits.Reason != pair.Reason || commits.Detail != pair.Detail || len(commits.Items) != 0 {
+		t.Fatalf("commit diagnostic: %+v %v", commits, err)
+	}
+	changes, err := ReadChanges(context.Background(), dir, pair, false)
+	if err != nil || changes.Reason != pair.Reason || changes.Detail != pair.Detail || len(changes.Files) != 0 {
+		t.Fatalf("change diagnostic: %+v %v", changes, err)
+	}
+	for _, row := range changes.Items(dir) {
+		for _, cell := range row.Cells {
+			if strings.Contains(cell, "fatal:") || strings.Contains(cell, "git rev-parse") {
+				t.Fatalf("raw diagnostic in cell %q", cell)
+			}
+		}
+	}
+}

@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"strings"
 	"testing"
 
@@ -69,7 +70,7 @@ func changeData(t *testing.T, row ochazuke.ListItem) Change {
 
 func readChanges(t *testing.T, dir, from, to string) ChangeList {
 	t.Helper()
-	list, err := ReadChanges(context.Background(), dir, listPair(t, dir, from, to))
+	list, err := ReadChanges(context.Background(), dir, listPair(t, dir, from, to), false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,6 +127,8 @@ func TestChangeDirtyMatchesGitStatusBytes(t *testing.T) {
 
 func TestChangeCommitTypesCopiesAndBinary(t *testing.T) {
 	dir := changeFixture(t)
+	// Default -C considers modified sources, without scanning every unchanged file.
+	write(t, dir, "copy source", "copy one\ncopy two\ncopy three\ncopy four\nsource edit\n")
 	sh(t, dir, "add", "-A")
 	sh(t, dir, "commit", "-q", "-m", "all types")
 	list := readChanges(t, dir, "HEAD~1", "HEAD")
@@ -157,6 +160,72 @@ func TestChangeCommitTypesCopiesAndBinary(t *testing.T) {
 		out := run(t, "", "change", "list", "--from", "HEAD~1", "--to", "HEAD", "--repo", dir, "--format", format)
 		if !strings.Contains(out, "bin") || !strings.Contains(out, "total") || !strings.Contains(out, "copy source → copied") {
 			t.Fatalf("%s: %s", format, out)
+		}
+	}
+}
+
+func TestChangeCopyDetectionSetting(t *testing.T) {
+	isolateCompare(t)
+	dir := newRepo(t, "r")
+	write(t, dir, "copied", "hello\n")
+	sh(t, dir, "add", "copied")
+	sh(t, dir, "commit", "-q", "-m", "copy an unchanged source")
+	a, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.r.Config().Disable()
+	const setting = "compare.files.find-copies-harder"
+	if a.r.Settings().Bool(setting) {
+		t.Fatal("harder copy search must default to false")
+	}
+	// The read helper consumes exactly these extra argv words. Default -C
+	// keeps ordinary copy detection without scanning every unchanged source.
+	args := commitChangeArgs(a.r.Settings().Bool(setting), "base", "tip")
+	if slices.Contains(args, "--find-copies-harder") || !slices.Equal(args, []string{"-C", "base", "tip"}) {
+		t.Fatalf("default commit diff argv: %v", args)
+	}
+	for _, harder := range []bool{false, true, false} {
+		if _, err := a.r.Settings().SetSession(setting, harder); err != nil {
+			t.Fatal(err)
+		}
+		if got := slices.Contains(commitChangeArgs(a.r.Settings().Bool(setting)), "--find-copies-harder"); got != harder {
+			t.Fatalf("setting=%v, harder argv flag=%v", harder, got)
+		}
+		want := "A"
+		if harder {
+			want = "C"
+		}
+		for _, command := range [][]string{
+			{"change", "list", "--from", "HEAD~1", "--to", "HEAD"},
+			{"compare", "files", "--from", "HEAD~1", "--to", "HEAD"},
+			{"commit", "files", "HEAD"},
+			{"change", "show", "copied", "--from", "HEAD~1", "--to", "HEAD"},
+		} {
+			var out, stderr strings.Builder
+			a.Stdout, a.Stderr = &out, &stderr
+			if err := a.Shell().Run(context.Background(), append(command, "--repo", dir)); err != nil {
+				t.Fatal(err)
+			}
+			var file Change
+			if command[1] == "show" {
+				file = decode[Change](t, out.String())
+			} else {
+				rows := decode[[]ochazuke.ListItem](t, out.String())
+				if len(rows) != 2 {
+					t.Fatalf("%v: %s", command, &out)
+				}
+				file = changeData(t, rows[0])
+			}
+			if file.Path != "copied" || file.Status != want || stderr.Len() != 0 {
+				t.Fatalf("setting=%v %v: %+v; %s", harder, command, file, &stderr)
+			}
+			if harder && file.OldPath != "README" {
+				t.Fatalf("copy source: %+v", file)
+			}
+			if !harder && file.Added != 1 {
+				t.Fatalf("addition count: %+v", file)
+			}
 		}
 	}
 }

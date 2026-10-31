@@ -141,6 +141,7 @@ func (a *App) commitShow(c ochazuke.Ctx) ochazuke.Result {
 
 func (a *App) commitFiles(c ochazuke.Ctx) ochazuke.Result {
 	sha := commitArg(c)
+	findCopiesHarder := a.r.Settings().Bool("compare.files.find-copies-harder")
 	return a.comparisonRead(listContext(c), func(r *EndpointResolver) (any, error) {
 		commit, err := ReadCommit(r.ctx, r.dir, sha, r.now)
 		if err != nil {
@@ -156,7 +157,7 @@ func (a *App) commitFiles(c ochazuke.Ctx) ochazuke.Result {
 			}
 			base = strings.TrimSpace(string(out))
 		}
-		files, err := readCommitChanges(r.ctx, r.dir, base, commit.SHA)
+		files, err := readCommitChanges(r.ctx, r.dir, findCopiesHarder, base, commit.SHA)
 		if err != nil {
 			return nil, err
 		}
@@ -175,8 +176,9 @@ func (a *App) commitCopy(c ochazuke.Ctx) ochazuke.Result {
 }
 
 func (a *App) changeList(c ochazuke.Ctx) ochazuke.Result {
+	findCopiesHarder := a.r.Settings().Bool("compare.files.find-copies-harder")
 	return a.listRead(c, func(r *EndpointResolver, p Comparison) ([]ochazuke.ListItem, string, error) {
-		list, err := ReadChanges(r.ctx, r.dir, p)
+		list, err := ReadChanges(r.ctx, r.dir, p, findCopiesHarder)
 		return list.Items(r.dir), list.Reason, err
 	})
 }
@@ -191,12 +193,12 @@ func changeArg(c ochazuke.Ctx) string {
 	return ""
 }
 
-func findChange(r *EndpointResolver, pair, from, to, path string) (Change, error) {
+func findChange(r *EndpointResolver, pair, from, to, path string, findCopiesHarder bool) (Change, error) {
 	if path == "" {
 		return Change{}, fmt.Errorf("give a changed path")
 	}
 	for _, p := range r.Show(pair, from, to) {
-		list, err := ReadChanges(r.ctx, r.dir, p)
+		list, err := ReadChanges(r.ctx, r.dir, p, findCopiesHarder)
 		if err != nil {
 			return Change{}, err
 		}
@@ -215,8 +217,9 @@ func (a *App) changeShow(c ochazuke.Ctx) ochazuke.Result {
 		return ochazuke.Failed(err)
 	}
 	path := changeArg(c)
+	findCopiesHarder := a.r.Settings().Bool("compare.files.find-copies-harder")
 	return a.comparisonRead(listContext(c), func(r *EndpointResolver) (any, error) {
-		return findChange(r, pair, from, to, path)
+		return findChange(r, pair, from, to, path, findCopiesHarder)
 	})
 }
 
@@ -226,8 +229,9 @@ func (a *App) changeCopy(c ochazuke.Ctx) ochazuke.Result {
 		return ochazuke.Failed(err)
 	}
 	path := changeArg(c)
+	findCopiesHarder := a.r.Settings().Bool("compare.files.find-copies-harder")
 	return a.copyRead(listContext(c), func(r *EndpointResolver) (any, error) {
-		file, err := findChange(r, pair, from, to, path)
+		file, err := findChange(r, pair, from, to, path, findCopiesHarder)
 		return file.Path, err
 	})
 }
