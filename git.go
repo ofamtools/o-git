@@ -120,12 +120,7 @@ func gitStream(ctx context.Context, dir string, noIndex bool, consume func(io.Re
 	ctx, cancel := context.WithTimeout(ctx, readTimeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "git", append([]string{"-C", dir, "-c", "core.fsmonitor=false", "-c", "color.ui=false"}, args...)...)
-	for _, entry := range gitEnv() {
-		if !strings.HasPrefix(entry, "GIT_PAGER=") {
-			cmd.Env = append(cmd.Env, entry)
-		}
-	}
-	cmd.Env = append(cmd.Env, "GIT_PAGER=cat")
+	cmd.Env = replaceGitEnv(gitEnv(), "GIT_PAGER", "cat")
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	stdout, err := cmd.StdoutPipe()

@@ -36,7 +36,6 @@ func progName() string {
 
 // Main runs one invocation.
 func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
-	args = diffCLIArgs(args)
 	a, err := New()
 	if err != nil {
 		return err

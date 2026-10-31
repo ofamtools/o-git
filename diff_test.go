@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/json"
 	"io"
@@ -119,12 +120,53 @@ func TestDiffTrackedAndCommit(t *testing.T) {
 	if got := run(t, "", "commit", "diff", "HEAD", "--repo", dir); got != want {
 		t.Fatalf("commit CLI patch\n%s", got)
 	}
-	structured := run(t, "", "commit", "diff", "HEAD", "--repo", dir, "--json")
+	structured := run(t, "", "commit", "diff", "HEAD", "--repo", dir, "--output", "json")
 	if got := decode[DiffResult](t, structured); !reflect.DeepEqual(got.Files, d.Files) {
 		t.Fatalf("CLI JSON %+v", got)
 	}
 	diffArtifact(t, "tracked.diff", want)
 	diffArtifact(t, "tracked.json", structured)
+}
+
+func TestDiffOutputParameter(t *testing.T) {
+	dir := newRepo(t, "output")
+	write(t, dir, "README", "changed\n")
+	empty := sh(t, dir, "hash-object", "-t", "tree", "/dev/null")
+	for _, tc := range []struct {
+		args []string
+		text string
+	}{
+		{[]string{"change", "diff", "README", "--repo", dir}, diffOracle(t, dir, false, "HEAD", "--")},
+		{[]string{"commit", "diff", "HEAD", "--repo", dir}, diffOracle(t, dir, false, empty, "HEAD", "--")},
+	} {
+		for _, flags := range [][]string{nil, {"--output", "plain"}, {"--json"}, {"--format", "json"}} {
+			args := append(append([]string{}, tc.args...), flags...)
+			if got := run(t, "", args...); got != tc.text {
+				t.Fatalf("%v changed plain output\n%s", args, got)
+			}
+		}
+		for _, flags := range [][]string{{"--output", "json"}, {"--output=json", "--json"}, {"--output", "json", "--format", "json"}} {
+			args := append(append([]string{}, tc.args...), flags...)
+			if got := decode[DiffResult](t, run(t, "", args...)); len(got.Files) != 1 || !got.Comparison.Available {
+				t.Fatalf("%v: %+v", args, got)
+			}
+		}
+		// Direct shell dispatch has the same defaults, without passing through
+		// Main or any argv adapter. API callers can request structured data
+		// through the declared output parameter as well.
+		a, err := New()
+		if err != nil {
+			t.Fatal(err)
+		}
+		var stdout, stderr bytes.Buffer
+		a.Stdout, a.Stderr = &stdout, &stderr
+		if err := a.Shell().Run(t.Context(), tc.args); err != nil || stdout.String() != tc.text || stderr.Len() != 0 {
+			t.Fatalf("direct shell: %v\nstdout %s\nstderr %s", err, &stdout, &stderr)
+		}
+		if !a.diffOptions(ochazuke.Ctx{}).Plain || a.diffOptions(ochazuke.Ctx{Args: ochazuke.Arguments{"output": "json"}}).Plain {
+			t.Fatal("CLI and API must share the output parameter's plain default")
+		}
+	}
 }
 
 func TestDiffMutableShapes(t *testing.T) {
@@ -165,7 +207,7 @@ func TestDiffMutableShapes(t *testing.T) {
 			if d.Unified != want || d.Reversed != tc.reverse {
 				t.Fatalf("reverse %v want %v\nGOT %s\nWANT %s", d.Reversed, tc.reverse, d.Unified, want)
 			}
-			jsonText := run(t, "", "change", "diff", "README", "--repo", dir, "--from", tc.from, "--to", tc.to, "--json")
+			jsonText := run(t, "", "change", "diff", "README", "--repo", dir, "--from", tc.from, "--to", tc.to, "--output", "json")
 			got := decode[DiffResult](t, jsonText)
 			if len(got.Files) != 1 || got.Reversed != tc.reverse {
 				t.Fatalf("CLI %+v", got)
@@ -216,7 +258,7 @@ func TestDiffMergeFirstParentAndLiteralPath(t *testing.T) {
 	if got, want := run(t, "", "commit", "diff", "HEAD", "--repo", dir), diffOracle(t, dir, false, "HEAD^1", "HEAD", "--"); got != want {
 		t.Fatalf("merge patch\nGOT %s\nWANT %s", got, want)
 	}
-	got := decode[DiffResult](t, run(t, "", "change", "diff", "star*file", "--from", "HEAD^1", "--to", "HEAD", "--repo", dir, "--json"))
+	got := decode[DiffResult](t, run(t, "", "change", "diff", "star*file", "--from", "HEAD^1", "--to", "HEAD", "--repo", dir, "--output", "json"))
 	if len(got.Files) != 1 || got.Files[0].NewPath != "star*file" {
 		t.Fatalf("glob path expanded %+v", got)
 	}
@@ -356,7 +398,7 @@ func TestDiffDegenerateRootUnbornAndSettings(t *testing.T) {
 			t.Fatalf("equal sides %+v", d)
 		}
 	}
-	got := decode[DiffResult](t, run(t, "", "change", "diff", "README", "--from", "missing", "--to", "HEAD", "--repo", dir, "--json"))
+	got := decode[DiffResult](t, run(t, "", "change", "diff", "README", "--from", "missing", "--to", "HEAD", "--repo", dir, "--output", "json"))
 	if got.Comparison.Available || got.Comparison.Reason == "" || len(got.Files) != 0 {
 		t.Fatalf("unavailable %+v", got)
 	}
@@ -396,7 +438,7 @@ func TestDiffDegenerateRootUnbornAndSettings(t *testing.T) {
 	write(t, unborn, "staged", "first\n")
 	sh(t, unborn, "add", "staged")
 	before := diffRepositoryFiles(t, unborn)
-	got = decode[DiffResult](t, run(t, "", "change", "diff", "staged", "--repo", unborn, "--json"))
+	got = decode[DiffResult](t, run(t, "", "change", "diff", "staged", "--repo", unborn, "--output", "json"))
 	if len(got.Files) != 1 || got.Files[0].Status != "A" || got.Files[0].Added != 1 {
 		t.Fatalf("unborn %+v", got)
 	}

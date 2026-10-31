@@ -109,7 +109,7 @@ direction; mutable-left patches use `-R`. Untracked files use read-only
 `git diff --no-index -- /dev/null PATH` semantics and are appended in Git's
 `ls-files --others --exclude-standard` order. No index or object is written.
 
-`--json` returns `{comparison, reversed, files}` (an array of results for remote
+`--output json` returns `{comparison, reversed, files}` (an array of results for remote
 expansion). Each file uses the ochazuke diffview model's JSON names: `oldPath`,
 `newPath`, `status`, `binary`, `oldSize`, `newSize`, `truncated`, `added`, `removed`,
 `hunks`; hunks use `oldStart`, `oldCount`, `newStart`, `newCount`, `header`, `lines`.
@@ -122,8 +122,11 @@ equal comparisons retain their state with an empty `files` array.
 `compare.diff.max-lines` defaults to 20000 source lines per file. Structured
 hunks also have a fixed 2 MiB per-file byte limit. Exceeding either limit clears
 that file's hunks and marks `truncated: true`, keeping complete `added`/`removed`
-counts. Plain patch text is complete. Host/API calls default to structured data;
-`--output json|plain` explicitly selects either result in both CLI and API calls.
+counts. Plain patch text is complete. CLI and host/API calls default to plain
+patch text; `--output plain|json` explicitly selects either result. The shell's
+bare `--json` and `--format json` do not change the verb's `output` parameter;
+use `--output json` for structured hunks. Ochazuke v0.66 through v0.69 does not
+offer a verb result with separate text and structured forms selected by format.
 
 Compared with Vim: these commands read Git content and add no editor, hunk
 motions or bindings. The future diff page owns the Vim `]c`/`[c` interaction.

@@ -19,7 +19,7 @@ func (a *App) registerDiffVerbs() error {
 		op.Parameters = map[string]ochazuke.Parameter{
 			"repo":    {Type: "string", Description: "repository directory or o-proj name; default current repository"},
 			"context": {Type: "integer", Description: "context lines; defaults to compare.diff.context"},
-			"output":  {Type: "string", Enum: []string{"json", "plain"}, Description: "structured JSON (API default) or exact unified patch text"},
+			"output":  {Type: "string", Enum: []string{"plain", "json"}, Description: "exact unified patch text (default plain), or structured JSON"},
 		}
 		if key == "change.diff" {
 			op.Parameters["path"] = ochazuke.Parameter{Type: "string", Required: true, Description: "literal path relative to repository root (either rename path)"}
@@ -35,24 +35,8 @@ func (a *App) registerDiffVerbs() error {
 	return nil
 }
 
-// The v0.66 shell consumes bare --json before dispatch, and its default output
-// is JSON. This CLI adapter selects plain output only for the two patch verbs;
-// the registered handlers stay structured for host/API calls. No shell fork.
-func diffCLIArgs(args []string) []string {
-	if len(args) < 2 || args[1] != "diff" || (args[0] != "change" && args[0] != "commit") {
-		return args
-	}
-	for _, arg := range args[2:] {
-		name, _, _ := strings.Cut(arg, "=")
-		if name == "--json" || name == "--format" || name == "--output" {
-			return args
-		}
-	}
-	return append(append([]string{}, args...), "--output=plain")
-}
-
 func (a *App) diffOptions(c ochazuke.Ctx) DiffOptions {
-	return DiffOptions{Path: ochazuke.StringArg(c.Args, "path", ""), Context: ochazuke.IntArg(c.Args, "context", a.r.Settings().Int("compare.diff.context")), MaxLines: a.r.Settings().Int("compare.diff.max-lines"), Plain: ochazuke.StringArg(c.Args, "output", "json") == "plain"}
+	return DiffOptions{Path: ochazuke.StringArg(c.Args, "path", ""), Context: ochazuke.IntArg(c.Args, "context", a.r.Settings().Int("compare.diff.context")), MaxLines: a.r.Settings().Int("compare.diff.max-lines"), Plain: ochazuke.StringArg(c.Args, "output", "plain") == "plain"}
 }
 
 func diffOutput(results []DiffResult, plain bool) any {
@@ -100,7 +84,7 @@ func (a *App) commitDiff(c ochazuke.Ctx) ochazuke.Result {
 				continue
 			}
 			if isMutable(to) || to.Kind == "empty" {
-				return nil, fmt.Errorf("%s is not a commit", sha)
+				return nil, fmt.Errorf("%s is not a commit", resolvedRef(to))
 			}
 			// Read stored parents rather than rev-list's shallow-boundary view:
 			// a missing parent must not silently turn a shallow commit into a root.
