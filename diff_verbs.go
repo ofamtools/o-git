@@ -11,9 +11,8 @@ func (a *App) registerDiffVerbs() error {
 	if err := declareDiffSettings(a.r); err != nil {
 		return err
 	}
-	// compare-lists also declares these nouns; Define extends a shared noun.
-	a.r.Define("change").Verb("diff", a.changeDiff, "content diff of a literal repository-relative PATH; default pair is compare.default-pair").Fetch().Quiet().Positional("path")
-	a.r.Define("commit").Verb("diff", a.commitDiff, "content diff of SHA against its first parent (empty tree for a root commit)").Fetch().Quiet().Positional("sha")
+	// The shared commit/change declarations live in registerListsVerbs;
+	// configure their diff parameters here after those verbs exist.
 	for _, key := range []string{"change.diff", "commit.diff"} {
 		op := a.r.Operations[key]
 		op.Parameters = map[string]ochazuke.Parameter{

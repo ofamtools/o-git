@@ -49,8 +49,8 @@ func TestEveryVerbDeclaresItsHistory(t *testing.T) {
 			t.Errorf("verb %s is not in the catalog", key)
 		}
 	}
-	if len(seen) != 24 {
-		t.Fatalf("the catalog has %d o-git verbs, want 24", len(seen))
+	if len(seen) != 33 {
+		t.Fatalf("the catalog has %d o-git verbs, want 33", len(seen))
 	}
 }
 
@@ -71,6 +71,10 @@ func TestVerbHistoryKinds(t *testing.T) {
 		"change.diff": ochazuke.HistoryFetch, "commit.diff": ochazuke.HistoryFetch,
 		"endpoint.copy": ochazuke.HistoryAction, "compare.copy": ochazuke.HistoryAction,
 		"repo.fetch": ochazuke.HistoryChange, "compare.fetch": ochazuke.HistoryChange,
+		"commit.list": ochazuke.HistoryFetch, "commit.show": ochazuke.HistoryFetch, "commit.files": ochazuke.HistoryFetch,
+		"change.list": ochazuke.HistoryFetch, "change.show": ochazuke.HistoryFetch,
+		"compare.commits": ochazuke.HistoryFetch, "compare.files": ochazuke.HistoryFetch,
+		"commit.copy": ochazuke.HistoryAction, "change.copy": ochazuke.HistoryAction,
 	} {
 		if got := a.r.Operations[a.r.CanonicalKey(key)].HistoryKind; got != want {
 			t.Errorf("%s: %q, want %q", key, got, want)

@@ -458,10 +458,9 @@ func TestCompareSettingsAndCLI(t *testing.T) {
 	if !reflect.DeepEqual(cfg.Endpoints, defaultEndpoints) || !reflect.DeepEqual(cfg.Pairs, defaultPairs) || cfg.StaleAfter != 24*time.Hour || !cfg.Collapse || cfg.DefaultPair != "dirty" {
 		t.Fatalf("%+v", cfg)
 	}
-	for _, s := range a.r.Settings().Declared() {
-		if strings.HasPrefix(s.Name, "compare.commits.") {
-			t.Fatal(s.Name)
-		}
+	s := a.r.Settings()
+	if !s.Bool("compare.commits.split") || s.Int("compare.commits.limit") != 500 || s.Int("compare.diff.context") != 3 || s.Int("compare.diff.max-lines") != defaultDiffLines {
+		t.Fatal("combined commit and diff setting defaults")
 	}
 	if err := a.r.Settings().Set("compare.stale-after", "-1s"); err == nil {
 		t.Fatal("negative stale age")

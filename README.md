@@ -59,7 +59,7 @@ The destructive verbs take plain arguments, the same ones the page's `d d` passe
 
 ## Compare command line
 
-The `endpoint` and `compare` nouns provide the data layer for comparisons. Content diffs are available through `change diff` and `commit diff`; the Compare page and commit/file lists follow in later lanes.
+The `endpoint`, `compare`, `commit` and `change` nouns provide comparison data, commit/file lists and content diffs through `change diff` and `commit diff`. The Compare page follows in a later lane.
 
 | Command | Result |
 |---|---|
@@ -71,6 +71,13 @@ The `endpoint` and `compare` nouns provide the data layer for comparisons. Conte
 | `compare copy [--pair NAME \| --from E --to E] [REPO]` | Resolved `A..B` range through that register |
 | `repo fetch [REPO] [--remote R]` | An explicit `git fetch --prune` job, one remote or all configured remotes |
 | `compare fetch [--pair NAME \| --from E --to E] [REPO]` | Fetch only the remote endpoints the pair uses, then resolve it again |
+| `commit list [--pair NAME \| --from E --to E] [--limit N] [REPO]` | Ahead/Behind commit rows in git's order within each section; `compare commits` is the same read |
+| `commit show SHA [REPO]` | Full message, parents, decorations, author and age |
+| `commit files SHA [REPO]` | Changes against its first parent; a root commit compares with the empty tree |
+| `commit copy SHA [REPO]` | Full SHA through the shared unnamed register |
+| `change list [--pair NAME \| --from E --to E] [REPO]` | Changed paths, status, numstats and a totals row; `compare files` is the same read |
+| `change show PATH [--pair NAME \| --from E --to E] [REPO]` | One change, including separate index/worktree counts for an XY row |
+| `change copy PATH [--pair NAME \| --from E --to E] [REPO]` | Path through the shared unnamed register |
 
 The list commands accept `--format table`, `markdown` and `toon`. Comparison `from`/`to` cells show resolved short refs (`master`, `origin/master`, `HEAD`); the original specs remain in JSON and in a separate, lowest-priority `spec` column. This ochazuke version has no default-hidden column flag, so the CLI includes that column. Short human reasons appear in `state`/`reason`; raw Git failures are retained separately in JSON `detail` for a detail view. Resolve/show return one object for one result and an array when `{remote}` expands to multiple results. Copy joins multiple results with newlines. `--repo R` is available everywhere; it has the same meaning as the positional `REPO`.
 
@@ -87,6 +94,16 @@ Endpoints are `HEAD`, `WORKTREE`, `INDEX`, a ref/SHA, `{main}`, `{branch}`, `{up
 | `compare.collapse` | `true`: join identical available pairs' labels, keeping every name/spec in `members` |
 | `compare.default-pair` | `dirty` |
 | `compare.stale-after` | `24h`; `0` disables stale marking |
+| `compare.commits.split` | `true`: Ahead/Behind sections; `false` keeps git's full interleaved order with a `<`/`>` column |
+| `compare.commits.limit` | `500` per side, followed by an `N more` row; `--limit` overrides it, and zero shows only the more rows |
+
+Commit rows retain full SHAs in `data.sha` and carry `section` metadata when split. No date/topology ordering flag is added. Non-commit endpoints produce an empty commit list and a reason on stderr. An unborn HEAD compares as empty history.
+
+Changes between commits have one status letter (`A M D R C T`); copies and renames keep both paths, displayed as `old → new`. Working-tree comparisons have XY letters: index against `from`, then worktree against index. `HEAD..WORKTREE` uses git status's exact paths, letters and order, including untracked directories as git normally groups them. `HEAD..INDEX` includes only staged changes; `INDEX..WORKTREE` includes unstaged and untracked paths. With a mutable left side the read is reversed with `-R` and reports “reversed: the working tree is on the left”; untracked paths on that side appear as deletions. Identical endpoints have no file rows, only zero totals.
+
+Against an older base, a path deleted from the index and recreated as untracked has one `D?` row: the index deletion and unknown worktree content are both retained. `data.untracked` remains true, including on reversed untracked deletions.
+
+XY numstats sum the two layers and also retain them separately in `data.index` and `data.worktree`. Untracked paths have no numstat and show blank count cells; they count toward the file total. Binary counts display `bin` and contribute to `data.binary` in the totals, without invented line counts. Diff reads pin `core.quotePath=false`, `--no-color`, `--no-ext-diff`, `--no-textconv` and `--no-relative`. All use `-M`; commit comparisons also enable `-C --find-copies-harder`. Working-tree copies remain additions with their full added-line counts, as in git status.
 
 Fetch age is the latest of the ref's reflog update, its remote's last successful explicit o-git fetch, and `FETCH_HEAD`'s mtime when its source URL uniquely identifies that remote. Successful fetches refresh age even when no ref moved; a different remote's fetch does not freshen it. Per-remote timestamps live under `compare-fetch/` in o-git's state directory, keyed by the shared Git directory, remote name and URL; URLs are hashed rather than stored. Aliases sharing a URL use explicit per-remote records because `FETCH_HEAD` cannot distinguish them. It describes the last local information; list and show never fetch. Fetch runs in a detached session, disables terminal/askpass and credential-manager interactivity, and defaults to `ssh -o BatchMode=yes` while preserving `GIT_SSH_COMMAND` or `core.sshCommand` overrides. Failures are reported and fetch appears on the jobs ticker. Divergence counts are memoised by repository, SHA pair and shallow boundary; fork points also track the reflog stamp. Successful counts from a shallow clone are labelled "counts limited by shallow clone". No worktree scan or commit/file list is needed for these summaries.
 

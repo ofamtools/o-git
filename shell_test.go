@@ -278,11 +278,16 @@ func TestCatalog(t *testing.T) {
 		t.Fatalf("catalog %s %s %s", cat.Name, cat.Version, cat.State)
 	}
 	got := map[string]string{}
+	columnCounts := map[string]int{"commit": len(commitColumns(true)), "change": 4}
+	for noun, cols := range columns {
+		columnCounts[noun] = len(cols)
+	}
 	for _, n := range cat.Nouns {
-		if columns[n.Name] == nil {
+		count, known := columnCounts[n.Name]
+		if !known {
 			continue
 		}
-		if len(n.Columns) != len(columns[n.Name]) {
+		if len(n.Columns) != count {
 			t.Fatalf("%s columns %+v", n.Name, n.Columns)
 		}
 		var verbs []string
@@ -304,9 +309,11 @@ func TestCatalog(t *testing.T) {
 	want := map[string]string{
 		"repo":     "fetch list=repo show state status",
 		"endpoint": "copy list=endpoint resolve show",
-		"compare":  "copy fetch list=compare show",
+		"compare":  "commits=commit copy fetch files=change list=compare show",
 		"worktree": "add list=worktree remove!",
 		"branch":   "create delete! list=branch switch",
+		"commit":   "copy diff files=change list=commit show",
+		"change":   "copy diff list=change show",
 	}
 	for noun, verbs := range want {
 		if got[noun] != verbs {

@@ -79,8 +79,12 @@ func New() (*App, error) {
 	if err := declareCompareSettings(r); err != nil {
 		return nil, err
 	}
+	if err := declareListsSettings(r); err != nil {
+		return nil, err
+	}
 	a.registerVerbs()
 	a.registerCompareVerbs()
+	a.registerListsVerbs()
 	if err := a.registerDiffVerbs(); err != nil {
 		return nil, err
 	}
