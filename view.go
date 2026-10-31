@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/x/ansi"
 	"github.com/unixsuperhero/ochazuke"
 	ocli "github.com/unixsuperhero/ochazuke/cli"
@@ -14,7 +15,7 @@ import (
 // right, the shown repository's worktrees, its branches and the detail of
 // the focused row (stacked below stackWidth columns). The panel holding
 // the focus has the accent border. The divider between the repo list and
-// the rest follows the page's pane keys (> and < move it, = resets;
+// the rest follows the page's pane keys (ctrl+w >/< move it, ctrl+w = resets;
 // ochazuke's Runtime.PaneLayout): the repo list's width side by side, its
 // height stacked, the other panels sharing what is left as before.
 
@@ -47,7 +48,7 @@ func dataPage() ocli.CatalogPage {
 const stackWidth = 70
 
 func (a *App) render(r *ochazuke.Runtime, width, height int) ochazuke.Block {
-	s := ochazuke.NewStyles(*a.m.Appearance)
+	s := a.m.Styles()
 	l := r.PaneLayout(pageID, ochazuke.Layout{Width: width, Height: height, Styles: s})
 	status := s.Muted.Render(ansi.Truncate(a.statusLine(), width, "…"))
 	bh := max(0, height-1)
@@ -94,23 +95,7 @@ func (a *App) render(r *ochazuke.Runtime, width, height int) ochazuke.Block {
 		panel("Branches"+name, a.branches, rw, bhh).Text,
 		detail(rw, dh).Text,
 	}, "\n")
-	lr, rr := strings.Split(left.Text, "\n"), strings.Split(right, "\n")
-	rows := make([]string, bh)
-	for i := range rows {
-		rows[i] = pad(at(lr, i), lw) + " " + at(rr, i)
-	}
-	return ochazuke.Text(status + "\n" + strings.Join(rows, "\n"))
-}
-
-func at(rows []string, i int) string {
-	if i < len(rows) {
-		return rows[i]
-	}
-	return ""
-}
-
-func pad(line string, width int) string {
-	return line + strings.Repeat(" ", max(0, width-ansi.StringWidth(line)))
+	return ochazuke.Text(status + "\n" + lipgloss.JoinHorizontal(lipgloss.Top, left.Text, " ", right))
 }
 
 // statusLine is the line above the panels: how many repositories, the

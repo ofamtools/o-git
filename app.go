@@ -172,7 +172,7 @@ func (a *App) refresh() {
 func (a *App) launch(owner, verb string, res ochazuke.Result) bool {
 	_, err := a.r.Launch(owner, verb, res, ochazuke.Ctx{Runtime: a.r, Context: a.r.Context(), Args: ochazuke.Arguments{}, Instance: a.r.Instances[owner]})
 	if err != nil {
-		a.r.UI().Status(err.Error())
+		a.r.UI().Error(err.Error())
 	}
 	return err == nil
 }

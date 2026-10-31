@@ -8,6 +8,7 @@ import (
 
 	"github.com/charmbracelet/x/ansi"
 	"github.com/unixsuperhero/ochazuke"
+	"github.com/unixsuperhero/ochazuke/keytest"
 )
 
 // The page's tests send keys through the runtime's stack walk (what the
@@ -109,7 +110,7 @@ func TestPageFollowsTheSelectedRepo(t *testing.T) {
 	if !a.repos.Focused() {
 		t.Fatalf("focus %s", a.r.Focus)
 	}
-	if _, cmd := m.Update(Msg("k", false, false)); cmd == nil || a.loading != one {
+	if _, cmd := m.Update(keytest.Msg("k", false, false)); cmd == nil || a.loading != one {
 		t.Fatalf("k through the model: cmd %v, loading %q", cmd != nil, a.loading)
 	}
 }
@@ -293,7 +294,7 @@ func TestListsTakeNoMarks(t *testing.T) {
 	}
 }
 
-// > and < move the divider between the repo list and the rest, = puts it
+// ctrl+w > and ctrl+w < move the divider; ctrl+w = puts it
 // back (ochazuke's pane keys, through PaneLayout); stacked, the same keys
 // move the repo list's bottom edge.
 func TestPaneKeysResizeTheRepoList(t *testing.T) {
@@ -309,15 +310,15 @@ func TestPaneKeysResizeTheRepoList(t *testing.T) {
 		return 0
 	}
 	before := divider()
-	keys(t, a, ">")
+	keys(t, a, "ctrl+w", ">")
 	if grown := divider(); grown <= before {
 		t.Fatalf("> did not grow the repo list: %d -> %d", before, grown)
 	}
-	keys(t, a, "<", "<")
+	keys(t, a, "ctrl+w", "<", "ctrl+w", "<")
 	if shrunk := divider(); shrunk >= before {
 		t.Fatalf("< did not shrink the repo list: %d", shrunk)
 	}
-	keys(t, a, "=")
+	keys(t, a, "ctrl+w", "=")
 	if reset := divider(); reset != before {
 		t.Fatalf("= did not reset: %d, want %d", reset, before)
 	}
@@ -333,7 +334,7 @@ func TestPaneKeysResizeTheRepoList(t *testing.T) {
 		return 0
 	}
 	top := row()
-	keys(t, a, "3", ">")
+	keys(t, a, "3", "ctrl+w", ">")
 	if lower := row(); lower <= top {
 		t.Fatalf("3> did not grow the stacked repo list: %d -> %d", top, lower)
 	}
