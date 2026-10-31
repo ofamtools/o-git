@@ -453,6 +453,10 @@ func (a *App) renderCompare(r *ochazuke.Runtime, width, height int) ochazuke.Blo
 	if p.failure != "" {
 		status += " · " + p.failure
 	}
+	// The status is one row: a multi-line failure (git's stderr on Linux
+	// adds "Stopping at filesystem boundary ...") would otherwise push the
+	// title off it, leaving only its last line.
+	status = strings.Join(strings.Fields(status), " ")
 	bh := height - 1
 	if width < 20 || bh < 8 {
 		return ochazuke.Text(ansi.Truncate(status, width, "…"))

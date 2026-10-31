@@ -573,3 +573,27 @@ func TestComparePageCommitSetsSide(t *testing.T) {
 		})
 	}
 }
+
+// A multi-line failure (git's stderr on Linux: "... not a git repository
+// (or any parent up to mount point /)\nStopping at filesystem boundary
+// ...") stays on the one status row, so the title keeps the repository.
+func TestCompareStatusFlattensMultiLineFailure(t *testing.T) {
+	a, dir := compareStory(t)
+	a.compare.failure = dir + " is not in a git worktree: fatal: not a git repository\nStopping at filesystem boundary"
+	for _, width := range []int{120, 300} {
+		a.m.Width, a.m.Height = width, 40
+		var status string
+		for _, line := range strings.Split(screen(a), "\n") {
+			if strings.Contains(line, "Compare "+tilde(dir)) {
+				status = line
+				break
+			}
+		}
+		if !strings.Contains(status, "Compare "+tilde(dir)) {
+			t.Fatalf("width %d: the status row lost the repository: %q\n%s", width, status, screen(a))
+		}
+		if width == 300 && !strings.Contains(status, "repository Stopping at filesystem boundary") {
+			t.Fatalf("the failure was not joined onto the status row: %q", status)
+		}
+	}
+}
