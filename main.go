@@ -48,10 +48,8 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 			}
 			return runTUI(args, stdin, stdout, stderr)
 		}))
-	// App commands claim their names before framework noun aliases (view
-	// is also the short name of ochazuke.view).
-	app.Add(viewCommand(stdin, stdout, stderr))
 	ocli.Mount(app, a.Shell())
+	app.Add(viewCommand(stdin, stdout, stderr))
 	app.HelpText += `
 Page:
   o-git (or o-git view) opens the Git page; --smoke renders one frame.`
