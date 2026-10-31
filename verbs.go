@@ -123,8 +123,9 @@ func splitPaths(s string) []string {
 
 func (a *App) repoList(c ochazuke.Ctx) ochazuke.Result {
 	extra := append(append([]string{}, a.Paths...), splitPaths(ochazuke.StringArg(c.Args, "path", ""))...)
+	selected := a.viewRepo
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
-		repos, err := listRepos(ctx, extra)
+		repos, err := listReposSelecting(ctx, extra, selected)
 		if err != nil {
 			return nil, err
 		}

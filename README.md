@@ -153,7 +153,7 @@ motions or bindings. The Compare page uses the shared diffview Vim `]c`/`[c` int
 
 The catalog declares it as a data page (`pages` in `o-git catalog`: layout `split`, the lists Repositories, Branches and Worktrees, and a detail of the selected row's record), so a host such as mtm draws this layout from the rows instead of a generic page. The host fills the lists from `repo state`, so there its branch and worktree lists hold every repository's rows; o-git's own page below shows one repository's at a time.
 
-`o-git` (or `o-git view [--path DIR,...]`) opens it; `--smoke` renders one frame and exits.
+`o-git` (or `o-git view [--repo DIR] [--path DIR,...]`) opens it; `--smoke` renders one frame and exits. `--repo DIR` selects the repository containing DIR, including a subdirectory or linked worktree, independently of o-proj. It puts that repository first and keeps o-proj's other repositories; `--path` adds directories without changing the selection. If discovery fails, the explicit repository and extra paths still open. A directory outside a repository remains visible with its reason.
 
 The repo list is on the left; on the right are the selected repo's worktrees, its branches and the detail of the focused row. The worktree and branch lists follow the selection in the repo list (one read off the loop each time it moves).
 
@@ -177,7 +177,11 @@ The keys follow the family key map (`~/hub/o-plans/plans/mtm-keys-and-ux-review-
 
 ## The Compare page
 
-`o-git view --page compare [--path DIR]` opens Compare, using the current directory's repository when no path is given. The noun-only `o-git compare` remains the CLI noun's help; use the view flag to open the page. `c` on a repository, worktree or branch opens it with that row as the `to` side and the configured default pair's `from` side. The page is local to o-git's TUI; host mounting is a later plan.
+`o-git view --page compare [--repo DIR] [--path DIR]` opens Compare on the selected repository, using the current directory's repository when neither flag is given. An unavailable repository opens the page with a reason. The noun-only `o-git compare` remains the CLI noun's help; use the view flag to open the page. `c` on a repository, worktree or branch opens it with that row as the `to` side and the configured default pair's `from` side. The page is local to o-git's TUI; native host mounting is a later plan.
+
+The catalog declares a `diff` side titled **Side diff**, with default terminal leader key `g`. Once mtm supports sides as data and o-git is registered as its Git extension, leader `g` opens this Compare page beside the current pane, using that pane's directory and environment. The command template is `{"command":["{bin}","view","--page","compare","--repo","{dir}"]}`; the host supplies the values as arguments. `q` on Compare quits o-git and closes the side; in a file diff, `q` first closes that modal. The repository stays fixed until the host restarts the side.
+
+The declaration adds no standalone key or process. In mtm, the side is enabled when the extension is registered; a `sides.json` override `{"name":"diff","disabled":true}` disables it, and `{"name":"diff","key":""}` removes its default leader key. Host bindings remain overridable. Compared with Vim's `:terminal` split (`:help :terminal`), the host chooses the side's program from a catalog row; o-git keeps its own Compare bindings inside it.
 
 Pairs sit on the left with from/to, ahead/behind, file counts, fetched age and state. Every pair occupies one row: cells truncate with an ellipsis; collapsed labels show the first name plus `+N`, with every name and the full state/reason in Detail. Low-value columns drop first when space is tight: fetched when all rows have no fetch time, then to when every target is HEAD. Unavailable pairs remain dimmed with reasons. The initial selection is `compare.default-pair` (`dirty`). At 80 columns the pairs list stacks above the other panels.
 
@@ -210,7 +214,7 @@ A replacing read off the event loop follows pair selection, filling Commits with
 | `y y` | pair | copy its resolved range through the shared unnamed register |
 | `R` | Compare | resolve the pairs again |
 
-The chooser's Log/All/Graph sources preserve git's order. Graph connector lines stay attached to the commit in its preview; ochazuke v0.68.0 chooser cells have no `Wrap` column API yet. A typed ref, SHA, `merge-base(...)` or `fork-point(...)` becomes an ad hoc `(custom) A..B` row at the top, including an unavailable spec and its reason. Edits are remembered per repository in `compare.json` in o-git's state directory, without changing settings. `compare save NAME` appends the selected comparison to `compare.pairs` through the settings API. `pages.hidden` containing `compare` hides the page from the tabs and cycling; direct opening remains available, following the framework's behavior. Bindings are individually replaceable or removable through `bindings.json`.
+The chooser's Log/All/Graph sources preserve git's order. Graph connector lines stay attached to the commit in its preview; ochazuke v0.72.0 chooser cells have no `Wrap` column API yet. A typed ref, SHA, `merge-base(...)` or `fork-point(...)` becomes an ad hoc `(custom) A..B` row at the top, including an unavailable spec and its reason. Edits are remembered per repository in `compare.json` in o-git's state directory, without changing settings. `compare save NAME` appends the selected comparison to `compare.pairs` through the settings API. `pages.hidden` containing `compare` hides the page from the tabs and cycling; direct opening remains available, following the framework's behavior. Bindings are individually replaceable or removable through `bindings.json`.
 
 | Diff setting | Default |
 |---|---|

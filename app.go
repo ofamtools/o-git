@@ -22,7 +22,7 @@ const (
 )
 
 // Version is the catalog's version.
-const Version = "0.2.0"
+const Version = "0.3.0"
 
 // App is o-git's state.
 type App struct {
@@ -34,6 +34,8 @@ type App struct {
 	// Paths are extra repository directories the repo list shows beside
 	// o-proj's (the TUI's --path flags).
 	Paths []string
+	// viewRepo is the view's explicit initial selection, independent of o-proj.
+	viewRepo string
 	// Now is the clock branch ages read.
 	Now func() time.Time
 
@@ -101,6 +103,12 @@ func New() (*App, error) {
 	// The page is declared as a data page (dataPage), so a host's
 	// catalog draws its lists; o-git's own TUI keeps drawing it itself.
 	if err := ocli.DeclarePage(r, dataPage()); err != nil {
+		return nil, err
+	}
+	if err := ocli.DeclareSide(r, ocli.CatalogSide{
+		Name: "diff", Title: "Side diff", Key: "g",
+		Command: []string{"{bin}", "view", "--page", "compare", "--repo", "{dir}"},
+	}); err != nil {
 		return nil, err
 	}
 	page := r.PageOf(pageID)

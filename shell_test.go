@@ -322,6 +322,29 @@ func TestCatalog(t *testing.T) {
 	}
 }
 
+func TestCatalogDeclaresSideDiff(t *testing.T) {
+	cat := decode[ocli.CatalogDoc](t, run(t, "", "catalog"))
+	if err := cat.ValidateSides(); err != nil {
+		t.Fatal(err)
+	}
+	want := []ocli.CatalogSide{{
+		Name: "diff", Title: "Side diff", Key: "g", Launch: "command",
+		Command: []string{"{bin}", "view", "--page", "compare", "--repo", "{dir}"},
+	}}
+	if !reflect.DeepEqual(cat.Sides, want) {
+		t.Fatalf("catalog sides: %+v", cat.Sides)
+	}
+	dir := newRepo(t, "side repo,with comma")
+	argv, err := ocli.ExpandSideCommand(cat.Sides[0].Command, map[string]string{"bin": "o-git", "dir": dir})
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := run(t, "", append(argv[1:], "--smoke", "--width", "300")...)
+	if !strings.Contains(out, "Compare "+dir) || !strings.Contains(out, "dirty") {
+		t.Fatalf("side command did not open its repository:\n%s", out)
+	}
+}
+
 // --format prints a list verb's rows as the table the page draws: the
 // noun's declared columns over the rows' cells, one table per noun.
 func TestListFormats(t *testing.T) {

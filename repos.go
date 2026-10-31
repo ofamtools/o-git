@@ -161,12 +161,26 @@ func resolve(ctx context.Context, word string) (string, string, error) {
 // is shown once. Without o-proj the extra directories still answer; with
 // neither it is ErrNoProj.
 func listRepos(ctx context.Context, extra []string) ([]Repo, error) {
+	return listReposSelecting(ctx, extra, "")
+}
+
+// listReposSelecting puts the view's requested directory first, retaining
+// invalid directories as rows. Discovery cannot prevent an explicit selection;
+// when it fails, the requested directory and --path rows still open.
+func listReposSelecting(ctx context.Context, extra []string, selected string) ([]Repo, error) {
 	known, err := listKnown(ctx)
-	if err != nil && (len(extra) == 0 || !errors.Is(err, ErrNoProj)) {
-		return nil, err
+	if err != nil {
+		if selected == "" && (len(extra) == 0 || !errors.Is(err, ErrNoProj)) {
+			return nil, err
+		}
+		known = nil
 	}
 	type want struct{ name, dir string }
 	var wants []want
+	if selected != "" {
+		// The empty name is filled from the resolved toplevel after inspection.
+		wants = append(wants, want{dir: absPath(selected)})
+	}
 	for _, k := range known {
 		wants = append(wants, want{k.Name, k.Dir})
 	}
@@ -175,7 +189,12 @@ func listRepos(ctx context.Context, extra []string) ([]Repo, error) {
 		wants = append(wants, want{repoName(dir, known), dir})
 	}
 	repos := make([]Repo, len(wants))
-	parallel(len(wants), func(i int) { repos[i] = inspect(ctx, wants[i].name, wants[i].dir) })
+	parallel(len(wants), func(i int) {
+		repos[i] = inspect(ctx, wants[i].name, wants[i].dir)
+		if repos[i].Name == "" {
+			repos[i].Name = repoName(repos[i].Path, known)
+		}
+	})
 	out := make([]Repo, 0, len(repos))
 	for _, r := range repos {
 		if !slices.ContainsFunc(out, func(o Repo) bool { return o.State != "missing" && o.Path == r.Path }) {

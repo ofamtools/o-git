@@ -202,6 +202,9 @@ func (a *App) compareDetail() string {
 	if detail != "" {
 		return detail
 	}
+	if a.compare.failure != "" {
+		return a.compare.failure
+	}
 	p := a.compare.shown
 	if p == nil {
 		return "Reading selected comparison…"

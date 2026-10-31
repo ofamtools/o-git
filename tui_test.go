@@ -115,6 +115,106 @@ func TestPageFollowsTheSelectedRepo(t *testing.T) {
 	}
 }
 
+// Entry-point stories exercise the real view command and its pending reads.
+func TestViewRepoStories(t *testing.T) {
+	t.Run("git/view-repo-selects-containing-repo", func(t *testing.T) {
+		known := newRepo(t, "known")
+		chosen := newRepo(t, "chosen")
+		nested := filepath.Join(chosen, "nested")
+		if err := os.Mkdir(nested, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		fakeProj(t, Known{Name: "Known", Dir: known})
+		out := run(t, "", "view", "--repo", nested, "--smoke", "--width", "240")
+		if !strings.Contains(out, "Worktrees chosen") || !strings.Contains(out, "Repos 2") {
+			t.Fatalf("explicit repository was not selected:\n%s", out)
+		}
+	})
+	t.Run("git/view-repo-path-adds", func(t *testing.T) {
+		chosen := newRepo(t, "chosen")
+		extra := newRepo(t, "extra")
+		out := run(t, "", "view", "--repo", chosen, "--path", extra, "--smoke", "--width", "240")
+		if !strings.Contains(out, "Worktrees chosen") || !strings.Contains(out, "Repos 2") || !strings.Contains(out, "extra") {
+			t.Fatal(out)
+		}
+	})
+	t.Run("git/compare-repo-overrides-discovery-and-path", func(t *testing.T) {
+		known := newRepo(t, "known")
+		chosen := newRepo(t, "chosen")
+		extra := newRepo(t, "extra")
+		fakeProj(t, Known{Name: "Known", Dir: known})
+		out := run(t, "", "view", "--page", "compare", "--repo", chosen, "--path", extra, "--smoke", "--width", "240")
+		if !strings.Contains(out, "Compare "+chosen) || !strings.Contains(out, "dirty") {
+			t.Fatal(out)
+		}
+	})
+	t.Run("git/compare-cwd-selects-containing-repo", func(t *testing.T) {
+		known := newRepo(t, "known")
+		chosen := newRepo(t, "chosen")
+		nested := filepath.Join(chosen, "nested")
+		if err := os.Mkdir(nested, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		fakeProj(t, Known{Name: "Known", Dir: known})
+		t.Chdir(nested)
+		out := run(t, "", "view", "--page", "compare", "--smoke", "--width", "300")
+		if !strings.Contains(out, "Compare "+chosen) || !strings.Contains(out, "dirty") {
+			t.Fatal(out)
+		}
+	})
+	t.Run("git/view-repo-linked-worktree", func(t *testing.T) {
+		main := newRepo(t, "main")
+		worktree := filepath.Join(t.TempDir(), "linked")
+		sh(t, main, "worktree", "add", "-q", "-b", "topic", worktree)
+		nested := filepath.Join(worktree, "nested")
+		if err := os.Mkdir(nested, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		top := sh(t, worktree, "rev-parse", "--show-toplevel")
+		for _, page := range []string{"git", "compare"} {
+			out := run(t, "", "view", "--page", page, "--repo", nested, "--smoke", "--width", "300")
+			if !strings.Contains(out, top) || (page == "git" && !strings.Contains(out, "topic")) || (page == "compare" && !strings.Contains(out, "Compare "+top)) {
+				t.Fatal(out)
+			}
+		}
+	})
+	t.Run("git/view-repo-survives-broken-discovery", func(t *testing.T) {
+		chosen := newRepo(t, "chosen")
+		bin := filepath.Join(t.TempDir(), "o-proj")
+		if err := os.WriteFile(bin, []byte("#!/bin/sh\nexit 1\n"), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		t.Setenv("O_GIT_PROJ", bin)
+		for _, page := range []string{"git", "compare"} {
+			out := run(t, "", "view", "--page", page, "--repo", chosen, "--smoke", "--width", "240")
+			if !strings.Contains(out, chosen) {
+				t.Fatal(out)
+			}
+		}
+	})
+	t.Run("git/view-repo-unassociated-reason", func(t *testing.T) {
+		known := newRepo(t, "known")
+		dir := t.TempDir()
+		fakeProj(t, Known{Name: "Known", Dir: known})
+		for _, page := range []string{"git", "compare"} {
+			out := run(t, "", "view", "--page", page, "--repo", dir, "--smoke", "--width", "300")
+			if !strings.Contains(out, "not in a git worktree") || !strings.Contains(out, dir) {
+				t.Fatalf("%s lost the requested directory or reason:\n%s", page, out)
+			}
+			if page == "compare" && !strings.Contains(out, "Compare "+dir) {
+				t.Fatal(out)
+			}
+		}
+	})
+	t.Run("git/compare-q-quits", func(t *testing.T) {
+		a, _ := compareStory(t)
+		keys(t, a, "q")
+		if !a.r.Quit {
+			t.Fatal("q on Compare must quit the program")
+		}
+	})
+}
+
 func TestPageWorktreeAddAndRemove(t *testing.T) {
 	dir := newRepo(t, "r")
 	a := open(t, dir)
