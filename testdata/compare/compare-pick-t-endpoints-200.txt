@@ -14,7 +14,7 @@
   ┃                                                                            ┃ │                                                                                                                   │
   ┃                 ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮─────────────────╯
   ┃                 │ Pick to · [Endpoints] Log All Refs Graph Worktrees                                                                                                           │─────────────────╮
-  ┃                 │ ›                                                                                       fuzzy │ HEAD                                                         │                 │
+  ┃                 │ ›                                                                                             │ HEAD                                                         │                 │
   ┃                 │   head                             HEAD      ready                                            │                                                              │                 │
   ┃                 │   worktree                         WORKTREE  ready                                            │                                                              │                 │
   ┃                 │   index                            INDEX     ready                                            │                                                              │                 │
@@ -22,7 +22,7 @@
   ┃                 │   upstream                         -         no upstream                                      │                                                              │                 │
   ┃                 │   origin/main                      -         no ref named origin/main; check the ref or fetc… │                                                              │                 │
   ┃                 │   {remote}/main · {remote}/branch  -         no remotes                                       │                                                              │                 │
-  ┃                 │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel · tab search.cycle-match                                │                 │
+  ┃                 │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel                                                         │                 │
   ┃                 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯─────────────────╯
   ┃                                                                            ┃ ╭─ Detail ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
   ┃                                                                            ┃ │ dirty                                                                                                             │
@@ -36,4 +36,4 @@
   ┃                                                                            ┃ │                                                                                                                   │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel · tab search.cycle-match
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel

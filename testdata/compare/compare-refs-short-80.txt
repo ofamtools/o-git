@@ -16,7 +16,7 @@
   │                                                                          │
   │     ╭──────────────────────────────────────────────────────────────╮     │
   │     │ Pick from · Endpoints Log All [Refs] Graph Worktrees         │     │
-  │     │ ›                              fuzzy │ refs/heads/main       │     │
+  │     │ ›                                    │ refs/heads/main       │     │
   ╰─────│   main   <sha>  first              │                       │─────╯
   ╭─ Fil│   topic  <sha>  feat: next         │                       │─────╮
   │ XY  │   v1.0   <sha>  feat: next         │                       │     │

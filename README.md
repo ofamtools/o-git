@@ -194,7 +194,7 @@ A replacing read off the event loop follows pair selection, filling Commits with
 | Key | Where | Does |
 |---|---|---|
 | `f` / `t` | Compare | choose the from / to endpoint |
-| `tab` / `shift+tab` | side chooser | next / previous match mode |
+| `tab` / `shift+tab` | side chooser, automatic commit search disabled | next / previous match mode |
 | `ctrl+o` / `alt+o` | side chooser | next / previous source: Endpoints, Log, All, Refs, Graph, Worktrees |
 | `enter` | side chooser | take the highlighted row, including the typed ref/spec create row |
 | `~` | Compare | swap the two sides |
@@ -216,6 +216,10 @@ A replacing read off the event loop follows pair selection, filling Commits with
 
 The chooser's Log/All/Graph sources preserve git's order. Graph connector lines stay attached to the commit in its preview; ochazuke v0.72.1 chooser cells have no `Wrap` column API yet. A typed ref, SHA, `merge-base(...)` or `fork-point(...)` becomes an ad hoc `(custom) A..B` row at the top, including an unavailable spec and its reason. Edits are remembered per repository in `compare.json` in o-git's state directory, without changing settings. `compare save NAME` appends the selected comparison to `compare.pairs` through the settings API. `pages.hidden` containing `compare` hides the page from the tabs and cycling; direct opening remains available, following the framework's behavior. Bindings are individually replaceable or removable through `bindings.json`.
 
+When a nonempty query matches no existing source row, the side chooser searches local commits from the repository's HEAD, pinned when the search starts. A SHA prefix of at least four hex characters matches the full SHA; text matches a case-insensitive substring of the commit subject. Results show short SHA, subject, author and date, and picking one sets that side to the full SHA. Reads run off the UI loop in chunks of 25, with each matching chunk displayed immediately. The default search stops after 100 commits. **Search 100 more commits…** continues from that offset, retaining matches; it stays available whenever a full block was scanned, even if that block found results. It may take one more read to establish that the history ended exactly at the block boundary. Editing the query or closing the chooser cancels pending work. These are local history reads, with no network fetch.
+
+Automatic search uses ochazuke's live source API. Existing source rows use the configured `chooser.match` and `search.case`; history completion uses literal subject substrings and SHA prefixes. Live sources own their matching in ochazuke v0.79, so Tab's interactive match-mode cycling is unavailable while automatic search is enabled. Set `compare.commit-search-depth` to `0` to restore ordinary chooser filtering and Tab cycling. The explicit ref/spec row remains available after search results.
+
 | Diff setting | Default |
 |---|---|
 | `compare.diff.layout` | `auto`: unified below 140 diff-content columns, split at 140 or more; `unified` and `split` force either layout |
@@ -223,6 +227,7 @@ The chooser's Log/All/Graph sources preserve git's order. Graph connector lines 
 | `compare.pairs.width-percent` | `40`: maximum wide-layout share for Pairs; `60` restores the former share |
 | `compare.files.follow-commit` | `true`: Files follows the focused commit; false loads only on Enter |
 | `compare.chooser.resolve-typed` | `true`: preview and prioritize the exact typed spec; false keeps the ordinary create row |
+| `compare.commit-search-depth` | `100`: commits scanned per automatic search block; `0` disables commit search and restores ordinary chooser matching |
 | `compare.copy-feedback` | `true`: show a plain notice after copying a comparison range; false silences it |
 
 The diff view reads layout and highlighting every frame; the merged reader's `compare.diff.context` and `compare.diff.max-lines` apply when a file loads. The existing `compare.files.find-copies-harder` and commit split/limit settings apply on refresh. All bindings remain individually overridable or removable.
@@ -234,6 +239,7 @@ Compared with Vim: Vim's `f`/`t` (`:help f`, `:help t`) find characters in text;
 | `CTRL-W w` / `CTRL-W W` | `CTRL-W_w`, `CTRL-W_W` | Similar: `}` / `{` walk lists in screen order, Pairs then Commits then Files |
 | `CTRL-W j` / `CTRL-W k` | `CTRL-W_j`, `CTRL-W_k` | Similar: list `j` / `k` spill at their edges in screen order; they do not wrap at the page edge |
 | Git endpoint selection and fetch | n/a | Domain operations with no Vim counterpart |
+| Command-line completion | `cmdline-completion`, `c_CTRL-D` | Similar: narrow candidates while typing; Git SHA/subject history search streams bounded chunks and offers explicit continuation instead of Vim's command/file completion |
 
 ## Build
 

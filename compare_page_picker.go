@@ -3,13 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 
 	"ofam.dev/ochazuke"
 )
 
 // Graph connector lines belong to a commit, never to selectable fake rows.
-type sideChoice struct{ Spec, Graph string }
+type sideChoice struct {
+	Spec, Graph string
+	Search      *commitSearch
+}
 
 func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 	repo, cfg, now := a.compareRepo(c), a.compareConfig(), a.Now()
@@ -27,24 +31,88 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 	choose := func(spec string) ochazuke.Result {
 		return a.compareSet(ochazuke.Ctx{Args: ochazuke.Arguments{"repo": repo, "side": side, "endpoint": spec}})
 	}
+	a.compare.chooserOther, a.compare.chooserRepo, a.compare.chooserFollowing = other, repo, ""
+	depth := a.r.Settings().Int("compare.commit-search-depth")
+	typed := a.r.Settings().Bool("compare.chooser.resolve-typed")
 	sources := []ochazuke.ChooserSource{}
-	a.compare.chooserOther = other
-	a.compare.chooserRepo = repo
-	a.compare.chooserFollowing = ""
 	for _, name := range []string{"Endpoints", "Log", "All", "Refs", "Graph", "Worktrees"} {
-		sources = append(sources, ochazuke.ChooserSource{Name: name, Load: func(_ string) ochazuke.Result {
-			return ochazuke.Pending(func(ctx context.Context) (any, error) {
-				_, dir, err := resolve(ctx, repo)
-				if err != nil {
-					return nil, err
+		var continuation *commitSearch
+		sources = append(sources, ochazuke.ChooserSource{Name: name, Live: depth > 0,
+			Open: func(row ochazuke.ChooserRow) (string, bool) {
+				choice, ok := row.Data.(sideChoice)
+				if !ok || choice.Search == nil {
+					return "", false
 				}
-				resolver, err := NewEndpointResolver(ctx, dir, cfg, now, &a.compareCache)
-				if err != nil {
-					return nil, err
-				}
-				return loadSideChoices(resolver, name, other)
-			})
-		}})
+				continuation = choice.Search
+				return continuation.query, true
+			},
+			Load: func(query string) ochazuke.Result {
+				next := continuation
+				continuation = nil
+				matcher := a.r.Matcher(a.r.ChooserMatch(), query)
+				cm := a.r.CaseFor(query)
+				return ochazuke.Pending(func(ctx context.Context) (any, error) {
+					if next != nil && next.query == query {
+						return ochazuke.ChooserBatch{Rows: next.rows, More: next.load()}, nil
+					}
+					_, dir, err := resolve(ctx, repo)
+					if err != nil {
+						return nil, err
+					}
+					resolver, err := NewEndpointResolver(ctx, dir, cfg, now, &a.compareCache)
+					if err != nil {
+						return nil, err
+					}
+					rows, err := loadSideChoices(resolver, name, other)
+					if err != nil {
+						return nil, err
+					}
+					if depth == 0 {
+						return rows, nil
+					}
+					matches := []ochazuke.ChooserRow{}
+					for _, row := range rows {
+						if matcher.Match(row.Label) {
+							matches = append(matches, row)
+						}
+					}
+					slices.SortStableFunc(matches, func(x, y ochazuke.ChooserRow) int {
+						if cm.Contains(x.Label, query) == cm.Contains(y.Label, query) {
+							return 0
+						}
+						if cm.Contains(x.Label, query) {
+							return -1
+						}
+						return 1
+					})
+					if strings.TrimSpace(query) == "" {
+						return matches, nil
+					}
+					var preview *ochazuke.ChooserRow
+					if typed {
+						var previews []string
+						for _, endpoint := range resolver.Resolve(query, other) {
+							if endpoint.Available {
+								previews = append(previews, "resolved "+endpointDetail(endpoint))
+							} else {
+								previews = append(previews, endpoint.Reason)
+							}
+						}
+						text := strings.Join(previews, "\n")
+						row := ochazuke.ChooserRow{ID: "typed-spec", Label: "Use ref/spec " + query, Cells: []string{query, text}, Data: sideChoice{Spec: query, Graph: text}}
+						preview = &row
+					}
+					if len(matches) > 0 {
+						if preview != nil {
+							matches = append([]ochazuke.ChooserRow{*preview}, matches...)
+						}
+						return matches, nil
+					}
+					search := &commitSearch{dir: dir, head: resolver.head, query: query, depth: depth, run: resolver.run, preview: preview}
+					return ochazuke.ChooserBatch{More: search.load()}, nil
+				})
+			},
+		})
 	}
 	_, err := a.r.OpenChooser(ochazuke.ChooserSpec{
 		Kind: "compare-side", Title: "Pick " + side, Sources: sources, CreateRow: true,
@@ -170,7 +238,7 @@ func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.Choo
 // source bindings and ordering; an exact spec is an ordinary first row.
 func (a *App) followCompareChooser() bool {
 	c := a.r.Chooser("compare-side")
-	if c == nil || !a.r.Settings().Bool("compare.chooser.resolve-typed") {
+	if c == nil || a.r.Settings().Int("compare.commit-search-depth") > 0 || !a.r.Settings().Bool("compare.chooser.resolve-typed") {
 		return false
 	}
 	query, source := c.Query(), c.Source()

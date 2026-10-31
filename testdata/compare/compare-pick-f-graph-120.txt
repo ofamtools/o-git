@@ -14,7 +14,7 @@
   ┃                                            ┃ │                                                                   │
   ┃         ╭──────────────────────────────────────────────────────────────────────────────────────────────╮─────────╯
   ┃         │ Pick from · Endpoints Log All Refs [Graph] Worktrees                                         │─────────╮
-  ┃         │ ›                                                 fuzzy │ * <sha> feat: next               │         │
+  ┃         │ ›                                                       │ * <sha> feat: next               │         │
   ┃         │   * <sha>  HEAD -> topic  feat: next                  │ <sha> │         │
   ┃         │   * <sha>  main           first                       │ 1c72f6                             │         │
   ┃         │                                                         │                                    │         │
@@ -36,4 +36,4 @@
   ┃                                            ┃ │                                                                   │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰───────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel · tab search.c…
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel

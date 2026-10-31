@@ -33,6 +33,12 @@ type CompareConfig struct {
 
 func declareCompareSettings(r *ochazuke.Runtime) error {
 	return r.DeclareSetting(
+		ochazuke.Setting{Name: "compare.commit-search-depth", Type: ochazuke.SettingInteger, Default: 100, Description: "Commit history searched per chooser block; zero disables automatic commit search", Validate: func(v any) error {
+			if v.(int) < 0 {
+				return fmt.Errorf("commit-search-depth must not be negative")
+			}
+			return nil
+		}},
 		ochazuke.Setting{Name: "compare.pairs.width-percent", Type: ochazuke.SettingInteger, Default: 40, Description: "Maximum wide-layout share for Pairs; 60 restores the former share", Validate: func(v any) error {
 			if n := v.(int); n < 25 || n > 75 {
 				return fmt.Errorf("width-percent must be between 25 and 75")

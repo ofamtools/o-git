@@ -1,0 +1,39 @@
+  ◆ o-git                                                        INSERT
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair          from  to        ↑  ↓  files  fetched  state                ┃
+  ┃ dirty         HEAD  WORKTREE  -  -  1      -        the working tree is… ┃
+  ┃ upstream      -     HEAD      -  -  -      -        no upstream          ┃
+  ┃ main +2       main  HEAD      1  0  1      -        ready                ┃
+  ┃ origin/main   -     HEAD      -  -  -      -        no ref named origin… ┃
+  ┃ no remot… +1  -     HEAD      -  -  -      -        no remotes           ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ the working tree is not a commit                                         │
+  │                                                                          │
+  │     ╭──────────────────────────────────────────────────────────────╮     │
+  │     │ Pick from · [Endpoints] Log All Refs Graph Worktrees         │     │
+  │     │ › unlisted subject needle            │ <sha> unlisted      │     │
+  │     │   <sha>   unliste…  Test  2026-10… │ subject needle Test   │     │
+  ╰─────│   unliste…  "unlist…                 │ 2026-10-31            │─────╯
+  ╭─ Fil│   + Use ref/spec unlisted subject n… │ <sha> │─────╮
+  │ XY  │   + Use ref/spec unlisted subject n… │ <sha>   │     │
+  │  M  │ enter chooser.pick · ctrl+o chooser.next-source · alt+o cho… │     │
+  │ t…  ╰──────────────────────────────────────────────────────────────╯     │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Detail ─────────────────────────────────────────────────────────────────╮
+  │ dirty                                                                    │
+  │ from  HEAD                                                               │
+  │ to    WORKTREE                                                           │
+  │ ↑- ↓-                                                                    │
+  │ the working tree is not a commit                                         │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ────────────────────────────────────────────────────────────────────────────
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-so…

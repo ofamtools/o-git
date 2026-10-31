@@ -16,7 +16,7 @@
   │                                                                          │
   │     ╭──────────────────────────────────────────────────────────────╮     │
   │     │ Pick from · [Endpoints] Log All Refs Graph Worktrees         │     │
-  │     │ › merge-base(main)             fuzzy │ resolved <sha>      │     │
+  │     │ › merge-base(main)                   │ resolved <sha>      │     │
   ╰─────│   merge-base(main)  resolved adc613… │ (merge-base(main))    │─────╯
   ╭─ Fil│   + Use ref/spec merge-base(main)    │ merge-base(main)      │─────╮
   │ XY  │   + Use ref/spec merge-base(main)    │                       │     │

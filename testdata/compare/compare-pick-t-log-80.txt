@@ -14,7 +14,7 @@
   │ the working tree is not a commit                                         │
   │     ╭──────────────────────────────────────────────────────────────╮     │
   │     │ Pick to · Endpoints [Log] All Refs Graph Worktrees           │     │
-  │     │ ›                              fuzzy │ <sha> feat: next    │     │
+  │     │ ›                                    │ <sha> feat: next    │     │
   │     │   <sha>  HEAD -> topic  feat: next │ <sha> │     │
   │     │   <sha>  main           first      │ <sha>   │     │
   ╰─────│                                      │                       │─────╯

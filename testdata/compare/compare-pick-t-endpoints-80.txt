@@ -14,7 +14,7 @@
   │ the working tree is not a commit                                         │
   │     ╭──────────────────────────────────────────────────────────────╮     │
   │     │ Pick to · [Endpoints] Log All Refs Graph Worktrees           │     │
-  │     │ ›                              fuzzy │ HEAD                  │     │
+  │     │ ›                                    │ HEAD                  │     │
   │     │   head         HEAD      ready       │                       │     │
   │     │   worktree     WORKTREE  ready       │                       │     │
   ╰─────│   index        INDEX     ready       │                       │─────╯
