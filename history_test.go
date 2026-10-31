@@ -7,45 +7,33 @@ import (
 	ocli "github.com/unixsuperhero/ochazuke/cli"
 )
 
-// frameworkOperations are the operations ochazuke registers on its own for
-// the parts o-git builds on (the runtime and the model): every other
-// operation is a verb o-git defines.
-func frameworkOperations() map[string]bool {
-	r := ochazuke.NewRuntime()
-	ochazuke.NewModel(r)
-	out := map[string]bool{}
-	for key := range r.Operations {
-		out[key] = true
-	}
-	return out
-}
-
-// Every verb o-git defines declares its history kind (Operation.HistoryKind)
-// rather than leaving it to the default, and the catalog's history is that
-// kind. A new verb without one fails here. The TUI and the command line
-// share one runtime, so walking the catalog covers every verb.
+// Every app and framework verb declares its history kind, and the catalog
+// publishes that kind. Shell adds the lazy catalog/MCP verbs, so declarations
+// and published verbs must be checked on the same Shell-backed runtime.
 func TestEveryVerbDeclaresItsHistory(t *testing.T) {
-	framework := frameworkOperations()
 	a, err := New()
 	if err != nil {
 		t.Fatal(err)
 	}
-	doc := decode[ocli.CatalogDoc](t, run(t, "", "catalog"))
+	sh := a.Shell()
+	data, err := ocli.Catalog(sh.Runtime, sh.Bin, sh.Version)
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc := decode[ocli.CatalogDoc](t, string(data))
+	r := sh.Runtime
 	seen := map[string]bool{}
 	for _, noun := range doc.Nouns {
 		for _, v := range noun.Verbs {
 			key := noun.Name + "." + v.Name
-			if framework[key] || a.r.Operations[a.r.CanonicalKey(key)].Builtin {
-				continue
-			}
 			seen[key] = true
-			if declared := a.r.Operations[a.r.CanonicalKey(key)].HistoryKind; declared == "" || v.History != declared {
+			if declared := r.Operations[r.CanonicalKey(key)].HistoryKind; declared == "" || v.History != declared {
 				t.Errorf("catalog verb %s: history %q, declared %q", key, v.History, declared)
 			}
 		}
 	}
-	for key := range a.r.Operations {
-		if !framework[key] && !a.r.Operations[key].Builtin && !seen[key] {
+	for key := range r.Operations {
+		if !seen[key] {
 			t.Errorf("verb %s is not in the catalog", key)
 		}
 	}
