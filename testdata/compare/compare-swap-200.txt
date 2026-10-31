@@ -3,20 +3,20 @@
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ╭━ Pairs 7 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────────────────────────────────────────────────────╮
-  ┃ pair                           from               to        ↑  ↓  files  fetched  state                           ┃ │ Phase B: commits not loaded                                                │
-  ┃ (custom) WORKTREE..HEAD        WORKTREE           HEAD      -  -         -        reversed: the working tree is   ┃ │ (empty list)                                                               │
-  ┃                                                                                   on the left                     ┃ │                                                                            │
-  ┃ dirty                          HEAD               WORKTREE  -  -         -        the working tree is not a       ┃ │                                                                            │
-  ┃                                                                                   commit                          ┃ │                                                                            │
-  ┃ upstream                       {upstream}         HEAD      -  -         -        no upstream                     ┃ │                                                                            │
-  ┃ main · merge-base · fork-      main               HEAD      1  0         -        ready                           ┃ │                                                                            │
-  ┃ point                                                                                                             ┃ │                                                                            │
-  ┃ origin/main                    origin/main        HEAD      -  -         -        no ref named origin/main        ┃ │                                                                            │
-  ┃ {remote}/main                  {remote}/{main}    HEAD      -  -         -        no remotes                      ┃ ╰────────────────────────────────────────────────────────────────────────────╯
-  ┃ {remote}/branch                {remote}/{branch}  HEAD      -  -         -        no remotes                      ┃ ╭─ Files ────────────────────────────────────────────────────────────────────╮
-  ┃                                                                                                                   ┃ │ Phase B: files not loaded                                                  │
-  ┃                                                                                                                   ┃ │ (empty list)                                                               │
+  ┃ pair                     from               to        ↑  ↓  files  fetched  state                                 ┃ │ the working tree is not a commit                                           │
+  ┃ (custom) WORKTREE..HEAD  WORKTREE           HEAD      -  -  1      -        reversed: the working tree is o…      ┃ │ sha  decorations  subject  author  age  parents                            │
+  ┃ dirty                    HEAD               WORKTREE  -  -  1      -        the working tree is not a commit      ┃ │ (empty list)                                                               │
+  ┃ upstream                 {upstream}         HEAD      -  -  -      -        no upstream                           ┃ │                                                                            │
+  ┃ main +2                  main               HEAD      1  0  1      -        ready                                 ┃ │                                                                            │
+  ┃ origin/main              origin/main        HEAD      -  -  -      -        no ref named origin/main              ┃ │                                                                            │
+  ┃ {remote}/main            {remote}/{main}    HEAD      -  -  -      -        no remotes                            ┃ │                                                                            │
+  ┃ {remote}/branch          {remote}/{branch}  HEAD      -  -  -      -        no remotes                            ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ ╰────────────────────────────────────────────────────────────────────────────╯
+  ┃                                                                                                                   ┃ ╭─ Files ────────────────────────────────────────────────────────────────────╮
+  ┃                                                                                                                   ┃ │ status  path     added  removed                                            │
+  ┃                                                                                                                   ┃ │ M       README   +1     -1                                                 │
+  ┃                                                                                                                   ┃ │ total   1 files  +1     -1                                                 │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
@@ -27,11 +27,11 @@
   ┃                                                                                                                   ┃ ╭─ Detail ───────────────────────────────────────────────────────────────────╮
   ┃                                                                                                                   ┃ │ (custom)                                                                   │
   ┃                                                                                                                   ┃ │ from  WORKTREE                                                             │
-  ┃                                                                                                                   ┃ │   WORKTREE                                                                 │
   ┃                                                                                                                   ┃ │ to    HEAD                                                                 │
-  ┃                                                                                                                   ┃ │   HEAD                                                                     │
   ┃                                                                                                                   ┃ │ ↑- ↓-                                                                      │
   ┃                                                                                                                   ┃ │ reversed: the working tree is on the left                                  │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────────────────────────────────────────────────────╯

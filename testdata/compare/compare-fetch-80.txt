@@ -2,38 +2,38 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────╮
-  ┃ pair          from   ↑  ↓  state       3› ┃ │ Phase B: commits not load… │
-  ┃ (custom)      orig…  -  -  the            ┃ │ (empty list)               │
-  ┃ origin/m                   working        ┃ │                            │
-  ┃ ain..                      tree is        ┃ │                            │
-  ┃ WORKTREE                   not a          ┃ │                            │
-  ┃                            commit         ┃ │                            │
-  ┃ dirty         HEAD   -  -  the            ┃ │                            │
-  ┃                            working        ┃ │                            │
-  ┃                            tree is        ┃ │                            │
-  ┃                            not a          ┃ ╰────────────────────────────╯
-  ┃                            commit         ┃ ╭─ Files ────────────────────╮
-  ┃ upstream      {ups…  -  -  no             ┃ │ Phase B: files not loaded  │
-  ┃                            upstream       ┃ │ (empty list)               │
-  ┃ main ·        main   1  0  ready          ┃ │                            │
-  ┃ merge-                                    ┃ │                            │
-  ┃ base                                      ┃ │                            │
-  ┃ origin/m      orig…  0  0  same           ┃ │                            │
-  ┃ ain ·                      commit:        ┃ │                            │
-  ┃ fork-                      nothing        ┃ │                            │
-  ┃ point                      differs        ┃ │                            │
-  ┃ origin/b      orig…  -  -  origin has     ┃ ╰────────────────────────────╯
-  ┃ ranch                      no topic       ┃ ╭─ Detail ───────────────────╮
-  ┃                            branch         ┃ │ (custom)                   │
-  ┃                            (not           ┃ │ from  origin/main          │
-  ┃                            pushed, or     ┃ │   origin/main              │
-  ┃                            not            ┃ │ to    WORKTREE             │
-  ┃                            fetched)       ┃ │   WORKTREE                 │
-  ┃                                           ┃ │ ↑- ↓-                      │
-  ┃                                           ┃ │ the working tree is not a  │
-  ┃                                           ┃ │ commit                     │
-  ┃                                           ┃ │                            │
-  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────╯
+  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair          from       to        ↑  ↓  files  fetched  state           ┃
+  ┃ (custom) or…  origin/m…  WORKTREE  -  -  1      0s ago   the working tr… ┃
+  ┃ dirty         HEAD       WORKTREE  -  -  1      -        the working tr… ┃
+  ┃ upstream      {upstrea…  HEAD      -  -  -      -        no upstream     ┃
+  ┃ main +1       main       HEAD      1  0  1      -        ready           ┃
+  ┃ origin/main…  origin/m…  HEAD      0  0  0      0s ago   same commit: n… ┃
+  ┃ origin/bran…  origin/t…  HEAD      -  -  -      -        origin has no … ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ the working tree is not a commit                                         │
+  │ sha  decorations  subject  author  age  parents                          │
+  │ (empty list)                                                             │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Files ──────────────────────────────────────────────────────────────────╮
+  │ status  path     added  removed                                          │
+  │  M      README   +1     -1                                               │
+  │ total   1 files  +1     -1                                               │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Detail ─────────────────────────────────────────────────────────────────╮
+  │ (custom)                                                                 │
+  │ from  origin/main                                                        │
+  │ to    WORKTREE                                                           │
+  │ ↑- ↓-                                                                    │
+  │ the working tree is not a commit                                         │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
   ── compare.fetch done · compare.set done ───────────────────────────────────
   enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ c…

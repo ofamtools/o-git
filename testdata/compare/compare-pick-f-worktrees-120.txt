@@ -3,21 +3,21 @@
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────────────────────╮
-  ┃ pair         from     to       ↑  ↓  files  fetched  state        ┃ │ Phase B: commits not loaded                │
-  ┃ dirty        HEAD     WORKTR…  -  -         -        the working  ┃ │ (empty list)                               │
-  ┃                                                      tree is not  ┃ │                                            │
-  ┃                                                      a commit     ┃ │                                            │
-  ┃ upstream     {upstr…  HEAD     -  -         -        no upstream  ┃ │                                            │
-  ┃ main ·       main     HEAD     1  0         -        ready        ┃ │                                            │
-  ┃ merge-base                                                        ┃ │                                            │
-  ┃ · fork- ╭──────────────────────────────────────────────────────────────────────────────────────────────╮         │
-  ┃ point   │ Pick from · Endpoints Log All Refs Graph [Worktrees]                                         │         │
-  ┃ origin/m│ ›                                                 fuzzy │ worktree:/fixture/story            │─────────╯
+  ┃ pair        from     to       ↑  ↓  files  fetched  state         ┃ │ the working tree is not a commit           │
+  ┃ dirty       HEAD     WORKTR…  -  -  1      -        the working … ┃ │ sha      decorations  subject  author   2› │
+  ┃ upstream    {upstr…  HEAD     -  -  -      -        no upstream   ┃ │ (empty list)                               │
+  ┃ main +2     main     HEAD     1  0  1      -        ready         ┃ │                                            │
+  ┃ origin/ma…  origin…  HEAD     -  -  -      -        no ref named… ┃ │                                            │
+  ┃ {remote}/…  {remot…  HEAD     -  -  -      -        no remotes    ┃ │                                            │
+  ┃ {remote}/…  {remot…  HEAD     -  -  -      -        no remotes    ┃ │                                            │
+  ┃         ╭──────────────────────────────────────────────────────────────────────────────────────────────╮         │
+  ┃         │ Pick from · Endpoints Log All Refs Graph [Worktrees]                                         │         │
+  ┃         │ ›                                                 fuzzy │ worktree:/fixture/story            │─────────╯
   ┃         │   topic  /fixture/story  <sha>                        │                                    │─────────╮
-  ┃ {remote}│                                                         │                                    │         │
-  ┃ in      │                                                         │                                    │         │
-  ┃ {remote}│                                                         │                                    │         │
-  ┃ anch    │                                                         │                                    │         │
+  ┃         │                                                         │                                    │         │
+  ┃         │                                                         │                                    │         │
+  ┃         │                                                         │                                    │         │
+  ┃         │                                                         │                                    │         │
   ┃         │                                                         │                                    │         │
   ┃         │                                                         │                                    │         │
   ┃         │                                                         │                                    │         │
@@ -27,11 +27,11 @@
   ┃         ╰──────────────────────────────────────────────────────────────────────────────────────────────╯─────────╮
   ┃                                                                   ┃ │ dirty                                      │
   ┃                                                                   ┃ │ from  HEAD                                 │
-  ┃                                                                   ┃ │   HEAD                                     │
   ┃                                                                   ┃ │ to    WORKTREE                             │
-  ┃                                                                   ┃ │   WORKTREE                                 │
   ┃                                                                   ┃ │ ↑- ↓-                                      │
   ┃                                                                   ┃ │ the working tree is not a commit           │
+  ┃                                                                   ┃ │                                            │
+  ┃                                                                   ┃ │                                            │
   ┃                                                                   ┃ │                                            │
   ┃                                                                   ┃ │                                            │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────────────────────╯

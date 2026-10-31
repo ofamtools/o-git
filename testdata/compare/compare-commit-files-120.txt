@@ -1,0 +1,39 @@
+  ◆ o-git                                                                                                NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭─ Pairs 7 ─────────────────────────────────────────────────────────╮ ╭─ Commits ──────────────────────────────────╮
+  │ pair        from     to       ↑  ↓  files  fetched  state         │ │ sha          decorations    subject     3› │
+  │ dirty       HEAD     WORKTR…  -  -  1      -        the working … │ │ Ahead                                      │
+  │ upstream    {upstr…  HEAD     -  -  -      -        no upstream   │ │ <sha>      HEAD -> topic  feat: next     │
+  │ main        main     HEAD     1  1  2      -        ready         │ │ Behind                                     │
+  │ origin/ma…  origin…  HEAD     -  -  -      -        no ref named… │ │ <sha>      main           main work      │
+  │ {remote}/…  {remot…  HEAD     -  -  -      -        no remotes    │ │                                            │
+  │ {remote}/…  {remot…  HEAD     -  -  -      -        no remotes    │ │                                            │
+  │ merge-bas…  main     HEAD     1  0  1      -        ready         │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ ╰────────────────────────────────────────────╯
+  │                                                                   │ ╭━ Files <sha> ━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  │                                                                   │ ┃ status  path     added  removed            ┃
+  │                                                                   │ ┃ A       next     +1     -0                 ┃
+  │                                                                   │ ┃ total   1 files  +1     -0                 ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  │                                                                   │ ╭─ Detail ───────────────────────────────────╮
+  │                                                                   │ │ A next                                     │
+  │                                                                   │ │ +1 -0                                      │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  ╰───────────────────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────╯
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  enter compare.file-open · y y change.copy · f compare.set · t compare.set · ~ compare.swap · F compare.fetch · R co…

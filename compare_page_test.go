@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/unixsuperhero/ochazuke"
+	"github.com/unixsuperhero/ochazuke/diffview"
 )
 
 // These are app-page stories: o-story's pages fixture builds synthetic pages,
@@ -97,8 +98,8 @@ func compareFrame(t *testing.T, a *App, name string) {
 			}
 			t.Fatalf("frame differs: %s (O_GIT_UPDATE_FRAMES=1 to update)", file)
 		}
-		if out := os.Getenv("O_GIT_FRAME_DIR"); out != "" && width == 120 {
-			if err := os.WriteFile(filepath.Join(out, name+"-120.txt"), []byte(frame), 0644); err != nil {
+		if out := os.Getenv("O_GIT_FRAME_DIR"); out != "" {
+			if err := os.WriteFile(filepath.Join(out, fmt.Sprintf("%s-%d.txt", name, width)), []byte(frame), 0644); err != nil {
 				t.Fatal(err)
 			}
 		}
@@ -225,7 +226,107 @@ func TestComparePageStories(t *testing.T) {
 	t.Run("git/compare-graph-wrap", func(t *testing.T) {
 		t.Skip("gap: ochazuke v0.68.0 chooser has no Wrap column API; connectors are in preview")
 	})
-	t.Run("git/compare-open-diff", func(t *testing.T) { t.Skip("gap: Phase B waits for compare-lists and compare-diff") })
+	t.Run("git/compare-commits", func(t *testing.T) {
+		a, dir := compareStory(t)
+		sh(t, dir, "switch", "main")
+		commit(t, dir, "other", "main work")
+		sh(t, dir, "switch", "topic")
+		storyRequest(t, a, "reload", nil)
+		selectComparePair(t, a, "main")
+		rows := a.compare.commits.Items()
+		if len(rows) != 2 || rows[0].Section != "Ahead" || rows[1].Section != "Behind" {
+			t.Fatalf("commit sections: %+v", rows)
+		}
+		compareFrame(t, a, "compare-commits")
+		keys(t, a, "enter", "y", "y")
+		selected, _ := a.compare.commits.Selected()
+		if got := a.r.Registers().Named["\""].Yank.Text; got != selected.Data.(Commit).SHA {
+			t.Fatal("commit copy", got)
+		}
+		keys(t, a, "enter")
+		if !a.compare.files.Focused() {
+			t.Fatal("commit enter did not show its files")
+		}
+		compareFrame(t, a, "compare-commit-files")
+		keys(t, a, "y", "y")
+		file, _ := a.compare.files.Selected()
+		if a.r.Registers().Named["\""].Yank.Text != file.Data.(Change).Path {
+			t.Fatal("commit file copy")
+		}
+		keys(t, a, "enter")
+		if a.r.TopModal() != "compare-diff" {
+			t.Fatal("commit file did not open diff")
+		}
+		compareFrame(t, a, "compare-commit-diff")
+		keys(t, a, "esc")
+	})
+	t.Run("git/compare-files", func(t *testing.T) {
+		a, dir := compareStory(t)
+		write(t, dir, "zeta", "new file\n")
+		storyRequest(t, a, "reload", nil)
+		rows := a.compare.files.Items()
+		if len(rows) != 3 {
+			t.Fatalf("files + total: %+v", rows)
+		}
+		if err := a.compare.files.Focus(); err != nil {
+			t.Fatal(err)
+		}
+		compareFrame(t, a, "compare-files")
+	})
+	t.Run("git/compare-open-diff", func(t *testing.T) {
+		a, dir := compareStory(t)
+		write(t, dir, "zeta", "new file\n")
+		storyRequest(t, a, "reload", nil)
+		if err := a.compare.files.Focus(); err != nil {
+			t.Fatal(err)
+		}
+		keys(t, a, "enter")
+		if a.r.TopModal() != "compare-diff" {
+			t.Fatal("file did not open diff")
+		}
+		compareFrame(t, a, "compare-open-diff")
+		keys(t, a, "{")
+		if !a.compare.diffFiles.Focused() {
+			t.Fatal("visual focus did not reach diff files")
+		}
+		keys(t, a, "}")
+		if a.r.Focus != diffID {
+			t.Fatal("visual focus did not return to diff")
+		}
+		keys(t, a, "]", "f")
+		row, _ := a.compare.files.Selected()
+		if row.Data.(Change).Path != "zeta" {
+			t.Fatal("diff.file did not select next file")
+		}
+		compareFrame(t, a, "compare-next-diff")
+		keys(t, a, "[", "f")
+		row, _ = a.compare.files.Selected()
+		if row.Data.(Change).Path != "README" {
+			t.Fatal("previous file")
+		}
+		view := diffview.Of(a.r, "compare/diff")
+		if view == nil {
+			t.Fatal("diff view missing")
+		}
+		if _, err := a.r.Settings().SetSession("compare.diff.layout", "split"); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := a.r.Settings().SetSession("compare.diff.highlight", false); err != nil {
+			t.Fatal(err)
+		}
+		_ = screen(a)
+		if fmt.Sprint(view.Snapshot()["layout"]) != "split" || view.Highlight {
+			t.Fatal(view.Snapshot())
+		}
+		keys(t, a, "q")
+		if a.r.Quit || a.r.TopModal() != "" || !a.compare.files.Focused() {
+			t.Fatal("q did not return to files")
+		}
+		keys(t, a, "enter", "esc")
+		if a.r.Quit || a.r.TopModal() != "" {
+			t.Fatal("esc did not close diff")
+		}
+	})
 }
 
 func TestComparePagePersistsCustomAndSavesThroughSettings(t *testing.T) {
@@ -360,7 +461,7 @@ func TestComparePageHiddenAndCommand(t *testing.T) {
 		t.Fatal("hidden page still in tabs")
 	}
 	out := run(t, "", "view", "--page", "compare", "--path", dir, "--smoke", "--width", "120")
-	if !strings.Contains(out, "Pairs") || !strings.Contains(out, "Phase B: commits") {
+	if !strings.Contains(out, "Pairs") || !strings.Contains(out, "Commits") {
 		t.Fatal(out)
 	}
 }
@@ -402,5 +503,73 @@ func TestComparePageSourcesKeepGitOrder(t *testing.T) {
 		if source == "Graph" && !connectors {
 			t.Fatal("connector lines did not stay with a commit")
 		}
+	}
+}
+
+func selectComparePair(t *testing.T, a *App, name string) {
+	t.Helper()
+	for _, row := range a.compare.pairs.Items() {
+		if slices.Contains(row.Data.(Comparison).Names, name) {
+			focusRow(t, a, a.compare.pairs, row.ID)
+			if err := a.Settle(); err != nil {
+				t.Fatal(err)
+			}
+			return
+		}
+	}
+	t.Fatalf("no pair %s", name)
+}
+
+func TestComparePagePairUX(t *testing.T) {
+	a, _ := compareStory(t)
+	for _, col := range a.compare.pairs.Columns() {
+		if col.Wrap {
+			t.Fatal("pair columns must not wrap")
+		}
+	}
+	for _, row := range a.compare.pairs.Items() {
+		p := row.Data.(Comparison)
+		if len(p.Names) > 1 && !strings.Contains(row.Cells[0], fmt.Sprintf("+%d", len(p.Names)-1)) {
+			t.Fatal("collapsed label not compact")
+		}
+	}
+	detail := a.compareDetail()
+	if strings.Contains(detail, "\n  HEAD") || strings.Contains(detail, "\n  WORKTREE") {
+		t.Fatal("duplicate endpoint line")
+	}
+	a.m.Width, a.m.Height = 80, 40
+	frame := screen(a)
+	if strings.Index(frame, "Commits") < strings.Index(frame, "Pairs") {
+		t.Fatal("stack order")
+	}
+	for _, line := range strings.Split(frame, "\n") {
+		if strings.Contains(line, "Pairs") && strings.Contains(line, "Commits") {
+			t.Fatal("80 cols should stack")
+		}
+	}
+}
+
+func TestComparePageCommitSetsSide(t *testing.T) {
+	for _, side := range []string{"from", "to"} {
+		t.Run(side, func(t *testing.T) {
+			a, _ := compareStory(t)
+			selectComparePair(t, a, "main")
+			keys(t, a, "enter")
+			row, _ := a.compare.commits.Selected()
+			sha := row.Data.(Commit).SHA
+			key := "f"
+			if side == "to" {
+				key = "t"
+			}
+			keys(t, a, key)
+			pair, _ := a.selectedComparison()
+			value := pair.From
+			if side == "to" {
+				value = pair.To
+			}
+			if value.SHA != sha {
+				t.Fatalf("%s was not set to commit", side)
+			}
+		})
 	}
 }

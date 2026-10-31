@@ -35,7 +35,7 @@ func TestEveryVerbDeclaresItsHistory(t *testing.T) {
 	for _, noun := range doc.Nouns {
 		for _, v := range noun.Verbs {
 			key := noun.Name + "." + v.Name
-			if framework[key] {
+			if framework[key] || a.r.Operations[a.r.CanonicalKey(key)].Builtin {
 				continue
 			}
 			seen[key] = true
@@ -45,7 +45,7 @@ func TestEveryVerbDeclaresItsHistory(t *testing.T) {
 		}
 	}
 	for key := range a.r.Operations {
-		if !framework[key] && !seen[key] {
+		if !framework[key] && !a.r.Operations[key].Builtin && !seen[key] {
 			t.Errorf("verb %s is not in the catalog", key)
 		}
 	}

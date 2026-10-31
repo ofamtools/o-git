@@ -147,7 +147,7 @@ use `--output json` for structured hunks. Ochazuke v0.66 through v0.69 does not
 offer a verb result with separate text and structured forms selected by format.
 
 Compared with Vim: these commands read Git content and add no editor, hunk
-motions or bindings. The future diff page owns the Vim `]c`/`[c` interaction.
+motions or bindings. The Compare page uses the shared diffview Vim `]c`/`[c` interaction.
 
 ## The Git page
 
@@ -179,7 +179,11 @@ The keys follow the family key map (`~/hub/o-plans/plans/mtm-keys-and-ux-review-
 
 `o-git view --page compare [--path DIR]` opens Compare. The noun-only `o-git compare` remains the CLI noun's help; use the view flag to open the page. `c` on a repository, worktree or branch opens it with that row as the `to` side. The page is local to o-git's TUI; host mounting is a later plan.
 
-Pairs sit on the left with from/to, ahead/behind, files, fetched age and state. Identical endpoints collapse according to `compare.collapse`; their names remain in the detail. Unavailable pairs remain dimmed with their reason. The initial selection is `compare.default-pair` (`dirty`). Pair selection follows through a replacing read off the event loop. Commits and Files currently show labelled Phase B placeholders; the files count stays blank until that data lane lands.
+Pairs sit on the left with from/to, ahead/behind, file counts, fetched age and state. Every pair occupies one row: cells truncate with an ellipsis; collapsed labels show the first name plus `+N`, with every name and the full state/reason in Detail. Low-value columns drop first when space is tight: fetched when all rows have no fetch time, then to when every target is HEAD. Unavailable pairs remain dimmed with reasons. The initial selection is `compare.default-pair` (`dirty`). At 80 columns the pairs list stacks above the other panels.
+
+A replacing read off the event loop follows pair selection, filling Commits with native Ahead/Behind sections (or interleaved rows when `compare.commits.split=false`) and Files with statuses, paths, numstats and totals. `enter` on a commit shows its files against its first parent, or the empty tree for a root commit. The Files title identifies that commit; moving to another pair restores comparison files. Detail follows the focused pair, commit, file or totals row.
+
+`enter` on a file opens its structured diff beside a file list in a modal. The same path works for commit files. Diffview owns rendering, hunk/line scrolling and file-navigation keys; its `diff.file` callback loads the next or previous actual file without visiting totals. `q` or Escape closes the diff and restores its file selection. The app calls the merged Go readers directly; no subprocess invokes o-git itself. Fetch remains explicit only.
 
 | Key | Where | Does |
 |---|---|---|
@@ -190,12 +194,28 @@ Pairs sit on the left with from/to, ahead/behind, files, fetched age and state. 
 | `F` | Compare | fetch only remotes used by the selected pair, as an explicit job; re-resolve on completion |
 | `F` | Git rows | fetch that repository's configured remotes |
 | `enter` | pair | focus Commits |
+| `enter` | commit | show that commit's files |
+| `enter` | file | open its diff |
+| `f` / `t` | commit | set from / to to that commit |
+| `y y` | commit / file | copy SHA / path through the shared register |
+| `] f` / `[ f` | diff | next / previous file (counts supported) |
+| `] c` / `[ c` | diff | next / previous hunk |
+| `J` / `K`, `ctrl+d` / `ctrl+u` | diff | scroll lines / half pages |
+| `}` / `{`, `tab` / `shift+tab` | diff modal | walk between the file list and diff |
+| `q` / `esc` | diff modal | close and return to the file row |
 | `y y` | pair | copy its resolved range through the shared unnamed register |
 | `R` | Compare | resolve the pairs again |
 
 The chooser's Log/All/Graph sources preserve git's order. Graph connector lines stay attached to the commit in its preview; ochazuke v0.68.0 chooser cells have no `Wrap` column API yet. A typed ref, SHA, `merge-base(...)` or `fork-point(...)` becomes an ad hoc `(custom) A..B` row at the top, including an unavailable spec and its reason. Edits are remembered per repository in `compare.json` in o-git's state directory, without changing settings. `compare save NAME` appends the selected comparison to `compare.pairs` through the settings API. `pages.hidden` containing `compare` hides the page from the tabs and cycling; direct opening remains available, following the framework's behavior. Bindings are individually replaceable or removable through `bindings.json`.
 
-Compared with Vim: Vim's `f`/`t` (`:help f`, `:help t`) find characters in text; these lists have no text cursor, so the keys pick from/to. Vim's `~` (`:help ~`) changes character case; Compare uses it to swap endpoints. List `j`/`k` retain the framework's visual row motion and spill rules. No staging or diff-get/put action is added.
+| Diff setting | Default |
+|---|---|
+| `compare.diff.layout` | `auto`: unified below 140 diff-content columns, split at 140 or more; `unified` and `split` force either layout |
+| `compare.diff.highlight` | `true`: syntax highlighting; false disables it |
+
+The diff view reads layout and highlighting every frame; the merged reader's `compare.diff.context` and `compare.diff.max-lines` apply when a file loads. The existing `compare.files.find-copies-harder` and commit split/limit settings apply on refresh. All bindings remain individually overridable or removable.
+
+Compared with Vim: Vim's `f`/`t` (`:help f`, `:help t`) find characters in text; these lists have no text cursor, so the keys pick from/to. Vim's `~` (`:help ~`) changes character case; Compare uses it to swap endpoints. List `j`/`k` retain the framework's visual row motion and spill rules. Diff hunk `] c`/`[ c` follow Vim `:help ]c`/`:help [c`, with counts. Split layout is similar to `:diffsplit`, comparing Git endpoints instead of editor buffers. No staging or diff-get/put action is added.
 
 ## Build
 

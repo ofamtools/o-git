@@ -3,20 +3,20 @@
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ╭━ Pairs 7 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────────────────────────────────────────────────────╮
-  ┃ pair                           from               to        ↑  ↓  files  fetched  state                           ┃ │ Phase B: commits not loaded                                                │
-  ┃ (custom) merge-base(topic)..   topic              WORKTREE  -  -         -        the working tree is not a       ┃ │ (empty list)                                                               │
-  ┃ WORKTREE                                                                          commit; relative to the         ┃ │                                                                            │
-  ┃                                                                                   worktree's HEAD                 ┃ │                                                                            │
-  ┃ dirty                          HEAD               WORKTREE  -  -         -        the working tree is not a       ┃ │                                                                            │
-  ┃                                                                                   commit                          ┃ │                                                                            │
-  ┃ upstream                       {upstream}         HEAD      -  -         -        no upstream                     ┃ │                                                                            │
-  ┃ main · merge-base · fork-      main               HEAD      1  0         -        ready                           ┃ │                                                                            │
-  ┃ point                                                                                                             ┃ │                                                                            │
-  ┃ origin/main                    origin/main        HEAD      -  -         -        no ref named origin/main        ┃ ╰────────────────────────────────────────────────────────────────────────────╯
-  ┃ {remote}/main                  {remote}/{main}    HEAD      -  -         -        no remotes                      ┃ ╭─ Files ────────────────────────────────────────────────────────────────────╮
-  ┃ {remote}/branch                {remote}/{branch}  HEAD      -  -         -        no remotes                      ┃ │ Phase B: files not loaded                                                  │
-  ┃                                                                                                                   ┃ │ (empty list)                                                               │
+  ┃ pair                      from               to        ↑  ↓  files  fetched  state                                ┃ │ the working tree is not a commit                                           │
+  ┃ (custom) merge-base(top…  topic              WORKTREE  -  -  1      -        the working tree is not a commi…     ┃ │ sha  decorations  subject  author  age  parents                            │
+  ┃ dirty                     HEAD               WORKTREE  -  -  1      -        the working tree is not a commit     ┃ │ (empty list)                                                               │
+  ┃ upstream                  {upstream}         HEAD      -  -  -      -        no upstream                          ┃ │                                                                            │
+  ┃ main +2                   main               HEAD      1  0  1      -        ready                                ┃ │                                                                            │
+  ┃ origin/main               origin/main        HEAD      -  -  -      -        no ref named origin/main             ┃ │                                                                            │
+  ┃ {remote}/main             {remote}/{main}    HEAD      -  -  -      -        no remotes                           ┃ │                                                                            │
+  ┃ {remote}/branch           {remote}/{branch}  HEAD      -  -  -      -        no remotes                           ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ ╰────────────────────────────────────────────────────────────────────────────╯
+  ┃                                                                                                                   ┃ ╭─ Files ────────────────────────────────────────────────────────────────────╮
+  ┃                                                                                                                   ┃ │ status  path     added  removed                                            │
+  ┃                                                                                                                   ┃ │  M      README   +1     -1                                                 │
+  ┃                                                                                                                   ┃ │ total   1 files  +1     -1                                                 │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
@@ -26,12 +26,12 @@
   ┃                                                                                                                   ┃ ╰────────────────────────────────────────────────────────────────────────────╯
   ┃                                                                                                                   ┃ ╭─ Detail ───────────────────────────────────────────────────────────────────╮
   ┃                                                                                                                   ┃ │ (custom)                                                                   │
-  ┃                                                                                                                   ┃ │ from  merge-base(topic)                                                    │
-  ┃                                                                                                                   ┃ │   topic                                                                    │
+  ┃                                                                                                                   ┃ │ from  topic (merge-base(topic))                                            │
   ┃                                                                                                                   ┃ │ to    WORKTREE                                                             │
-  ┃                                                                                                                   ┃ │   WORKTREE                                                                 │
   ┃                                                                                                                   ┃ │ ↑- ↓-                                                                      │
   ┃                                                                                                                   ┃ │ the working tree is not a commit; relative to the worktree's HEAD          │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────────────────────────────────────────────────────╯

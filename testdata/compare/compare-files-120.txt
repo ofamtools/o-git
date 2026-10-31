@@ -1,0 +1,39 @@
+  ◆ o-git                                                                                                NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭─ Pairs 6 ─────────────────────────────────────────────────────────╮ ╭─ Commits ──────────────────────────────────╮
+  │ pair        from     to       ↑  ↓  files  fetched  state         │ │ the working tree is not a commit           │
+  │ dirty       HEAD     WORKTR…  -  -  2      -        the working … │ │ sha      decorations  subject  author   2› │
+  │ upstream    {upstr…  HEAD     -  -  -      -        no upstream   │ │ (empty list)                               │
+  │ main +2     main     HEAD     1  0  1      -        ready         │ │                                            │
+  │ origin/ma…  origin…  HEAD     -  -  -      -        no ref named… │ │                                            │
+  │ {remote}/…  {remot…  HEAD     -  -  -      -        no remotes    │ │                                            │
+  │ {remote}/…  {remot…  HEAD     -  -  -      -        no remotes    │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ ╰────────────────────────────────────────────╯
+  │                                                                   │ ╭━ Files ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  │                                                                   │ ┃ status  path     added  removed            ┃
+  │                                                                   │ ┃  M      README   +1     -1                 ┃
+  │                                                                   │ ┃ ??      zeta                               ┃
+  │                                                                   │ ┃ total   2 files  +1     -1                 ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ┃                                            ┃
+  │                                                                   │ ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  │                                                                   │ ╭─ Detail ───────────────────────────────────╮
+  │                                                                   │ │  M README                                  │
+  │                                                                   │ │ +1 -1                                      │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  │                                                                   │ │                                            │
+  ╰───────────────────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────╯
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  enter compare.file-open · y y change.copy · f compare.set · t compare.set · ~ compare.swap · F compare.fetch · R co…

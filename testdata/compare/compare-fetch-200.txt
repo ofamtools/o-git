@@ -3,20 +3,20 @@
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────────────────────────────────────────────────────╮
-  ┃ pair                            from          to        ↑  ↓  files  fetched  state                               ┃ │ Phase B: commits not loaded                                                │
-  ┃ (custom) origin/main..WORKTREE  origin/main   WORKTREE  -  -         0s ago   the working tree is not a commit    ┃ │ (empty list)                                                               │
-  ┃ dirty                           HEAD          WORKTREE  -  -         -        the working tree is not a commit    ┃ │                                                                            │
-  ┃ upstream                        {upstream}    HEAD      -  -         -        no upstream                         ┃ │                                                                            │
-  ┃ main · merge-base               main          HEAD      1  0         -        ready                               ┃ │                                                                            │
-  ┃ origin/main · fork-point        origin/main   HEAD      0  0         0s ago   same commit: nothing differs        ┃ │                                                                            │
-  ┃ origin/branch                   origin/topic  HEAD      -  -         -        origin has no topic branch (not     ┃ │                                                                            │
-  ┃                                                                               pushed, or not fetched)             ┃ │                                                                            │
+  ┃ pair                      from          to        ↑  ↓  files  fetched  state                                     ┃ │ the working tree is not a commit                                           │
+  ┃ (custom) origin/main..W…  origin/main   WORKTREE  -  -  1      0s ago   the working tree is not a commit          ┃ │ sha  decorations  subject  author  age  parents                            │
+  ┃ dirty                     HEAD          WORKTREE  -  -  1      -        the working tree is not a commit          ┃ │ (empty list)                                                               │
+  ┃ upstream                  {upstream}    HEAD      -  -  -      -        no upstream                               ┃ │                                                                            │
+  ┃ main +1                   main          HEAD      1  0  1      -        ready                                     ┃ │                                                                            │
+  ┃ origin/main +1            origin/main   HEAD      0  0  0      0s ago   same commit: nothing differs              ┃ │                                                                            │
+  ┃ origin/branch             origin/topic  HEAD      -  -  -      -        origin has no topic branch (not…          ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ ╰────────────────────────────────────────────────────────────────────────────╯
   ┃                                                                                                                   ┃ ╭─ Files ────────────────────────────────────────────────────────────────────╮
-  ┃                                                                                                                   ┃ │ Phase B: files not loaded                                                  │
-  ┃                                                                                                                   ┃ │ (empty list)                                                               │
-  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │ status  path     added  removed                                            │
+  ┃                                                                                                                   ┃ │  M      README   +1     -1                                                 │
+  ┃                                                                                                                   ┃ │ total   1 files  +1     -1                                                 │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
@@ -27,11 +27,11 @@
   ┃                                                                                                                   ┃ ╭─ Detail ───────────────────────────────────────────────────────────────────╮
   ┃                                                                                                                   ┃ │ (custom)                                                                   │
   ┃                                                                                                                   ┃ │ from  origin/main                                                          │
-  ┃                                                                                                                   ┃ │   origin/main                                                              │
   ┃                                                                                                                   ┃ │ to    WORKTREE                                                             │
-  ┃                                                                                                                   ┃ │   WORKTREE                                                                 │
   ┃                                                                                                                   ┃ │ ↑- ↓-                                                                      │
   ┃                                                                                                                   ┃ │ the working tree is not a commit                                           │
+  ┃                                                                                                                   ┃ │                                                                            │
+  ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ┃                                                                                                                   ┃ │                                                                            │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────────────────────────────────────────────────────╯

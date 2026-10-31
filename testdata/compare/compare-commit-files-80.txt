@@ -1,0 +1,39 @@
+  ◆ o-git                                                        NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭─ Pairs 7 ────────────────────────────────────────────────────────────────╮
+  │ pair          from       to        ↑  ↓  files  fetched  state           │
+  │ dirty         HEAD       WORKTREE  -  -  1      -        the working tr… │
+  │ upstream      {upstrea…  HEAD      -  -  -      -        no upstream     │
+  │ main          main       HEAD      1  1  2      -        ready           │
+  │ origin/main   origin/m…  HEAD      -  -  -      -        no ref named o… │
+  │ {remote}/ma…  {remote}…  HEAD      -  -  -      -        no remotes      │
+  │ {remote}/br…  {remote}…  HEAD      -  -  -      -        no remotes      │
+  │ merge-base …  main       HEAD      1  0  1      -        ready           │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ sha      decorations    subject     author  age  parents                 │
+  │ Ahead                                                                    │
+  │ <sha>  HEAD -> topic  feat: next  Test    1h   1                       │
+  │ Behind                                                                   │
+  │ <sha>  main           main work   Test    1h   1                       │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭━ Files <sha> ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ status  path     added  removed                                          ┃
+  ┃ A       next     +1     -0                                               ┃
+  ┃ total   1 files  +1     -0                                               ┃
+  ┃                                                                          ┃
+  ┃                                                                          ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Detail ─────────────────────────────────────────────────────────────────╮
+  │ A next                                                                   │
+  │ +1 -0                                                                    │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ────────────────────────────────────────────────────────────────────────────
+  enter compare.file-open · y y change.copy · f compare.set · t compare.set ·…

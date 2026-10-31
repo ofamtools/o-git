@@ -2,38 +2,38 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 7 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────╮
-  ┃ pair          from   ↑  ↓  state       3› ┃ │ Phase B: commits not load… │
-  ┃ (custom)      WORK…  -  -  reversed:      ┃ │ (empty list)               │
-  ┃ WORKTREE                   the            ┃ │                            │
-  ┃ ..HEAD                     working        ┃ │                            │
-  ┃                            tree is on     ┃ │                            │
-  ┃                            the left       ┃ │                            │
-  ┃ dirty         HEAD   -  -  the            ┃ │                            │
-  ┃                            working        ┃ │                            │
-  ┃                            tree is        ┃ │                            │
-  ┃                            not a          ┃ ╰────────────────────────────╯
-  ┃                            commit         ┃ ╭─ Files ────────────────────╮
-  ┃ upstream      {ups…  -  -  no             ┃ │ Phase B: files not loaded  │
-  ┃                            upstream       ┃ │ (empty list)               │
-  ┃ main ·        main   1  0  ready          ┃ │                            │
-  ┃ merge-                                    ┃ │                            │
-  ┃ base ·                                    ┃ │                            │
-  ┃ fork-                                     ┃ │                            │
-  ┃ point                                     ┃ │                            │
-  ┃ origin/m      orig…  -  -  no ref         ┃ │                            │
-  ┃ ain                        named          ┃ │                            │
-  ┃                            origin/mai     ┃ ╰────────────────────────────╯
-  ┃                            n              ┃ ╭─ Detail ───────────────────╮
-  ┃ {remote}      {rem…  -  -  no remotes     ┃ │ (custom)                   │
-  ┃ /main                                     ┃ │ from  WORKTREE             │
-  ┃ {remote}      {rem…  -  -  no remotes     ┃ │   WORKTREE                 │
-  ┃ /branch                                   ┃ │ to    HEAD                 │
-  ┃                                           ┃ │   HEAD                     │
-  ┃                                           ┃ │ ↑- ↓-                      │
-  ┃                                           ┃ │ reversed: the working tree │
-  ┃                                           ┃ │  is on the left            │
-  ┃                                           ┃ │                            │
-  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────╯
+  ╭━ Pairs 7 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair          from       to        ↑  ↓  files  fetched  state           ┃
+  ┃ (custom) WO…  WORKTREE   HEAD      -  -  1      -        reversed: the … ┃
+  ┃ dirty         HEAD       WORKTREE  -  -  1      -        the working tr… ┃
+  ┃ upstream      {upstrea…  HEAD      -  -  -      -        no upstream     ┃
+  ┃ main +2       main       HEAD      1  0  1      -        ready           ┃
+  ┃ origin/main   origin/m…  HEAD      -  -  -      -        no ref named o… ┃
+  ┃ {remote}/ma…  {remote}…  HEAD      -  -  -      -        no remotes      ┃
+  ┃ {remote}/br…  {remote}…  HEAD      -  -  -      -        no remotes      ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ the working tree is not a commit                                         │
+  │ sha  decorations  subject  author  age  parents                          │
+  │ (empty list)                                                             │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Files ──────────────────────────────────────────────────────────────────╮
+  │ status  path     added  removed                                          │
+  │ M       README   +1     -1                                               │
+  │ total   1 files  +1     -1                                               │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Detail ─────────────────────────────────────────────────────────────────╮
+  │ (custom)                                                                 │
+  │ from  WORKTREE                                                           │
+  │ to    HEAD                                                               │
+  │ ↑- ↓-                                                                    │
+  │ reversed: the working tree is on the left                                │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
   ── compare.swap done ───────────────────────────────────────────────────────
   enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ c…
