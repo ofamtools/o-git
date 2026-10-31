@@ -340,7 +340,9 @@ func TestCatalogDeclaresSideDiff(t *testing.T) {
 		t.Fatal(err)
 	}
 	out := run(t, "", append(argv[1:], "--smoke", "--width", "300")...)
-	if !strings.Contains(out, "Compare "+dir) || !strings.Contains(out, "dirty") {
+	// The title draws the path as tilde does (~/... when TMPDIR is under
+	// HOME, as on a CI runner).
+	if !strings.Contains(out, "Compare "+tilde(dir)) || !strings.Contains(out, "dirty") {
 		t.Fatalf("side command did not open its repository:\n%s", out)
 	}
 }

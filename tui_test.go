@@ -144,7 +144,7 @@ func TestViewRepoStories(t *testing.T) {
 		extra := newRepo(t, "extra")
 		fakeProj(t, Known{Name: "Known", Dir: known})
 		out := run(t, "", "view", "--page", "compare", "--repo", chosen, "--path", extra, "--smoke", "--width", "240")
-		if !strings.Contains(out, "Compare "+chosen) || !strings.Contains(out, "dirty") {
+		if !strings.Contains(out, "Compare "+tilde(chosen)) || !strings.Contains(out, "dirty") {
 			t.Fatal(out)
 		}
 	})
@@ -158,7 +158,7 @@ func TestViewRepoStories(t *testing.T) {
 		fakeProj(t, Known{Name: "Known", Dir: known})
 		t.Chdir(nested)
 		out := run(t, "", "view", "--page", "compare", "--smoke", "--width", "300")
-		if !strings.Contains(out, "Compare "+chosen) || !strings.Contains(out, "dirty") {
+		if !strings.Contains(out, "Compare "+tilde(chosen)) || !strings.Contains(out, "dirty") {
 			t.Fatal(out)
 		}
 	})
@@ -173,7 +173,7 @@ func TestViewRepoStories(t *testing.T) {
 		top := sh(t, worktree, "rev-parse", "--show-toplevel")
 		for _, page := range []string{"git", "compare"} {
 			out := run(t, "", "view", "--page", page, "--repo", nested, "--smoke", "--width", "300")
-			if !strings.Contains(out, top) || (page == "git" && !strings.Contains(out, "topic")) || (page == "compare" && !strings.Contains(out, "Compare "+top)) {
+			if !strings.Contains(out, tilde(top)) || (page == "git" && !strings.Contains(out, "topic")) || (page == "compare" && !strings.Contains(out, "Compare "+tilde(top))) {
 				t.Fatal(out)
 			}
 		}
@@ -187,7 +187,7 @@ func TestViewRepoStories(t *testing.T) {
 		t.Setenv("O_GIT_PROJ", bin)
 		for _, page := range []string{"git", "compare"} {
 			out := run(t, "", "view", "--page", page, "--repo", chosen, "--smoke", "--width", "240")
-			if !strings.Contains(out, chosen) {
+			if !strings.Contains(out, tilde(chosen)) {
 				t.Fatal(out)
 			}
 		}
@@ -198,10 +198,10 @@ func TestViewRepoStories(t *testing.T) {
 		fakeProj(t, Known{Name: "Known", Dir: known})
 		for _, page := range []string{"git", "compare"} {
 			out := run(t, "", "view", "--page", page, "--repo", dir, "--smoke", "--width", "300")
-			if !strings.Contains(out, "not in a git worktree") || !strings.Contains(out, dir) {
+			if !strings.Contains(out, "not in a git worktree") || !strings.Contains(out, tilde(dir)) {
 				t.Fatalf("%s lost the requested directory or reason:\n%s", page, out)
 			}
-			if page == "compare" && !strings.Contains(out, "Compare "+dir) {
+			if page == "compare" && !strings.Contains(out, "Compare "+tilde(dir)) {
 				t.Fatal(out)
 			}
 		}
