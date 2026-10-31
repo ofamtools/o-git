@@ -20,6 +20,9 @@ func TestCompareStaleness(t *testing.T) {
 	logPath := filepath.Join(r.commonDir, "logs", ref)
 	// Build a reflog update timestamp independently of the commit date.
 	old := time.Now().Add(-48 * time.Hour).Truncate(time.Second).UTC()
+	if err := os.Chtimes(r.fetchHead, old, old); err != nil {
+		t.Fatal(err)
+	}
 	sha := sh(t, d, "rev-parse", "HEAD")
 	line := fmt.Sprintf("%s %s Test <test@example.com> %d +0000\tfetch: fixture\n", sha, sha, old.Unix())
 	if err := os.WriteFile(logPath, []byte(line), 0o644); err != nil {

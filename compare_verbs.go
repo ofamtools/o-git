@@ -91,7 +91,7 @@ func fetchedText(at *time.Time, stale bool, now time.Time) string {
 
 func endpointRow(e Endpoint, now time.Time) ocli.Row {
 	return ocli.Row{Noun: "endpoint", ID: "endpoint/" + e.Repo + ":" + e.Source + ":" + e.Name, Label: e.Name, Data: e,
-		Cells: []string{e.Name, e.Spec, e.Kind, e.Ref, shortSHA(e.SHA), fetchedText(e.Fetched, e.Stale, now), endpointState(e)}}
+		Cells: []string{e.Name, e.Spec, e.Kind, resolvedRef(e), shortSHA(e.SHA), fetchedText(e.Fetched, e.Stale, now), endpointState(e)}}
 }
 
 func comparisonRow(c Comparison, now time.Time) ocli.Row {
@@ -100,7 +100,7 @@ func comparisonRow(c Comparison, now time.Time) ocli.Row {
 		ahead, behind = "-", "-"
 	}
 	return ocli.Row{Noun: "compare", ID: "compare/" + c.Repo + ":" + c.Source + ":" + c.Names[0], Label: c.Name, Data: c,
-		Cells: []string{c.Name, c.From.Spec, c.To.Spec, ahead, behind, fetchedText(c.Fetched, c.Stale, now), c.State}}
+		Cells: []string{c.Name, resolvedRef(c.From), resolvedRef(c.To), ahead, behind, fetchedText(c.Fetched, c.Stale, now), c.State, c.From.Spec + ".." + c.To.Spec}}
 }
 
 func (a *App) endpointList(c ochazuke.Ctx) ochazuke.Result {
@@ -115,13 +115,16 @@ func (a *App) endpointList(c ochazuke.Ctx) ochazuke.Result {
 				continue
 			}
 			resolved := r.Resolve(strings.TrimSpace(spec), "HEAD")
-			for _, e := range resolved {
+			expanded, _ := r.expandAlias(spec, map[string]bool{})
+			for i, e := range resolved {
 				e.Name = strings.TrimSpace(name)
 				e.Source = strings.TrimSpace(name)
-				if strings.Contains(name, "{remote}") && len(e.Remotes) > 0 {
-					e.Name = strings.ReplaceAll(e.Name, "{remote}", e.Remotes[0])
-				} else if len(resolved) > 1 && len(e.Remotes) > 0 {
-					e.Name += " (" + e.Remotes[0] + ")"
+				if strings.Contains(expanded, "{remote}") && i < len(r.remotes) {
+					if strings.Contains(name, "{remote}") {
+						e.Name = strings.ReplaceAll(e.Name, "{remote}", r.remotes[i])
+					} else if len(resolved) > 1 {
+						e.Name += " (" + r.remotes[i] + ")"
+					}
 				}
 				rows = append(rows, endpointRow(e, r.now))
 			}
@@ -244,7 +247,7 @@ type FetchResult struct {
 // FetchRemotes is the single mutation shared by both verbs. The runner is
 // injectable so tests can assert --prune and failure handling without deleting
 // remote-tracking refs. Remote names are checked before starting any fetch.
-func FetchRemotes(ctx context.Context, dir string, remotes, configured []string, run gitRunner) error {
+func FetchRemotes(ctx context.Context, dir string, remotes, configured []string, run gitRunner, record func(string) error) error {
 	if len(remotes) == 0 {
 		return fmt.Errorf("no remotes to fetch")
 	}
@@ -260,6 +263,10 @@ func FetchRemotes(ctx context.Context, dir string, remotes, configured []string,
 	for _, remote := range remotes {
 		if _, err := run(ctx, writeTimeout, dir, "fetch", "--prune", "--", remote); err != nil {
 			failures = append(failures, remote+": "+err.Error())
+		} else if record != nil {
+			if err := record(remote); err != nil {
+				failures = append(failures, remote+": fetched, but could not record fetch time: "+err.Error())
+			}
 		}
 	}
 	if len(failures) > 0 {
@@ -295,7 +302,10 @@ func (a *App) fetch(c ochazuke.Ctx, compare bool) ochazuke.Result {
 		} else if remote != "" {
 			remotes = []string{remote}
 		}
-		if err := FetchRemotes(ctx, dir, remotes, r.remotes, run); err != nil {
+		record := func(remote string) error {
+			return recordRemoteFetch(cfg.StateDir, r.commonDir, remote, r.remoteURLs[remote], clock())
+		}
+		if err := FetchRemotes(ctx, dir, remotes, r.remotes, run, record); err != nil {
 			return nil, err
 		}
 		result := FetchResult{Repo: dir, Remotes: remotes}

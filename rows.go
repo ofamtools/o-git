@@ -31,7 +31,7 @@ var columns = map[string][]ochazuke.Column{
 	},
 	"compare": {
 		{Title: "pair"}, {Title: "from"}, {Title: "to"}, {Title: "ahead", Align: ochazuke.AlignRight},
-		{Title: "behind", Align: ochazuke.AlignRight}, {Title: "fetched"}, {Title: "state"},
+		{Title: "behind", Align: ochazuke.AlignRight}, {Title: "fetched"}, {Title: "state"}, {Title: "spec", Priority: 99},
 	},
 	"repo": {
 		{Title: "repo", Min: 10}, {Title: "branch", Priority: 1}, {Title: "sync", Priority: 2},

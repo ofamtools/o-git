@@ -22,6 +22,7 @@ type Comparison struct {
 	Behind        int          `json:"behind"`
 	Available     bool         `json:"available"`
 	Reason        string       `json:"reason"`
+	Detail        string       `json:"detail,omitempty"`
 	State         string       `json:"state"`
 	CommitsReason string       `json:"commits_reason,omitempty"`
 	Reversed      bool         `json:"reversed"`
@@ -71,7 +72,13 @@ func makeComparison(dir, name, from, to string, f, t Endpoint) Comparison {
 			if c.Reason != "" {
 				c.Reason += "; "
 			}
-			c.Reason += e.Spec + ": " + e.Reason
+			c.Reason += e.Reason
+			if e.Detail != "" {
+				if c.Detail != "" {
+					c.Detail += "; "
+				}
+				c.Detail += e.Detail
+			}
 		}
 		if e.Fetched != nil && (c.Fetched == nil || e.Fetched.Before(*c.Fetched)) {
 			c.Fetched = e.Fetched
@@ -159,7 +166,21 @@ func (r *EndpointResolver) pairRows(name, from, to string) []Comparison {
 		}
 		fs, ts := strings.ReplaceAll(f, "{remote}", remote), strings.ReplaceAll(t, "{remote}", remote)
 		inputFrom, inputTo := strings.ReplaceAll(from, "{remote}", remote), strings.ReplaceAll(to, "{remote}", remote)
-		left, right := r.ResolvePair(fs, ts)
+		var left, right Endpoint
+		if err := remoteEndpointError(remote); err != nil {
+			left, right = r.unavailable(inputFrom, "", err.Error()), r.unavailable(inputTo, "", err.Error())
+			if !strings.Contains(f, "{remote}") {
+				left = r.resolve(f, nil, 0)
+			}
+			if !strings.Contains(t, "{remote}") {
+				right = r.resolve(t, nil, 0)
+			}
+			if !strings.Contains(f+t, "{remote}") {
+				left = r.unavailable(inputFrom, "", err.Error())
+			}
+		} else {
+			left, right = r.ResolvePair(fs, ts)
+		}
 		if fe != nil {
 			left = r.unavailable(from, "", fe.Error())
 		}
@@ -168,10 +189,10 @@ func (r *EndpointResolver) pairRows(name, from, to string) []Comparison {
 		}
 		// An expanded row depends on its remote even if an absent branch or
 		// detached HEAD prevented its remote-tracking ref from resolving.
-		if strings.Contains(f, "{remote}") {
+		if strings.Contains(f, "{remote}") && !left.Available {
 			left.Remotes = unionRemotes(left.Remotes, []string{remote})
 		}
-		if strings.Contains(t, "{remote}") {
+		if strings.Contains(t, "{remote}") && !right.Available {
 			right.Remotes = unionRemotes(right.Remotes, []string{remote})
 		}
 		left.Spec, right.Spec = inputFrom, inputTo
@@ -289,6 +310,9 @@ func (r *EndpointResolver) countPairs(pairs []Comparison) {
 	groups := map[string][]int{}
 	var keys []string
 	for i, c := range pairs {
+		if r.shallow != "" && c.Available && !isMutable(c.From) && !isMutable(c.To) {
+			pairs[i].State += "; counts limited by shallow clone"
+		}
 		if !c.Available || isMutable(c.From) || isMutable(c.To) || endpointKey(c.From) == endpointKey(c.To) {
 			continue
 		}
@@ -303,7 +327,11 @@ func (r *EndpointResolver) countPairs(pairs []Comparison) {
 		counts, err := r.count(pairs[groups[key][0]], key)
 		for _, j := range groups[key] {
 			if err != nil {
-				pairs[j].Available, pairs[j].Reason, pairs[j].State = false, err.Error(), err.Error()
+				reason := "commit counts unavailable"
+				if timedOut(err) {
+					reason = "commit counts timed out"
+				}
+				pairs[j].Available, pairs[j].Reason, pairs[j].State, pairs[j].Detail = false, reason, reason, err.Error()
 			} else {
 				pairs[j].Ahead, pairs[j].Behind = counts.Ahead, counts.Behind
 			}

@@ -22,6 +22,7 @@ var defaultPairs = []string{
 
 // CompareConfig is copied on the event loop before a pending read starts.
 type CompareConfig struct {
+	StateDir         string
 	Endpoints, Pairs []string
 	Main             string
 	MainNames        []string
@@ -49,5 +50,5 @@ func declareCompareSettings(r *ochazuke.Runtime) error {
 
 func (a *App) compareConfig() CompareConfig {
 	s := a.r.Settings()
-	return CompareConfig{Endpoints: s.Strings("compare.endpoints"), Pairs: s.Strings("compare.pairs"), Main: s.String("compare.main"), MainNames: s.Strings("compare.main-names"), Collapse: s.Bool("compare.collapse"), DefaultPair: s.String("compare.default-pair"), StaleAfter: s.Duration("compare.stale-after")}
+	return CompareConfig{StateDir: a.r.Config().StateDirectory(), Endpoints: s.Strings("compare.endpoints"), Pairs: s.Strings("compare.pairs"), Main: s.String("compare.main"), MainNames: s.Strings("compare.main-names"), Collapse: s.Bool("compare.collapse"), DefaultPair: s.String("compare.default-pair"), StaleAfter: s.Duration("compare.stale-after")}
 }

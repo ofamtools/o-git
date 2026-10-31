@@ -563,7 +563,7 @@ func TestCompareFetchRunnerAndEnvironment(t *testing.T) {
 		calls = append(calls, slices.Clone(args))
 		return nil, nil
 	}
-	if err := FetchRemotes(context.Background(), t.TempDir(), []string{"origin", "upstream"}, []string{"origin", "upstream"}, runner); err != nil {
+	if err := FetchRemotes(context.Background(), t.TempDir(), []string{"origin", "upstream"}, []string{"origin", "upstream"}, runner, nil); err != nil {
 		t.Fatal(err)
 	}
 	if !reflect.DeepEqual(calls, [][]string{{"fetch", "--prune", "--", "origin"}, {"fetch", "--prune", "--", "upstream"}}) {
@@ -571,7 +571,7 @@ func TestCompareFetchRunnerAndEnvironment(t *testing.T) {
 	}
 	before := len(calls)
 	for _, remotes := range [][]string{nil, {"missing"}, {"origin", "--all"}} {
-		if FetchRemotes(context.Background(), t.TempDir(), remotes, []string{"origin"}, runner) == nil {
+		if FetchRemotes(context.Background(), t.TempDir(), remotes, []string{"origin"}, runner, nil) == nil {
 			t.Fatal("accepted", remotes)
 		}
 	}
@@ -581,7 +581,7 @@ func TestCompareFetchRunnerAndEnvironment(t *testing.T) {
 	fail := func(context.Context, time.Duration, string, ...string) ([]byte, error) {
 		return nil, fmt.Errorf("local fixture transport failed")
 	}
-	if err := FetchRemotes(context.Background(), t.TempDir(), []string{"origin"}, []string{"origin"}, fail); err == nil || !strings.Contains(err.Error(), "local fixture transport failed") {
+	if err := FetchRemotes(context.Background(), t.TempDir(), []string{"origin"}, []string{"origin"}, fail, nil); err == nil || !strings.Contains(err.Error(), "local fixture transport failed") {
 		t.Fatalf("%v", err)
 	}
 }

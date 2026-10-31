@@ -23,6 +23,7 @@ type Endpoint struct {
 	SHA       string `json:"sha"`
 	Available bool   `json:"available"`
 	Reason    string `json:"reason"`
+	Detail    string `json:"detail,omitempty"`
 	Name      string `json:"name,omitempty"`
 	Source    string `json:"source,omitempty"` // original setting name, before remote expansion
 	Repo      string `json:"repo,omitempty"`
@@ -57,6 +58,8 @@ type EndpointResolver struct {
 	refs                          map[string]compareRef
 	worktrees                     []Worktree
 	remotes                       []string
+	remoteURLs                    map[string]string
+	remoteFetched                 map[string]*time.Time
 	head, branch                  string
 	commonDir, gitDir, fetchHead  string
 	shallow                       string
@@ -74,13 +77,14 @@ func NewEndpointResolver(ctx context.Context, dir string, cfg CompareConfig, now
 }
 
 func newEndpointResolver(ctx context.Context, dir string, cfg CompareConfig, now time.Time, cache *CompareCache, run gitRunner) (*EndpointResolver, error) {
-	r := &EndpointResolver{ctx: ctx, dir: dir, cfg: cfg, now: now, run: run, refs: map[string]compareRef{}, aliases: map[string]string{}, verified: map[refRequest]Endpoint{}, ages: map[string]Endpoint{}, cache: cache}
+	r := &EndpointResolver{ctx: ctx, dir: dir, cfg: cfg, now: now, run: run, refs: map[string]compareRef{}, aliases: map[string]string{}, verified: map[refRequest]Endpoint{}, ages: map[string]Endpoint{}, remoteURLs: map[string]string{}, remoteFetched: map[string]*time.Time{}, cache: cache}
 	args := [][]string{
 		{"for-each-ref", "--format=%(refname)%00%(objectname)%00%(objecttype)%00%(*objectname)%00%(*objecttype)%00%(symref)%00%(upstream)"},
 		{"worktree", "list", "--porcelain", "-z"}, {"remote"},
 		{"rev-parse", "--verify", "HEAD^{commit}"}, {"symbolic-ref", "--quiet", "HEAD"},
 		{"rev-parse", "--path-format=absolute", "--git-common-dir", "--absolute-git-dir"},
 		{"rev-parse", "--path-format=absolute", "--git-path", "FETCH_HEAD"},
+		{"config", "--get-regexp", `^remote\..*\.url$`},
 	}
 	outs := make([][]byte, len(args))
 	errs := make([]error, len(args))
@@ -98,6 +102,15 @@ func newEndpointResolver(ctx context.Context, dir string, cfg CompareConfig, now
 	}
 	r.worktrees = parseWorktrees(outs[1])
 	r.remotes = strings.Fields(string(outs[2]))
+	for _, line := range strings.Split(string(outs[7]), "\n") {
+		key, url, ok := strings.Cut(line, " ")
+		if ok {
+			remote := strings.TrimSuffix(strings.TrimPrefix(key, "remote."), ".url")
+			if _, exists := r.remoteURLs[remote]; !exists {
+				r.remoteURLs[remote] = url
+			}
+		}
+	}
 	r.head = strings.TrimSpace(string(outs[3]))
 	r.branch = strings.TrimPrefix(strings.TrimSpace(string(outs[4])), "refs/heads/")
 	if errs[3] != nil && (r.branch == "" || r.refs["refs/heads/"+r.branch].sha != "") {
@@ -285,9 +298,15 @@ func (r *EndpointResolver) Resolve(spec, other string) []Endpoint {
 	}
 	var out []Endpoint
 	for _, remote := range remotes {
+		if err := remoteEndpointError(remote); err != nil {
+			e := r.unavailable(strings.ReplaceAll(spec, "{remote}", remote), "", err.Error())
+			e.Remotes = []string{remote}
+			out = append(out, e)
+			continue
+		}
 		from, _ := r.ResolvePair(strings.ReplaceAll(expanded, "{remote}", remote), strings.ReplaceAll(otherSpec, "{remote}", remote))
 		from.Spec = strings.ReplaceAll(spec, "{remote}", remote)
-		if remote != "" {
+		if remote != "" && !from.Available {
 			from.Remotes = unionRemotes(from.Remotes, []string{remote})
 		}
 		out = append(out, from)
@@ -296,25 +315,76 @@ func (r *EndpointResolver) Resolve(spec, other string) []Endpoint {
 }
 
 func (r *EndpointResolver) ResolvePair(from, to string) (Endpoint, Endpoint) {
-	f := r.resolve(from, nil, 0)
-	t := r.resolve(to, nil, 0)
-	if f.relative && t.relative {
-		f.Reason, t.Reason = "both sides are relative to each other", "both sides are relative to each other"
-	} else {
-		// Re-evaluate even an available fallback: an earlier relative
-		// alternative may now resolve with the known opposite endpoint.
-		if t.Available || f.relative {
-			f = r.resolve(from, &t, 0)
-		}
-		if f.Available || t.relative {
-			t = r.resolve(to, &f, 0)
-		}
-		if (f.Kind == "merge-base" || f.Kind == "fork-point") && (t.Kind == "merge-base" || t.Kind == "fork-point") {
-			f.Available, t.Available = false, false
-			f.Reason, t.Reason = "both sides are relative to each other", "both sides are relative to each other"
+	left, right := r.pairChoices(from), r.pairChoices(to)
+	var failed [2]Endpoint
+	haveFailure := false
+	// Only the two-alternation case needs a category preference; a single
+	// alternation retains its written first-available order.
+	categories := []int{-1}
+	if len(left) > 1 && len(right) > 1 {
+		categories = []int{0, 1, 2}
+	}
+	for _, category := range categories {
+		for _, l := range left {
+			for _, v := range right {
+				if l.relative && v.relative {
+					continue
+				}
+				kind := 2
+				if l.relative {
+					kind = 0
+				} else if v.relative {
+					kind = 1
+				}
+				if category >= 0 && kind != category {
+					continue
+				}
+				f, t := r.resolve(l.spec, nil, 0), r.resolve(v.spec, nil, 0)
+				if l.relative {
+					f = r.resolve(l.spec, &t, 0)
+				}
+				if v.relative {
+					t = r.resolve(v.spec, &f, 0)
+				}
+				f.Spec, t.Spec = from, to
+				if f.Available && t.Available {
+					return f, t
+				}
+				if !haveFailure {
+					failed = [2]Endpoint{f, t}
+					haveFailure = true
+				}
+			}
 		}
 	}
+	if haveFailure {
+		return failed[0], failed[1]
+	}
+	f, t := r.resolve(from, nil, 0), r.resolve(to, nil, 0)
+	f.Available, t.Available = false, false
+	f.Reason, t.Reason = "both sides are relative to each other", "both sides are relative to each other"
 	return f, t
+}
+
+type endpointChoice struct {
+	spec     string
+	relative bool
+}
+
+func (r *EndpointResolver) pairChoices(spec string) []endpointChoice {
+	expanded, err := r.expandAlias(spec, map[string]bool{})
+	if err != nil {
+		return []endpointChoice{{spec: spec}}
+	}
+	parts, err := alternatives(expanded)
+	if err != nil {
+		return []endpointChoice{{spec: spec}}
+	}
+	var choices []endpointChoice
+	for _, part := range parts {
+		choices = append(choices, endpointChoice{part, r.resolve(part, nil, 0).relative})
+	}
+	return choices
 }
 
 func (r *EndpointResolver) resolve(original string, other *Endpoint, depth int) Endpoint {
@@ -331,6 +401,7 @@ func (r *EndpointResolver) resolve(original string, other *Endpoint, depth int) 
 	}
 	if len(parts) > 1 {
 		var reasons []string
+		var details []string
 		var pending Endpoint
 		for _, part := range parts {
 			e := r.resolve(part, other, depth+1)
@@ -342,31 +413,37 @@ func (r *EndpointResolver) resolve(original string, other *Endpoint, depth int) 
 				pending = e
 			}
 			reasons = append(reasons, e.Reason)
+			if e.Detail != "" {
+				details = append(details, e.Detail)
+			}
 		}
 		if pending.relative {
 			return pending
 		}
-		return r.unavailable(original, "", strings.Join(reasons, "; "))
+		e := r.unavailable(original, "", strings.Join(reasons, "; "))
+		e.Detail = strings.Join(details, "; ")
+		return e
 	}
 	for _, kind := range []string{"merge-base", "fork-point"} {
 		if strings.HasPrefix(spec, kind+"(") && strings.HasSuffix(spec, ")") {
 			base := r.resolve(spec[len(kind)+1:len(spec)-1], nil, depth+1)
 			e := r.unavailable(original, kind, "relative endpoint needs the other side")
 			e.Remotes = base.Remotes
+			if base.relative || (base.Kind != "commit" && base.Kind != "merge-base" && base.Kind != "fork-point" && base.Available) {
+				e.Reason = "relative base must be a commit"
+				return e
+			}
 			if other == nil {
 				e.relative = true
 				return e
 			}
 			if !base.Available {
-				e.Reason = base.Reason
-				return e
-			}
-			if base.relative || (base.Kind != "commit" && base.Kind != "merge-base" && base.Kind != "fork-point") {
-				e.Reason = "relative base must be a commit"
+				e.Reason, e.Detail = base.Reason, base.Detail
 				return e
 			}
 			if !other.Available {
 				e.Reason = "other side: " + other.Reason
+				e.Detail = other.Detail
 				return e
 			}
 			sha := other.SHA
@@ -393,7 +470,9 @@ func (r *EndpointResolver) resolve(original string, other *Endpoint, depth int) 
 			if r.emptySHA == "" {
 				out, err := r.run(r.ctx, readTimeout, r.dir, "hash-object", "-t", "tree", "--stdin")
 				if err != nil {
-					return r.unavailable(original, "empty", err.Error())
+					e := r.unavailable(original, "empty", "empty tree unavailable")
+					e.Detail = err.Error()
+					return e
 				}
 				r.emptySHA = strings.TrimSpace(string(out))
 			}
@@ -484,7 +563,7 @@ func (r *EndpointResolver) resolveRef(ref string, verify bool) Endpoint {
 			matches = append(matches, candidate)
 		}
 	}
-	if len(matches) == 1 {
+	if len(matches) > 0 {
 		full := matches[0]
 		v := r.refs[full]
 		e.Ref = full
@@ -497,11 +576,11 @@ func (r *EndpointResolver) resolveRef(ref string, verify bool) Endpoint {
 			e.SHA = v.peeled
 		}
 	}
-	if e.SHA == "" || verify {
+	if e.SHA == "" || verify || len(matches) > 1 {
 		out, err := r.run(r.ctx, readTimeout, r.dir, "rev-parse", "--verify", ref+"^{commit}")
 		if err != nil {
 			e.SHA = ""
-			e.Reason = fmt.Sprintf("%s is not a commit here: %v", ref, err)
+			e.Reason, e.Detail = r.refFailure(ref, err), err.Error()
 		} else {
 			e.SHA = strings.TrimSpace(string(out))
 		}
@@ -517,12 +596,9 @@ func (r *EndpointResolver) resolveRef(ref string, verify bool) Endpoint {
 		}
 	}
 	for _, remote := range r.remotes {
-		if strings.HasPrefix(e.Ref, "refs/remotes/"+remote+"/") || strings.HasPrefix(ref, remote+"/") {
+		if strings.HasPrefix(e.Ref, "refs/remotes/"+remote+"/") && r.refs[e.Ref].sha != "" {
 			e.Remote, e.Remotes = remote, []string{remote}
-			if !strings.HasPrefix(e.Ref, "refs/") {
-				e.Ref = "refs/remotes/" + ref
-			}
-			age := r.remoteAge(e.Ref)
+			age := r.remoteAge(e.Ref, remote)
 			e.Fetched, e.Stale = age.Fetched, age.Stale
 			break
 		}
@@ -565,17 +641,12 @@ func reflogTime(path string) *time.Time {
 	return &t
 }
 
-func (r *EndpointResolver) remoteAge(ref string) Endpoint {
+func (r *EndpointResolver) remoteAge(ref, remote string) Endpoint {
 	if age, ok := r.ages[ref]; ok {
 		return age
 	}
 	age := Endpoint{Fetched: reflogTime(filepath.Join(r.commonDir, "logs", ref))}
-	if age.Fetched == nil {
-		if info, err := os.Stat(r.fetchHead); err == nil {
-			t := info.ModTime().UTC()
-			age.Fetched = &t
-		}
-	}
+	age.Fetched = laterTime(age.Fetched, r.remoteFetchTime(remote))
 	age.Stale = age.Fetched != nil && r.cfg.StaleAfter > 0 && r.now.Sub(*age.Fetched) > r.cfg.StaleAfter
 	r.ages[ref] = age
 	return age
@@ -628,6 +699,7 @@ func (r *EndpointResolver) relativeEndpoint(e, base Endpoint, other string) Endp
 		}
 		out, err := r.run(r.ctx, readTimeout, r.dir, append(args, left, other)...)
 		if err != nil {
+			e.Detail = err.Error()
 			e.Reason = "no common ancestor"
 			if e.Kind == "fork-point" {
 				e.Reason = "no fork point in " + base.Ref + "'s reflog"

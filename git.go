@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -62,8 +63,30 @@ func (e *GitError) Unwrap() error { return e.Err }
 func git(ctx context.Context, timeout time.Duration, dir string, args ...string) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "git", append([]string{"-C", dir, "-c", "core.fsmonitor=false", "-c", "color.ui=false"}, args...)...)
-	cmd.Env = gitEnv()
+	options := []string{"-C", dir, "-c", "core.fsmonitor=false", "-c", "color.ui=false"}
+	env := gitEnv()
+	fetch := len(args) > 0 && args[0] == "fetch"
+	if fetch {
+		// Unknown credential settings are ignored by older Git versions.
+		options = append(options, "-c", "credential.interactive=never")
+		env = replaceGitEnv(env, "GCM_INTERACTIVE", "never")
+		if strings.TrimSpace(os.Getenv("GIT_SSH_COMMAND")) == "" {
+			out, err := git(ctx, readTimeout, dir, "config", "--get", "core.sshCommand")
+			var exit *exec.ExitError
+			if err != nil && (!errors.As(err, &exit) || exit.ExitCode() != 1) {
+				return nil, err
+			}
+			env = replaceGitEnv(env, "GIT_SSH_COMMAND", "")
+			if strings.TrimSpace(string(out)) == "" {
+				env = append(env, "GIT_SSH_COMMAND=ssh -o BatchMode=yes")
+			}
+		}
+	}
+	cmd := exec.CommandContext(ctx, "git", append(options, args...)...)
+	cmd.Env = env
+	if fetch {
+		cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	}
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	out, err := cmd.Output()
@@ -74,6 +97,19 @@ func git(ctx context.Context, timeout time.Duration, dir string, args ...string)
 		return nil, &GitError{Args: args, Stderr: stderr.String(), Err: err}
 	}
 	return out, nil
+}
+
+func replaceGitEnv(env []string, key, value string) []string {
+	out := make([]string, 0, len(env)+1)
+	for _, entry := range env {
+		if !strings.HasPrefix(entry, key+"=") {
+			out = append(out, entry)
+		}
+	}
+	if value != "" {
+		out = append(out, key+"="+value)
+	}
+	return out
 }
 
 // Toplevel is the root of the worktree holding dir, as git spells it
