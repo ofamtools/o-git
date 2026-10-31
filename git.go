@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strconv"
@@ -110,6 +111,49 @@ func replaceGitEnv(env []string, key, value string) []string {
 		out = append(out, key+"="+value)
 	}
 	return out
+}
+
+// gitStream is the read-only streaming counterpart of git. noIndex permits
+// diff --no-index's exit status 1 (differences found), without hiding failures.
+// consume must drain stdout; its error cancels the child before waiting.
+func gitStream(ctx context.Context, dir string, noIndex bool, consume func(io.Reader) error, args ...string) error {
+	ctx, cancel := context.WithTimeout(ctx, readTimeout)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "git", append([]string{"-C", dir, "-c", "core.fsmonitor=false", "-c", "color.ui=false"}, args...)...)
+	for _, entry := range gitEnv() {
+		if !strings.HasPrefix(entry, "GIT_PAGER=") {
+			cmd.Env = append(cmd.Env, entry)
+		}
+	}
+	cmd.Env = append(cmd.Env, "GIT_PAGER=cat")
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	if err = cmd.Start(); err != nil {
+		return err
+	}
+	rerr := consume(stdout)
+	if rerr != nil {
+		cancel()
+	}
+	err = cmd.Wait()
+	if rerr != nil {
+		return rerr
+	}
+	if ctx.Err() != nil {
+		return &GitError{Args: args, Stderr: stderr.String(), Err: ctx.Err()}
+	}
+	var exit *exec.ExitError
+	if noIndex && errors.As(err, &exit) && exit.ExitCode() == 1 && !strings.Contains(stderr.String(), "error:") && !strings.Contains(stderr.String(), "fatal:") {
+		return nil
+	}
+	if err != nil {
+		return &GitError{Args: args, Stderr: stderr.String(), Err: err}
+	}
+	return nil
 }
 
 // Toplevel is the root of the worktree holding dir, as git spells it
