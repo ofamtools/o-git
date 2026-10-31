@@ -596,10 +596,12 @@ func (r *EndpointResolver) resolveRef(ref string, verify bool) Endpoint {
 		}
 	}
 	for _, remote := range r.remotes {
-		if strings.HasPrefix(e.Ref, "refs/remotes/"+remote+"/") && r.refs[e.Ref].sha != "" {
+		if strings.HasPrefix(e.Ref, "refs/remotes/"+remote+"/") || !e.Available && strings.HasPrefix(strings.TrimPrefix(ref, "refs/remotes/"), remote+"/") {
 			e.Remote, e.Remotes = remote, []string{remote}
-			age := r.remoteAge(e.Ref, remote)
-			e.Fetched, e.Stale = age.Fetched, age.Stale
+			if e.Available {
+				age := r.remoteAge(e.Ref, remote)
+				e.Fetched, e.Stale = age.Fetched, age.Stale
+			}
 			break
 		}
 	}

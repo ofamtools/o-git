@@ -2,38 +2,38 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
-  ┃ pair          from       to        ↑  ↓  files  fetched  state           ┃
-  ┃ (custom) or…  origin/m…  WORKTREE  -  -  1      0s ago   the working tr… ┃
-  ┃ dirty         HEAD       WORKTREE  -  -  1      -        the working tr… ┃
-  ┃ upstream      {upstrea…  HEAD      -  -  -      -        no upstream     ┃
-  ┃ main +1       main       HEAD      1  0  1      -        ready           ┃
-  ┃ origin/main…  origin/m…  HEAD      0  0  0      0s ago   same commit: n… ┃
-  ┃ origin/bran…  origin/t…  HEAD      -  -  -      -        origin has no … ┃
+  ╭━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair           from      to        ↑  ↓  files  fetched  state           ┃
+  ┃ (custom) +1    origin/…  WORKTREE  -  -  1      0s       the working tr… ┃
+  ┃ upstream       -         HEAD      -  -  -      -        no upstream     ┃
+  ┃ main +1        main      HEAD      1  0  1      -        ready           ┃
+  ┃ origin/m… +1   origin/…  HEAD      0  0  0      0s       same commit: n… ┃
+  ┃ origin/branch  -         HEAD      -  -  -      -        origin has no … ┃
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
   ╭─ Commits ────────────────────────────────────────────────────────────────╮
   │ the working tree is not a commit                                         │
-  │ sha  decorations  subject  author  age  parents                          │
-  │ (empty list)                                                             │
+  │                                                                          │
+  │                                                                          │
   │                                                                          │
   │                                                                          │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ╭─ Files ──────────────────────────────────────────────────────────────────╮
-  │ status  path     added  removed                                          │
-  │  M      README   +1     -1                                               │
-  │ total   1 files  +1     -1                                               │
+  │ XY  path    added  removed                                               │
+  │  M  README  +1     -1                                                    │
+  │ t…  1 file  +1     -1                                                    │
   │                                                                          │
   │                                                                          │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ╭─ Detail ─────────────────────────────────────────────────────────────────╮
-  │ (custom)                                                                 │
+  │ (custom) · dirty                                                         │
   │ from  origin/main                                                        │
   │ to    WORKTREE                                                           │
   │ ↑- ↓-                                                                    │
   │ the working tree is not a commit                                         │
+  │ as of the last fetch, 0s ago                                             │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ── compare.fetch done · compare.set done ───────────────────────────────────
-  enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ c…
+  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …

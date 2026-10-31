@@ -1,0 +1,39 @@
+  ◆ o-git                                                        NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair              from  to        ↑  ↓  files  fetched  state            ┃
+  ┃ (custom) HEAD..…  HEAD  main      0  1  1      -        ready            ┃
+  ┃ dirty             HEAD  WORKTREE  -  -  1      -        the working tre… ┃
+  ┃ upstream          -     HEAD      -  -  -      -        no upstream      ┃
+  ┃ main +2           main  HEAD      1  0  1      -        ready            ┃
+  ┃ origin/main       -     HEAD      -  -  -      -        no ref named or… ┃
+  ┃ no remot… +1      -     HEAD      -  -  -      -        no remotes       ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ sha      decorations    subject     author  age  parents                 │
+  │ Behind                                                                   │
+  │ <sha>  HEAD -> topic  feat: next  Test    1h   1                       │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Files ──────────────────────────────────────────────────────────────────╮
+  │ XY  path    added  removed                                               │
+  │ D   next    +0     -1                                                    │
+  │ t…  1 file  +0     -1                                                    │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Detail ─────────────────────────────────────────────────────────────────╮
+  │ (custom)                                                                 │
+  │ from  HEAD                                                               │
+  │ to    main                                                               │
+  │ ↑0 ↓1                                                                    │
+  │ ready                                                                    │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ── branch.compare done · compare.set done ──────────────────────────────────
+  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …

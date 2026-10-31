@@ -1,0 +1,39 @@
+  ◆ o-git                                                        NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair      from   to        ↑  ↓  files  fetched  state                   ┃
+  ┃ dirty     HEAD   WORKTREE  -  -  1      -        the working tree is no… ┃
+  ┃ upstream  -      HEAD      -  -  -      -        no upstream             ┃
+  ┃ main +6   topic  HEAD      0  0  0      0s       same commit: nothing d… ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ same commit: nothing differs                                             │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Files ──────────────────────────────────────────────────────────────────╮
+  │ XY  path     added  removed                                              │
+  │ t…  0 files  +0     -0                                                   │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Detail ─────────────────────────────────────────────────────────────────╮
+  │ main · origin/main · upstream/main · origin/branch · upstream/branch ·   │
+  │ merge-base · fork-point                                                  │
+  │ from  topic ({main})                                                     │
+  │ to    HEAD                                                               │
+  │ ↑0 ↓0                                                                    │
+  │ same commit: nothing differs                                             │
+  │ as of the last fetch, 0s ago                                             │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ── compare.fetch done ──────────────────────────────────────────────────────
+  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …

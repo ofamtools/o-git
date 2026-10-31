@@ -1,0 +1,39 @@
+  ◆ o-git                                                        NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair              from  to        ↑  ↓  files  fetched  state            ┃
+  ┃ (custom) -..WOR…  -     WORKTREE  -  -  -      -        no ref named no… ┃
+  ┃ dirty             HEAD  WORKTREE  -  -  1      -        the working tre… ┃
+  ┃ upstream          -     HEAD      -  -  -      -        no upstream      ┃
+  ┃ main +2           main  HEAD      1  0  1      -        ready            ┃
+  ┃ origin/main       -     HEAD      -  -  -      -        no ref named or… ┃
+  ┃ no remot… +1      -     HEAD      -  -  -      -        no remotes       ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ no ref named not-a-ref; check the ref or fetch its remote                │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Files ──────────────────────────────────────────────────────────────────╮
+  │ no ref named not-a-ref; check the ref or fetch its remote                │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Detail ─────────────────────────────────────────────────────────────────╮
+  │ (custom)                                                                 │
+  │ from  not-a-ref: no ref named not-a-ref; check the ref or fetch its      │
+  │ remote                                                                   │
+  │ to    WORKTREE                                                           │
+  │ ↑- ↓-                                                                    │
+  │ no ref named not-a-ref; check the ref or fetch its remote                │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ── compare.set done ────────────────────────────────────────────────────────
+  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …

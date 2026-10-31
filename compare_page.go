@@ -23,15 +23,20 @@ const filesID = "compare/files"
 
 // comparePage holds domain state; ochazuke owns focus, chooser and delivery.
 type comparePage struct {
-	pairs, commits, files                *ochazuke.List
-	repo, loadedRepo, following          string
-	custom                               map[string]customPair
-	shown                                *Comparison
-	loading, failure                     string
-	fileCommit, commitReason, fileReason string
-	diff                                 *diffview.View
-	diffFiles                            *ochazuke.List
-	diffPath                             string
+	pairs, commits, files                       *ochazuke.List
+	repo, loadedRepo, following                 string
+	custom                                      map[string]customPair
+	shown                                       *Comparison
+	loading, failure                            string
+	fileCommit, commitReason, fileReason        string
+	pairFiles                                   []ochazuke.ListItem
+	pairFileReason                              string
+	fileFollowing                               string
+	chooserRepo, chooserOther, chooserFollowing string
+
+	diff      *diffview.View
+	diffFiles *ochazuke.List
+	diffPath  string
 }
 
 type customPair struct {
@@ -46,9 +51,9 @@ type comparePageData struct {
 }
 
 var pairColumns = []ochazuke.Column{
-	{Title: "pair", Min: 8, Max: 24}, {Title: "from", Min: 5, Priority: 3}, {Title: "to", Min: 5, Priority: 3},
+	{Title: "pair", Min: 12, Max: 24}, {Title: "from", Min: 5, Priority: 3}, {Title: "to", Min: 5, Priority: 3},
 	{Title: "↑", Min: 1, Align: ochazuke.AlignRight}, {Title: "↓", Min: 1, Align: ochazuke.AlignRight},
-	{Title: "files", Min: 3}, {Title: "fetched", Priority: 4}, {Title: "state", Min: 12, Max: 32, Priority: 1},
+	{Title: "files", Min: 3}, {Title: "fetched", Min: 7, Max: 7, Priority: 4}, {Title: "state", Min: 12, Max: 32, Priority: 1},
 }
 
 func (a *App) registerComparePage() error {
@@ -163,6 +168,7 @@ func (a *App) compareArguments(c ochazuke.Ctx) ochazuke.Arguments {
 	if args["pair"] == nil && args["from"] == nil && args["to"] == nil && a.r.Page == comparePageID {
 		if p, ok := a.selectedComparison(); ok {
 			args["from"], args["to"] = p.From.Spec, p.To.Spec
+			args["remotes"] = slices.Clone(p.Remotes)
 		}
 	}
 	return args
@@ -223,9 +229,12 @@ func pagePairs(r *EndpointResolver, custom *customPair) []Comparison {
 	if custom != nil {
 		adhoc := r.Show("", custom.From, custom.To)
 		for i := range adhoc {
-			adhoc[i].Name = "(custom) " + custom.From + ".." + custom.To
+			adhoc[i].Name = "(custom) " + resolvedRef(adhoc[i].From) + ".." + resolvedRef(adhoc[i].To)
 		}
 		pairs = append(adhoc, pairs...)
+	}
+	if r.cfg.Collapse {
+		pairs = collapseComparisons(pairs, true)
 	}
 	return pairs
 }
@@ -314,8 +323,9 @@ func (a *App) compareOpen(c ochazuke.Ctx) ochazuke.Result {
 func (a *App) editComparison(c ochazuke.Ctx, edit func(customPair) customPair) ochazuke.Result {
 	cfg, now, repo := a.compareConfig(), a.Now(), a.compareRepo(c)
 	copies := a.r.Settings().Bool("compare.files.find-copies-harder")
+	reset := a.r.Page != comparePageID
 	var selected *customPair
-	if pair, ok := a.selectedComparison(); ok && (repo == pair.Repo || repo == "") {
+	if pair, ok := a.selectedComparison(); ok && a.r.Page == comparePageID && (repo == pair.Repo || repo == "") {
 		selected = &customPair{pair.From.Spec, pair.To.Spec}
 	}
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
@@ -332,6 +342,9 @@ func (a *App) editComparison(c ochazuke.Ctx, edit func(customPair) customPair) o
 			return nil, err
 		}
 		current, ok := saved[dir]
+		if reset {
+			ok = false
+		}
 		if !ok {
 			defaults := resolver.Show("", "", "")
 			if len(defaults) == 0 {
@@ -429,6 +442,7 @@ func (a *App) rowCompare(c ochazuke.Ctx) ochazuke.Result {
 }
 
 func (a *App) renderCompare(r *ochazuke.Runtime, width, height int) ochazuke.Block {
+	a.updateCompareAges()
 	p := a.compare
 	s := a.m.Styles()
 	l := r.PaneLayout(comparePageID, ochazuke.Layout{Width: width, Height: height, Styles: s})
@@ -452,14 +466,14 @@ func (a *App) renderCompare(r *ochazuke.Runtime, width, height int) ochazuke.Blo
 				reason = p.fileReason
 			}
 			if reason != "" {
-				body = ansi.Truncate(reason, cw, "…") + "\n" + list.View(cw, max(0, ch-1))
+				body = ansi.Truncate(reason, cw, "…")
 			}
 		}
 		return l.PanelBlock(title, ochazuke.Text(body), w, h, list.Focused())
 	}
 	detail := func(w, h int) ochazuke.Block {
 		cw, _ := ochazuke.PanelContentSize(w, h)
-		return l.PanelBlock("Detail", ochazuke.Text(ansi.Hardwrap(a.compareDetail(), max(1, cw), true)), w, h, false)
+		return l.PanelBlock("Detail", ochazuke.Text(ansi.Wordwrap(a.compareDetail(), max(1, cw), "")), w, h, false)
 	}
 	if width < 90 {
 		ph := l.Divide(min(max(6, p.pairs.Len()+3), max(6, bh-12)), bh, ochazuke.PaneMinHeight)
@@ -471,9 +485,10 @@ func (a *App) renderCompare(r *ochazuke.Runtime, width, height int) ochazuke.Blo
 			detail(width, bh-ph-ch-fh).Text,
 		}, "\n"))
 	}
-	lw := l.Divide(width*3/5, width-1, ochazuke.PaneMinWidth)
+	lw := l.Divide(max(32, width*r.Settings().Int("compare.pairs.width-percent")/100), width-1, ochazuke.PaneMinWidth)
 	rw := width - lw - 1
 	ch, fh := max(4, bh/3), max(4, bh/3)
+	left := panel(fmt.Sprintf("Pairs %d", p.pairs.Len()), p.pairs, lw, bh).Text
 	right := strings.Join([]string{panel("Commits", p.commits, rw, ch).Text, panel(a.compareFilesTitle(), p.files, rw, fh).Text, detail(rw, bh-ch-fh).Text}, "\n")
-	return ochazuke.Text(s.Muted.Render(ansi.Truncate(status, width, "…")) + "\n" + lipgloss.JoinHorizontal(lipgloss.Top, panel(fmt.Sprintf("Pairs %d", p.pairs.Len()), p.pairs, lw, bh).Text, " ", right))
+	return ochazuke.Text(s.Muted.Render(ansi.Truncate(status, width, "…")) + "\n" + lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right))
 }

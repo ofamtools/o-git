@@ -18,6 +18,12 @@ func shortRef(ref string) string {
 }
 
 func resolvedRef(e Endpoint) string {
+	if !e.Available {
+		return "-"
+	}
+	if e.Kind == "merge-base" || e.Kind == "fork-point" {
+		return shortSHA(e.SHA)
+	}
 	if e.Ref == "" {
 		return e.Spec
 	}
@@ -52,7 +58,7 @@ func (r *EndpointResolver) refFailure(ref string, err error) string {
 	if ok && slices.Contains(r.remotes, remote) && !strings.ContainsAny(branch, "~^:@{}") {
 		return fmt.Sprintf("%s has no %s branch (not pushed, or not fetched)", remote, branch)
 	}
-	return "no ref named " + name
+	return "no ref named " + name + "; check the ref or fetch its remote"
 }
 
 func remoteEndpointError(remote string) error {

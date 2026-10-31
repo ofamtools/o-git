@@ -1,0 +1,39 @@
+  ◆ o-git                                                                                                INSERT
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ─────────────────────────────────────────────────────────╮
+  ┃ pair              ↑  ↓  files           4› ┃ │ the working tree is not a commit                                  │
+  ┃ dirty             -  -  1                  ┃ │                                                                   │
+  ┃ upstream          -  -  -                  ┃ │                                                                   │
+  ┃ main +2           1  0  1                  ┃ │                                                                   │
+  ┃ origin/main       -  -  -                  ┃ │                                                                   │
+  ┃ no remot… +1      -  -  -                  ┃ │                                                                   │
+  ┃                                            ┃ │                                                                   │
+  ┃                                            ┃ │                                                                   │
+  ┃                                            ┃ │                                                                   │
+  ┃         ╭──────────────────────────────────────────────────────────────────────────────────────────────╮─────────╯
+  ┃         │ Pick from · [Endpoints] Log All Refs Graph Worktrees                                         │─────────╮
+  ┃         │ ›                                                 fuzzy │ HEAD                               │         │
+  ┃         │   head                 HEAD         ready               │                                    │         │
+  ┃         │   worktree             WORKTREE     ready               │                                    │         │
+  ┃         │   index                INDEX        ready               │                                    │         │
+  ┃         │   main · merge-base    main         ready               │                                    │         │
+  ┃         │   upstream             -            no upstream         │                                    │         │
+  ┃         │   origin/main · fork…  origin/main  ready               │                                    │         │
+  ┃         │   origin/branch        -            origin has no topi… │                                    │         │
+  ┃         │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc choos… │         │
+  ┃         ╰──────────────────────────────────────────────────────────────────────────────────────────────╯─────────╯
+  ┃                                            ┃ ╭─ Detail ──────────────────────────────────────────────────────────╮
+  ┃                                            ┃ │ dirty                                                             │
+  ┃                                            ┃ │ from  HEAD                                                        │
+  ┃                                            ┃ │ to    WORKTREE                                                    │
+  ┃                                            ┃ │ ↑- ↓-                                                             │
+  ┃                                            ┃ │ the working tree is not a commit                                  │
+  ┃                                            ┃ │                                                                   │
+  ┃                                            ┃ │                                                                   │
+  ┃                                            ┃ │                                                                   │
+  ┃                                            ┃ │                                                                   │
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰───────────────────────────────────────────────────────────────────╯
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel · tab search.c…

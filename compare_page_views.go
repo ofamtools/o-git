@@ -24,6 +24,7 @@ func (a *App) registerCompareViews() error {
 	}
 	diffview.Register(r)
 	r.Define("compare").Verb("commit-open", a.compareCommitOpen, "show the selected commit's files").Fetch().Quiet().
+		Verb("pair-files", func(c ochazuke.Ctx) ochazuke.Result { a.restorePairFiles(); return ochazuke.Done(nil) }, "return Files to the selected comparison").
 		Verb("file-open", a.compareFileOpen, "open the selected file's structured diff").Fetch().Quiet().
 		Verb("close", func(c ochazuke.Ctx) ochazuke.Result {
 			if r.TopModal() != diffFrame {
@@ -47,7 +48,7 @@ func (a *App) registerCompareViews() error {
 	op := r.Operations["commit.compare"]
 	op.Parameters = map[string]ochazuke.Parameter{"side": {Type: "string", Enum: []string{"from", "to"}}}
 	r.Operations["commit.compare"] = op
-	setHistory(r, ochazuke.HistoryAction, "commit.compare", "compare.close")
+	setHistory(r, ochazuke.HistoryAction, "commit.compare", "compare.close", "compare.pair-files")
 	r.DefineGuard("compare-commit-row", func(r *ochazuke.Runtime, ev ochazuke.KeyEvent) bool {
 		inst := r.Instances[ev.Focus]
 		if inst == nil {
@@ -82,8 +83,8 @@ func (a *App) registerCompareViews() error {
 	return r.LoadDefaultBindings("compare-views", []byte(`{"bindings":[
   {"context":"commit/normal","bindings":[
    {"key":"enter","action":"compare.commit-open","when":"compare-commit-row"},
-   {"key":"f","action":"commit.compare","args":{"side":"from"},"when":"compare-commit-row"},
-   {"key":"t","action":"commit.compare","args":{"side":"to"},"when":"compare-commit-row"},
+   {"key":"f","action":"commit.compare","args":{"side":"from"},"when":"compare-commit-row","hint":"from"},
+   {"key":"t","action":"commit.compare","args":{"side":"to"},"when":"compare-commit-row","hint":"to"},
    {"key":"y y","action":"commit.copy","when":"compare-commit-row"}
   ]},
   {"context":"change/normal","bindings":[
@@ -92,7 +93,8 @@ func (a *App) registerCompareViews() error {
   ]},
   {"context":"compare-diff/normal","bindings":[
    {"key":"q","action":"compare.close"},{"key":"esc","action":"compare.close"}
-  ]}
+  ]},
+  {"instance":"compare/files","mode":"normal","bindings":[{"key":"esc","action":"compare.pair-files"}]}
  ]}`))
 }
 
@@ -108,15 +110,54 @@ func (a *App) compareCommitOpen(c ochazuke.Ctx) ochazuke.Result {
 	if !ok || row.SHA == "" {
 		return ochazuke.Failed(fmt.Errorf("no commit selected"))
 	}
+	return a.loadCommitFiles(row, true)
+}
+
+func (a *App) loadCommitFiles(row Commit, focus bool) ochazuke.Result {
+	p := a.compare
+	p.fileFollowing = row.SHA
+	c := ochazuke.Ctx{Args: ochazuke.Arguments{"repo": row.Repo, "sha": row.SHA}}
 	return a.commitFiles(c).ReplacingAt(comparePageID, "commit-files").Then(func(_ ochazuke.Ctx, v any, err error) {
 		if err != nil {
+			return
+		}
+		if p.fileFollowing != row.SHA {
 			return
 		}
 		a.compare.fileCommit = row.SHA
 		a.compare.fileReason = ""
 		_ = a.compare.files.SetItems(v.([]ochazuke.ListItem))
-		_ = a.compare.files.Focus()
+		if focus {
+			_ = a.compare.files.Focus()
+		}
 	})
+}
+
+func (a *App) restorePairFiles() {
+	p := a.compare
+	p.fileCommit, p.fileFollowing = "", ""
+	p.fileReason = p.pairFileReason
+	_ = p.files.SetItems(p.pairFiles)
+}
+
+func (a *App) followCompareFiles() bool {
+	p := a.compare
+	if p.pairs.Focused() && p.fileFollowing != "" {
+		a.restorePairFiles()
+		return false
+	}
+	if !p.commits.Focused() || !a.r.Settings().Bool("compare.files.follow-commit") {
+		return false
+	}
+	row, ok := p.commits.Selected()
+	if !ok {
+		return false
+	}
+	commit, ok := row.Data.(Commit)
+	if !ok || commit.SHA == "" || commit.SHA == p.fileFollowing {
+		return false
+	}
+	return a.launch(commitsID, "commit.files", a.loadCommitFiles(commit, false))
 }
 
 func (a *App) compareFileOpen(c ochazuke.Ctx) ochazuke.Result {
@@ -202,13 +243,25 @@ func (a *App) loadCompareDiff(path string, opening bool) ochazuke.Result {
 		p.diffPath = path
 		a.selectDiffFile(path)
 		view := a.m.ModalViews[diffFrame]
-		view.Title = "Diff " + path + " · " + endpointDetail(data.Comparison.From) + " → " + endpointDetail(data.Comparison.To)
+		view.Title = "Diff " + path + " · " + diffEndpointLabel(data.Comparison.From) + " → " + diffEndpointLabel(data.Comparison.To)
 		a.m.ModalViews[diffFrame] = view
 		_ = a.r.SetFocus(diffID)
 	})
 }
 
 func (a *App) selectDiffFile(path string) {
+	if list := a.compare.diffFiles; list != nil {
+		rows := list.Items()
+		for i := range rows {
+			if file, ok := rows[i].Data.(Change); ok {
+				rows[i].Cells[1] = changeItem(file).Cells[1]
+				if file.Path == path {
+					rows[i].Cells[1] = "● " + rows[i].Cells[1]
+				}
+			}
+		}
+		_ = list.SetItems(rows)
+	}
 	for _, row := range a.compare.files.Items() {
 		if file, ok := row.Data.(Change); ok && file.Path == path {
 			_ = a.compare.files.Select(row.ID)
@@ -218,6 +271,13 @@ func (a *App) selectDiffFile(path string) {
 			return
 		}
 	}
+}
+
+func diffEndpointLabel(e Endpoint) string {
+	if e.SHA != "" {
+		return shortSHA(e.SHA)
+	}
+	return resolvedRef(e)
 }
 
 // diffview emits diff.file before calling its host callback. File order comes
@@ -270,7 +330,7 @@ func (a *App) renderCompareDiff(r *ochazuke.Runtime, _ *ochazuke.Instance, w, h 
 		fh := min(7, max(3, h/3))
 		return ochazuke.Text(strings.Join([]string{files(w, fh).Text, diff(w, h-fh).Text}, "\n"))
 	}
-	lw := min(32, w/4)
+	lw := min(32, max(28, w/4))
 	rw := w - lw - 1
 	return ochazuke.Text(lipgloss.JoinHorizontal(lipgloss.Top, files(lw, h).Text, " ", diff(rw, h).Text))
 }

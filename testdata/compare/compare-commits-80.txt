@@ -2,15 +2,14 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 7 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
-  ┃ pair          from       to        ↑  ↓  files  fetched  state           ┃
-  ┃ dirty         HEAD       WORKTREE  -  -  1      -        the working tr… ┃
-  ┃ upstream      {upstrea…  HEAD      -  -  -      -        no upstream     ┃
-  ┃ main          main       HEAD      1  1  2      -        ready           ┃
-  ┃ origin/main   origin/m…  HEAD      -  -  -      -        no ref named o… ┃
-  ┃ {remote}/ma…  {remote}…  HEAD      -  -  -      -        no remotes      ┃
-  ┃ {remote}/br…  {remote}…  HEAD      -  -  -      -        no remotes      ┃
-  ┃ merge-base …  main       HEAD      1  0  1      -        ready           ┃
+  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair          from     to        ↑  ↓  files  fetched  state             ┃
+  ┃ dirty         HEAD     WORKTREE  -  -  1      -        the working tree… ┃
+  ┃ upstream      -        HEAD      -  -  -      -        no upstream       ┃
+  ┃ main          main     HEAD      1  1  2      -        ready             ┃
+  ┃ origin/main   -        HEAD      -  -  -      -        no ref named ori… ┃
+  ┃ no remot… +1  -        HEAD      -  -  -      -        no remotes        ┃
+  ┃ merge-ba… +1  <sha>  HEAD      1  0  1      -        ready             ┃
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
   ╭─ Commits ────────────────────────────────────────────────────────────────╮
   │ sha      decorations    subject     author  age  parents                 │
@@ -18,12 +17,14 @@
   │ <sha>  HEAD -> topic  feat: next  Test    1h   1                       │
   │ Behind                                                                   │
   │ <sha>  main           main work   Test    1h   1                       │
+  │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ╭─ Files ──────────────────────────────────────────────────────────────────╮
-  │ status  path     added  removed                                          │
-  │ A       next     +1     -0                                               │
-  │ D       other    +0     -1                                               │
-  │ total   2 files  +1     -1                                               │
+  │ XY  path     added  removed                                              │
+  │ A   next     +1     -0                                                   │
+  │ D   other    +0     -1                                                   │
+  │ t…  2 files  +1     -1                                                   │
+  │                                                                          │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ╭─ Detail ─────────────────────────────────────────────────────────────────╮
@@ -33,7 +34,6 @@
   │ ↑1 ↓1                                                                    │
   │ ready                                                                    │
   │                                                                          │
-  │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ c…
+  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …

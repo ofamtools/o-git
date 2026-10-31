@@ -2,38 +2,38 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭─ Pairs 7 ─────────────────────────────────────────────────────────╮ ╭─ Commits ──────────────────────────────────╮
-  │ pair        from     to       ↑  ↓  files  fetched  state         │ │ sha          decorations    subject     3› │
-  │ dirty       HEAD     WORKTR…  -  -  1      -        the working … │ │ Ahead                                      │
-  │ upstream    {upstr…  HEAD     -  -  -      -        no upstream   │ │ <sha>      HEAD -> topic  feat: next     │
-  │ main        main     HEAD     1  1  2      -        ready         │ │ Behind                                     │
-  │ origin/ma…  origin…  HEAD     -  -  -      -        no ref named… │ │ <sha>      main           main work      │
-  │ {remote}/…  {remot…  HEAD     -  -  -      -        no remotes    │ │                                            │
-  │ {remote}/…  {remot…  HEAD     -  -  -      -        no remotes    │ │                                            │
-  │ merge-bas…  main     HEAD     1  0  1      -        ready         │ │                                            │
-  │                                                                   │ │                                            │
-  │                                                                   │ ╰────────────────────────────────────────────╯
-  │                                                                   │ ╭━ Files <sha> ━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
-  │                                                                   │ ┃ status  path     added  removed            ┃
-  │                                                                   │ ┃ A       next     +1     -0                 ┃
-  │                                                                   │ ┃ total   1 files  +1     -0                 ┃
-  │                                                                   │ ┃                                            ┃
-  │                                                                   │ ┃                                            ┃
-  │                                                                   │ ┃                                            ┃
-  │                                                                   │ ┃                                            ┃
-  │                                                                   │ ┃                                            ┃
-  │                                                                   │ ┃                                            ┃
-  │                                                                   │ ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
-  │                                                                   │ ╭─ Detail ───────────────────────────────────╮
-  │                                                                   │ │ A next                                     │
-  │                                                                   │ │ +1 -0                                      │
-  │                                                                   │ │                                            │
-  │                                                                   │ │                                            │
-  │                                                                   │ │                                            │
-  │                                                                   │ │                                            │
-  │                                                                   │ │                                            │
-  │                                                                   │ │                                            │
-  │                                                                   │ │                                            │
-  ╰───────────────────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────╯
+  ╭─ Pairs 6 ──────────────────────────────────╮ ╭─ Commits ─────────────────────────────────────────────────────────╮
+  │ pair              ↑  ↓  files           4› │ │ sha      decorations    subject     author  age  parents          │
+  │ dirty             -  -  1                  │ │ Ahead                                                             │
+  │ upstream          -  -  -                  │ │ <sha>  HEAD -> topic  feat: next  Test    1h   1                │
+  │ main              1  1  2                  │ │ Behind                                                            │
+  │ origin/main       -  -  -                  │ │ <sha>  main           main work   Test    1h   1                │
+  │ no remot… +1      -  -  -                  │ │                                                                   │
+  │ merge-ba… +1      1  0  1                  │ │                                                                   │
+  │                                            │ │                                                                   │
+  │                                            │ │                                                                   │
+  │                                            │ ╰───────────────────────────────────────────────────────────────────╯
+  │                                            │ ╭━ Files <sha> ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  │                                            │ ┃ XY  path    added  removed                                        ┃
+  │                                            │ ┃ A   next    +1     -0                                             ┃
+  │                                            │ ┃ t…  1 file  +1     -0                                             ┃
+  │                                            │ ┃                                                                   ┃
+  │                                            │ ┃                                                                   ┃
+  │                                            │ ┃                                                                   ┃
+  │                                            │ ┃                                                                   ┃
+  │                                            │ ┃                                                                   ┃
+  │                                            │ ┃                                                                   ┃
+  │                                            │ ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  │                                            │ ╭─ Detail ──────────────────────────────────────────────────────────╮
+  │                                            │ │ A next                                                            │
+  │                                            │ │ +1 -0                                                             │
+  │                                            │ │                                                                   │
+  │                                            │ │                                                                   │
+  │                                            │ │                                                                   │
+  │                                            │ │                                                                   │
+  │                                            │ │                                                                   │
+  │                                            │ │                                                                   │
+  │                                            │ │                                                                   │
+  ╰────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter compare.file-open · y y change.copy · f compare.set · t compare.set · ~ compare.swap · F compare.fetch · R co…
+  enter compare.file-open · y y change.copy · esc compare.pair-files · f from · t to · ~ compare.swap · F compare.fet…

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 	"strconv"
@@ -48,6 +49,9 @@ func (a *App) registerCompareVerbs() {
 		} else {
 			op.Result = strings.Split(key, ".")[0] + " or array (remote expansion)"
 		}
+		if strings.HasSuffix(key, ".fetch") {
+			op.Parameters["verbose"] = ochazuke.Parameter{Type: "boolean", Description: "include raw git diagnostics on failure"}
+		}
 		r.Operations[r.CanonicalKey(key)] = op
 	}
 }
@@ -82,9 +86,19 @@ func fetchedText(at *time.Time, stale bool, now time.Time) string {
 		return "-"
 	}
 	age := max(time.Duration(0), now.Sub(*at))
-	text := age.Round(time.Second).String() + " ago"
+	var text string
+	switch {
+	case age >= 24*time.Hour:
+		text = fmt.Sprintf("%dd", int(age/(24*time.Hour)))
+	case age >= time.Hour:
+		text = fmt.Sprintf("%dh", int(age/time.Hour))
+	case age >= time.Minute:
+		text = fmt.Sprintf("%dm", int(age/time.Minute))
+	default:
+		text = fmt.Sprintf("%ds", int(age/time.Second))
+	}
 	if stale {
-		text += " (stale)"
+		text += " !"
 	}
 	return text
 }
@@ -189,10 +203,13 @@ func (a *App) compareShow(c ochazuke.Ctx) ochazuke.Result {
 
 // The read happens in the pending job; register mutation happens on delivery,
 // through the framework verb so yank history and clipboard policy still apply.
-func (a *App) copyRead(c ochazuke.Ctx, work func(*EndpointResolver) (any, error)) ochazuke.Result {
+func (a *App) copyRead(c ochazuke.Ctx, work func(*EndpointResolver) (any, error), feedback ...func(string)) ochazuke.Result {
 	return a.comparisonRead(c, work).Then(func(_ ochazuke.Ctx, value any, err error) {
 		if err == nil {
 			_, _ = a.r.Execute(ochazuke.Request{Noun: "ochazuke.register", Verb: "set", Args: ochazuke.Arguments{"name": "\"", "text": value.(string)}})
+			for _, notify := range feedback {
+				notify(value.(string))
+			}
 		}
 	})
 }
@@ -235,6 +252,15 @@ func (a *App) compareCopy(c ochazuke.Ctx) ochazuke.Result {
 			ranges = append(ranges, rangeEnd(p.From)+".."+rangeEnd(p.To))
 		}
 		return strings.Join(ranges, "\n"), nil
+	}, func(text string) {
+		if a.tui && a.r.Settings().Bool("compare.copy-feedback") {
+			lines := strings.Split(text, "\n")
+			for i, line := range lines {
+				from, to, _ := strings.Cut(line, "..")
+				lines[i] = shortSHA(from) + ".." + shortSHA(to)
+			}
+			a.r.UI().Info("copied " + strings.Join(lines, ", "))
+		}
 	})
 }
 
@@ -249,7 +275,7 @@ type FetchResult struct {
 // remote-tracking refs. Remote names are checked before starting any fetch.
 func FetchRemotes(ctx context.Context, dir string, remotes, configured []string, run gitRunner, record func(string) error) error {
 	if len(remotes) == 0 {
-		return fmt.Errorf("no remotes to fetch")
+		return fmt.Errorf("this repository has no remotes")
 	}
 	for _, remote := range remotes {
 		if err := ValidRef(remote); err != nil {
@@ -259,10 +285,11 @@ func FetchRemotes(ctx context.Context, dir string, remotes, configured []string,
 			return fmt.Errorf("no configured remote %q", remote)
 		}
 	}
-	var failures []string
+	var failures, details []string
 	for _, remote := range remotes {
 		if _, err := run(ctx, writeTimeout, dir, "fetch", "--prune", "--", remote); err != nil {
-			failures = append(failures, remote+": "+err.Error())
+			failures = append(failures, remote+": "+plainFetchReason(err))
+			details = append(details, err.Error())
 		} else if record != nil {
 			if err := record(remote); err != nil {
 				failures = append(failures, remote+": fetched, but could not record fetch time: "+err.Error())
@@ -270,9 +297,37 @@ func FetchRemotes(ctx context.Context, dir string, remotes, configured []string,
 		}
 	}
 	if len(failures) > 0 {
-		return fmt.Errorf("fetch failed: %s", strings.Join(failures, "; "))
+		return &FetchError{Reason: strings.Join(failures, "; "), Detail: strings.Join(details, "\n")}
 	}
 	return nil
+}
+
+type FetchError struct{ Reason, Detail string }
+
+func (e *FetchError) Error() string { return e.Reason }
+
+func plainFetchReason(err error) string {
+	if timedOut(err) {
+		return "fetch timed out; check the remote and retry"
+	}
+	if errors.Is(err, context.Canceled) {
+		return "fetch cancelled; retry when ready"
+	}
+	var ge *GitError
+	if !errors.As(err, &ge) {
+		line, _, _ := strings.Cut(err.Error(), "\n")
+		return line + "; check git remote -v and remote access"
+	}
+	if errors.As(err, &ge) {
+		for _, line := range strings.Split(ge.Stderr, "\n") {
+			line = strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(line), "fatal:"))
+			if strings.Contains(line, "does not appear to be a git repository") {
+				path := strings.TrimSpace(strings.TrimSuffix(line, "does not appear to be a git repository"))
+				return "repository " + path + " not found; check git remote -v"
+			}
+		}
+	}
+	return "could not fetch; check git remote -v and remote access (use --verbose for details)"
 }
 
 func (a *App) fetch(c ochazuke.Ctx, compare bool) ochazuke.Result {
@@ -284,6 +339,8 @@ func (a *App) fetch(c ochazuke.Ctx, compare bool) ochazuke.Result {
 	word, cfg, now := a.repoWord(c), a.compareConfig(), a.Now()
 	run := a.fetchRun
 	clock := a.Now
+	selectedRemotes, _ := c.Args["remotes"].([]string)
+	verbose, _ := c.Args["verbose"].(bool)
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
 		_, dir, err := resolve(ctx, word)
 		if err != nil {
@@ -299,6 +356,10 @@ func (a *App) fetch(c ochazuke.Ctx, compare bool) ochazuke.Result {
 			for _, p := range r.Show(pair, from, to) {
 				remotes = unionRemotes(remotes, p.Remotes)
 			}
+			remotes = unionRemotes(remotes, selectedRemotes)
+			if len(remotes) == 0 {
+				remotes = r.remotes
+			}
 		} else if remote != "" {
 			remotes = []string{remote}
 		}
@@ -306,6 +367,10 @@ func (a *App) fetch(c ochazuke.Ctx, compare bool) ochazuke.Result {
 			return recordRemoteFetch(cfg.StateDir, r.commonDir, remote, r.remoteURLs[remote], clock())
 		}
 		if err := FetchRemotes(ctx, dir, remotes, r.remotes, run, record); err != nil {
+			var failure *FetchError
+			if verbose && errors.As(err, &failure) {
+				return nil, fmt.Errorf("%s\n%s", failure.Reason, failure.Detail)
+			}
 			return nil, err
 		}
 		result := FetchResult{Repo: dir, Remotes: remotes}

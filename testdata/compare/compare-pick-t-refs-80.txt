@@ -2,28 +2,27 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
-  ┃ pair          from       to        ↑  ↓  files  fetched  state           ┃
-  ┃ dirty         HEAD       WORKTREE  -  -  1      -        the working tr… ┃
-  ┃ upstream      {upstrea…  HEAD      -  -  -      -        no upstream     ┃
-  ┃ main +2       main       HEAD      1  0  1      -        ready           ┃
-  ┃ origin/main   origin/m…  HEAD      -  -  -      -        no ref named o… ┃
-  ┃ {remote}/ma…  {remote}…  HEAD      -  -  -      -        no remotes      ┃
-  ┃ {remote}/br…  {remote}…  HEAD      -  -  -      -        no remotes      ┃
-  ╰━━━━━╭──────────────────────────────────────────────────────────────╮━━━━━╯
-  ╭─ Com│ Pick to · Endpoints Log All [Refs] Graph Worktrees           │─────╮
-  │ the │ ›                              fuzzy │ refs/heads/main       │     │
-  │ sha │   refs/heads/m…  <sha>  first      │                       │     │
-  │ (emp│   refs/heads/t…  <sha>  feat: next │                       │     │
-  │     │                                      │                       │     │
-  │     │                                      │                       │     │
-  │     │                                      │                       │     │
+  ╭━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair          from  to        ↑  ↓  files  fetched  state                ┃
+  ┃ dirty         HEAD  WORKTREE  -  -  1      -        the working tree is… ┃
+  ┃ upstream      -     HEAD      -  -  -      -        no upstream          ┃
+  ┃ main +2       main  HEAD      1  0  1      -        ready                ┃
+  ┃ origin/main   -     HEAD      -  -  -      -        no ref named origin… ┃
+  ┃ no remot… +1  -     HEAD      -  -  -      -        no remotes           ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ the working tree is not a commit                                         │
+  │     ╭──────────────────────────────────────────────────────────────╮     │
+  │     │ Pick to · Endpoints Log All [Refs] Graph Worktrees           │     │
+  │     │ ›                              fuzzy │ refs/heads/main       │     │
+  │     │   main   <sha>  first              │                       │     │
+  │     │   topic  <sha>  feat: next         │                       │     │
   ╰─────│                                      │                       │─────╯
   ╭─ Fil│                                      │                       │─────╮
-  │ stat│                                      │                       │     │
+  │ XY  │                                      │                       │     │
   │  M  │                                      │                       │     │
-  │ tota│                                      │                       │     │
-  │     │ tab chooser.next-source · shift+tab chooser.previous-source… │     │
+  │ t…  │                                      │                       │     │
+  │     │ enter chooser.pick · ctrl+o chooser.next-source · alt+o cho… │     │
   │     ╰──────────────────────────────────────────────────────────────╯     │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
@@ -34,6 +33,7 @@
   │ ↑- ↓-                                                                    │
   │ the working tree is not a commit                                         │
   │                                                                          │
+  │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  tab chooser.next-source · shift+tab chooser.previous-source · enter chooser…
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-so…

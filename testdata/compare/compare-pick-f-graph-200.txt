@@ -2,38 +2,38 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────────────────────────────────────────────────────╮
-  ┃ pair             from               to        ↑  ↓  files  fetched  state                                         ┃ │ the working tree is not a commit                                           │
-  ┃ dirty            HEAD               WORKTREE  -  -  1      -        the working tree is not a commit              ┃ │ sha  decorations  subject  author  age  parents                            │
-  ┃ upstream         {upstream}         HEAD      -  -  -      -        no upstream                                   ┃ │ (empty list)                                                               │
-  ┃ main +2          main               HEAD      1  0  1      -        ready                                         ┃ │                                                                            │
-  ┃ origin/main      origin/main        HEAD      -  -  -      -        no ref named origin/main                      ┃ │                                                                            │
-  ┃ {remote}/main    {remote}/{main}    HEAD      -  -  -      -        no remotes                                    ┃ │                                                                            │
-  ┃ {remote}/branch  {remote}/{branch}  HEAD      -  -  -      -        no remotes                                    ┃ │                                                                            │
-  ┃                 ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮                 │
-  ┃                 │ Pick from · Endpoints Log All Refs [Graph] Worktrees                                                                                                         │                 │
-  ┃                 │ ›                                                                                       fuzzy │ * <sha> feat: next                                         │─────────────────╯
-  ┃                 │   * <sha>  HEAD -> topic  feat: next                                                        │ <sha>                     │─────────────────╮
+  ╭━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ─────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  ┃ pair          from  to        ↑  ↓  files  fetched  state                  ┃ │ the working tree is not a commit                                                                                  │
+  ┃ dirty         HEAD  WORKTREE  -  -  1      -        the working tree is n… ┃ │                                                                                                                   │
+  ┃ upstream      -     HEAD      -  -  -      -        no upstream            ┃ │                                                                                                                   │
+  ┃ main +2       main  HEAD      1  0  1      -        ready                  ┃ │                                                                                                                   │
+  ┃ origin/main   -     HEAD      -  -  -      -        no ref named origin/m… ┃ │                                                                                                                   │
+  ┃ no remot… +1  -     HEAD      -  -  -      -        no remotes             ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                 ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮─────────────────╯
+  ┃                 │ Pick from · Endpoints Log All Refs [Graph] Worktrees                                                                                                         │─────────────────╮
+  ┃                 │ ›                                                                                       fuzzy │ * <sha> feat: next                                         │                 │
+  ┃                 │   * <sha>  HEAD -> topic  feat: next                                                        │ <sha>                     │                 │
   ┃                 │   * <sha>  main           first                                                             │                                                              │                 │
   ┃                 │                                                                                               │                                                              │                 │
   ┃                 │                                                                                               │                                                              │                 │
   ┃                 │                                                                                               │                                                              │                 │
   ┃                 │                                                                                               │                                                              │                 │
   ┃                 │                                                                                               │                                                              │                 │
-  ┃                 │                                                                                               │                                                              │                 │
-  ┃                 │                                                                                               │                                                              │                 │
-  ┃                 │                                                                                               │                                                              │                 │
-  ┃                 │ tab chooser.next-source · shift+tab chooser.previous-source · enter chooser.pick · esc chooser.cancel                                                        │─────────────────╯
-  ┃                 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯─────────────────╮
-  ┃                                                                                                                   ┃ │ dirty                                                                      │
-  ┃                                                                                                                   ┃ │ from  HEAD                                                                 │
-  ┃                                                                                                                   ┃ │ to    WORKTREE                                                             │
-  ┃                                                                                                                   ┃ │ ↑- ↓-                                                                      │
-  ┃                                                                                                                   ┃ │ the working tree is not a commit                                           │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────────────────────────────────────────────────────╯
+  ┃                 │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel · tab search.cycle-match                                │                 │
+  ┃                 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯─────────────────╯
+  ┃                                                                            ┃ ╭─ Detail ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  ┃                                                                            ┃ │ dirty                                                                                                             │
+  ┃                                                                            ┃ │ from  HEAD                                                                                                        │
+  ┃                                                                            ┃ │ to    WORKTREE                                                                                                    │
+  ┃                                                                            ┃ │ ↑- ↓-                                                                                                             │
+  ┃                                                                            ┃ │ the working tree is not a commit                                                                                  │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  tab chooser.next-source · shift+tab chooser.previous-source · enter chooser.pick · esc chooser.cancel
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel · tab search.cycle-match

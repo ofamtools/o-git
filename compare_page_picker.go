@@ -28,6 +28,9 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 		return a.compareSet(ochazuke.Ctx{Args: ochazuke.Arguments{"repo": repo, "side": side, "endpoint": spec}})
 	}
 	sources := []ochazuke.ChooserSource{}
+	a.compare.chooserOther = other
+	a.compare.chooserRepo = repo
+	a.compare.chooserFollowing = ""
 	for _, name := range []string{"Endpoints", "Log", "All", "Refs", "Graph", "Worktrees"} {
 		sources = append(sources, ochazuke.ChooserSource{Name: name, Load: func(_ string) ochazuke.Result {
 			return ochazuke.Pending(func(ctx context.Context) (any, error) {
@@ -55,9 +58,6 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 	if err != nil {
 		return ochazuke.Failed(err)
 	}
-	if err := a.bindSideChooser(); err != nil {
-		return ochazuke.Failed(err)
-	}
 	return ochazuke.Done(nil)
 }
 
@@ -68,6 +68,7 @@ func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.Choo
 	}
 	switch source {
 	case "Endpoints":
+		seen := map[string]int{}
 		for _, entry := range r.cfg.Endpoints {
 			name, spec, ok := strings.Cut(entry, "=")
 			if !ok {
@@ -83,6 +84,20 @@ func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.Choo
 						label += " (" + r.remotes[i] + ")"
 					}
 				}
+				key := endpointKey(e)
+				// Distinct branch names may share a commit. Only aliases for
+				// the same resolved ref are joined in the endpoint chooser.
+				key += "\x00" + e.Ref
+				if !e.Available {
+					key = "unavailable:" + e.Reason
+				}
+				if at, ok := seen[key]; ok {
+					if !strings.Contains(rows[at].Cells[0], label) {
+						rows[at].Cells[0] += " · " + label
+					}
+					continue
+				}
+				seen[key] = len(rows)
 				add(e.Spec, label+" "+e.Spec+" "+resolvedRef(e)+" "+e.Reason, label, resolvedRef(e), endpointState(e))
 			}
 		}
@@ -99,7 +114,7 @@ func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.Choo
 		for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
 			parts := strings.SplitN(line, "\x00", 3)
 			if len(parts) == 3 {
-				add(parts[0], strings.Join(parts, " "), parts[0], shortSHA(parts[1]), parts[2])
+				add(parts[0], shortRef(parts[0])+" "+parts[1]+" "+parts[2], shortRef(parts[0]), shortSHA(parts[1]), parts[2])
 			}
 		}
 	case "Log", "All", "Graph":
@@ -149,4 +164,50 @@ func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.Choo
 		}
 	}
 	return rows, nil
+}
+
+// Typed resolution is an app read. The chooser keeps its standard matcher,
+// source bindings and ordering; an exact spec is an ordinary first row.
+func (a *App) followCompareChooser() bool {
+	c := a.r.Chooser("compare-side")
+	if c == nil || !a.r.Settings().Bool("compare.chooser.resolve-typed") {
+		return false
+	}
+	query, source := c.Query(), c.Source()
+	key := source + "\x00" + query
+	if key == a.compare.chooserFollowing {
+		return false
+	}
+	a.compare.chooserFollowing = key
+	repo, cfg, now, other := a.compare.chooserRepo, a.compareConfig(), a.Now(), a.compare.chooserOther
+	res := ochazuke.Pending(func(ctx context.Context) (any, error) {
+		_, dir, err := resolve(ctx, repo)
+		if err != nil {
+			return nil, err
+		}
+		resolver, err := NewEndpointResolver(ctx, dir, cfg, now, &a.compareCache)
+		if err != nil {
+			return nil, err
+		}
+		rows, err := loadSideChoices(resolver, source, other)
+		if err != nil || strings.TrimSpace(query) == "" {
+			return rows, err
+		}
+		var previews []string
+		for _, endpoint := range resolver.Resolve(query, other) {
+			if endpoint.Available {
+				previews = append(previews, "resolved "+endpointDetail(endpoint))
+			} else {
+				previews = append(previews, endpoint.Reason)
+			}
+		}
+		preview := strings.Join(previews, "\n")
+		typed := ochazuke.ChooserRow{ID: "typed-spec", Label: "Use ref/spec " + query, Cells: []string{query, preview}, Data: sideChoice{Spec: query, Graph: preview}}
+		return append([]ochazuke.ChooserRow{typed}, rows...), nil
+	}).Replacing("typed-preview").Then(func(_ ochazuke.Ctx, v any, err error) {
+		if err == nil && a.r.Chooser("compare-side") == c && c.Query() == query && c.Source() == source {
+			c.SetRows(v.([]ochazuke.ChooserRow))
+		}
+	})
+	return a.launch("compare-side", "endpoint.resolve", res)
 }

@@ -219,32 +219,7 @@ func (r *EndpointResolver) Pairs() []Comparison {
 		out = append(out, r.pairRows(name, from, to)...)
 	}
 	if r.cfg.Collapse {
-		var collapsed []Comparison
-		keys := map[string]int{}
-		for _, c := range out {
-			key := endpointKey(c.From) + "\x01" + endpointKey(c.To)
-			if index, exists := keys[key]; exists && c.Available {
-				old := &collapsed[index]
-				for _, name := range c.Names {
-					if !slices.Contains(old.Names, name) {
-						old.Names = append(old.Names, name)
-					}
-				}
-				old.Name = strings.Join(old.Names, " · ")
-				old.Members = append(old.Members, c.Members...)
-				old.Remotes = unionRemotes(old.Remotes, c.Remotes)
-				old.Stale = old.Stale || c.Stale
-				if c.Fetched != nil && (old.Fetched == nil || c.Fetched.Before(*old.Fetched)) {
-					old.Fetched = c.Fetched
-				}
-				continue
-			}
-			if c.Available {
-				keys[key] = len(collapsed)
-			}
-			collapsed = append(collapsed, c)
-		}
-		out = collapsed
+		out = collapseComparisons(out, false)
 	}
 	r.countPairs(out)
 	return out
@@ -397,4 +372,41 @@ func (r *EndpointResolver) count(c Comparison, key string) (divergence, error) {
 		r.cache.mu.Unlock()
 	}
 	return d, nil
+}
+
+func comparisonCollapseKey(c Comparison) string {
+	key := func(e Endpoint) string {
+		if !e.Available {
+			return "unavailable:" + e.Reason
+		}
+		return endpointKey(e)
+	}
+	return key(c.From) + "\x01" + key(c.To)
+}
+
+func collapseComparisons(out []Comparison, unavailable bool) []Comparison {
+	var collapsed []Comparison
+	keys := map[string]int{}
+	for _, c := range out {
+		key := comparisonCollapseKey(c)
+		if index, exists := keys[key]; exists && (c.Available || unavailable) {
+			old := &collapsed[index]
+			for _, name := range c.Names {
+				if !slices.Contains(old.Names, name) {
+					old.Names = append(old.Names, name)
+				}
+			}
+			old.Name = strings.Join(old.Names, " · ")
+			old.Members = append(old.Members, c.Members...)
+			old.Remotes = unionRemotes(old.Remotes, c.Remotes)
+			old.Stale = old.Stale || c.Stale
+			if c.Fetched != nil && (old.Fetched == nil || c.Fetched.Before(*old.Fetched)) {
+				old.Fetched = c.Fetched
+			}
+			continue
+		}
+		keys[key] = len(collapsed)
+		collapsed = append(collapsed, c)
+	}
+	return collapsed
 }

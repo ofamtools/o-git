@@ -2,38 +2,38 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 7 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ──────────────────────────────────────────────────────────────────╮
-  ┃ pair                      from               to        ↑  ↓  files  fetched  state                                ┃ │ the working tree is not a commit                                           │
-  ┃ (custom) merge-base(top…  topic              WORKTREE  -  -  1      -        the working tree is not a commi…     ┃ │ sha  decorations  subject  author  age  parents                            │
-  ┃ dirty                     HEAD               WORKTREE  -  -  1      -        the working tree is not a commit     ┃ │ (empty list)                                                               │
-  ┃ upstream                  {upstream}         HEAD      -  -  -      -        no upstream                          ┃ │                                                                            │
-  ┃ main +2                   main               HEAD      1  0  1      -        ready                                ┃ │                                                                            │
-  ┃ origin/main               origin/main        HEAD      -  -  -      -        no ref named origin/main             ┃ │                                                                            │
-  ┃ {remote}/main             {remote}/{main}    HEAD      -  -  -      -        no remotes                           ┃ │                                                                            │
-  ┃ {remote}/branch           {remote}/{branch}  HEAD      -  -  -      -        no remotes                           ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ ╰────────────────────────────────────────────────────────────────────────────╯
-  ┃                                                                                                                   ┃ ╭─ Files ────────────────────────────────────────────────────────────────────╮
-  ┃                                                                                                                   ┃ │ status  path     added  removed                                            │
-  ┃                                                                                                                   ┃ │  M      README   +1     -1                                                 │
-  ┃                                                                                                                   ┃ │ total   1 files  +1     -1                                                 │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ ╰────────────────────────────────────────────────────────────────────────────╯
-  ┃                                                                                                                   ┃ ╭─ Detail ───────────────────────────────────────────────────────────────────╮
-  ┃                                                                                                                   ┃ │ (custom)                                                                   │
-  ┃                                                                                                                   ┃ │ from  topic (merge-base(topic))                                            │
-  ┃                                                                                                                   ┃ │ to    WORKTREE                                                             │
-  ┃                                                                                                                   ┃ │ ↑- ↓-                                                                      │
-  ┃                                                                                                                   ┃ │ the working tree is not a commit; relative to the worktree's HEAD          │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ┃                                                                                                                   ┃ │                                                                            │
-  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰────────────────────────────────────────────────────────────────────────────╯
+  ╭━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮ ╭─ Commits ─────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  ┃ pair          from     to        ↑  ↓  files  fetched  state               ┃ │ the working tree is not a commit                                                                                  │
+  ┃ (custom) +1   <sha>  WORKTREE  -  -  1      -        the working tree i… ┃ │                                                                                                                   │
+  ┃ upstream      -        HEAD      -  -  -      -        no upstream         ┃ │                                                                                                                   │
+  ┃ main +2       main     HEAD      1  0  1      -        ready               ┃ │                                                                                                                   │
+  ┃ origin/main   -        HEAD      -  -  -      -        no ref named origi… ┃ │                                                                                                                   │
+  ┃ no remot… +1  -        HEAD      -  -  -      -        no remotes          ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃                                                                            ┃ ╭─ Files ───────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  ┃                                                                            ┃ │ XY  path    added  removed                                                                                        │
+  ┃                                                                            ┃ │  M  README  +1     -1                                                                                             │
+  ┃                                                                            ┃ │ t…  1 file  +1     -1                                                                                             │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃                                                                            ┃ ╭─ Detail ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  ┃                                                                            ┃ │ (custom) · dirty                                                                                                  │
+  ┃                                                                            ┃ │ from  <sha> (merge-base(topic))                                                                                 │
+  ┃                                                                            ┃ │ to    WORKTREE                                                                                                    │
+  ┃                                                                            ┃ │ ↑- ↓-                                                                                                             │
+  ┃                                                                            ┃ │ the working tree is not a commit; relative to the worktree's HEAD                                                 │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ┃                                                                            ┃ │                                                                                                                   │
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
   ── chooser.pick done ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter compare.open · y y compare.copy · f compare.set · t compare.set · ~ compare.swap · F compare.fetch · R compare.reload · q app.quit · ctrl+w >/< resize · : palette.open · ? bindings.help · '…
+  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F compare.fetch · R compare.reload · q app.quit · ctrl+w >/< resize · : palette.open · ? bindings.help · ' page.pick · / f…

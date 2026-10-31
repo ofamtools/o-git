@@ -358,6 +358,6 @@ func (l ChangeList) Items(dir string) []ochazuke.ListItem {
 		rows = append(rows, changeItem(file))
 	}
 	t := l.Totals
-	rows = append(rows, ochazuke.ListItem{ID: "change-total/" + dir, Noun: "change", Label: fmt.Sprintf("%d files, +%d -%d", t.Files, t.Added, t.Removed), Data: t, Cells: []string{"total", fmt.Sprintf("%d files", t.Files), "+" + strconv.Itoa(t.Added), "-" + strconv.Itoa(t.Removed)}})
+	rows = append(rows, ochazuke.ListItem{ID: "change-total/" + dir, Noun: "change", Label: fmt.Sprintf("%s, +%d -%d", counted(t.Files, "file"), t.Added, t.Removed), Data: t, Cells: []string{"total", counted(t.Files, "file"), "+" + strconv.Itoa(t.Added), "-" + strconv.Itoa(t.Removed)}})
 	return rows
 }

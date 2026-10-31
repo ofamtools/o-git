@@ -1,13 +1,11 @@
 package main
 
-import "github.com/unixsuperhero/ochazuke"
-
 // Rows are data: applications and owners can replace any one of them.
 func (a *App) bindComparePage() error {
 	return a.r.LoadDefaultBindings("compare-page", []byte(`{"bindings":[
  {"context":"compare-page/normal","bindings":[
-  {"key":"f","action":"compare.set","args":{"side":"from"}},
-  {"key":"t","action":"compare.set","args":{"side":"to"}},
+  {"key":"f","action":"compare.set","args":{"side":"from"},"hint":"from"},
+  {"key":"t","action":"compare.set","args":{"side":"to"},"hint":"to"},
   {"key":"~","action":"compare.swap"},
   {"key":"F","action":"compare.fetch"},
   {"key":"R","action":"compare.reload"},
@@ -21,12 +19,4 @@ func (a *App) bindComparePage() error {
  {"context":"worktree/normal","bindings":[{"key":"c","action":"worktree.compare"},{"key":"F","action":"repo.fetch"}]},
  {"context":"branch/normal","bindings":[{"key":"c","action":"branch.compare"},{"key":"F","action":"repo.fetch"}]}
  ]}`))
-}
-
-func (a *App) bindSideChooser() error {
-	// Instance rows override the chooser's tab match-cycle only in this chooser.
-	return a.r.Bind(
-		ochazuke.Binding{Instance: "compare-side/query", Mode: "insert", Keys: "tab", Request: ochazuke.Request{Noun: "ochazuke.chooser", Verb: "next-source"}},
-		ochazuke.Binding{Instance: "compare-side/query", Mode: "insert", Keys: "shift+tab", Request: ochazuke.Request{Noun: "ochazuke.chooser", Verb: "previous-source"}},
-	)
 }

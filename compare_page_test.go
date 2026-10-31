@@ -156,7 +156,7 @@ func TestComparePageStories(t *testing.T) {
 					t.Fatal(c.Source())
 				}
 				compareFrame(t, a, "compare-pick-"+key+"-"+strings.ToLower(source))
-				keys(t, a, "tab")
+				keys(t, a, "ctrl+o")
 			}
 			keys(t, a, "esc")
 		}

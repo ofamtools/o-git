@@ -177,25 +177,27 @@ The keys follow the family key map (`~/hub/o-plans/plans/mtm-keys-and-ux-review-
 
 ## The Compare page
 
-`o-git view --page compare [--path DIR]` opens Compare. The noun-only `o-git compare` remains the CLI noun's help; use the view flag to open the page. `c` on a repository, worktree or branch opens it with that row as the `to` side. The page is local to o-git's TUI; host mounting is a later plan.
+`o-git view --page compare [--path DIR]` opens Compare, using the current directory's repository when no path is given. The noun-only `o-git compare` remains the CLI noun's help; use the view flag to open the page. `c` on a repository, worktree or branch opens it with that row as the `to` side and the configured default pair's `from` side. The page is local to o-git's TUI; host mounting is a later plan.
 
 Pairs sit on the left with from/to, ahead/behind, file counts, fetched age and state. Every pair occupies one row: cells truncate with an ellipsis; collapsed labels show the first name plus `+N`, with every name and the full state/reason in Detail. Low-value columns drop first when space is tight: fetched when all rows have no fetch time, then to when every target is HEAD. Unavailable pairs remain dimmed with reasons. The initial selection is `compare.default-pair` (`dirty`). At 80 columns the pairs list stacks above the other panels.
 
-A replacing read off the event loop follows pair selection, filling Commits with native Ahead/Behind sections (or interleaved rows when `compare.commits.split=false`) and Files with statuses, paths, numstats and totals. `enter` on a commit shows its files against its first parent, or the empty tree for a root commit. The Files title identifies that commit; moving to another pair restores comparison files. Detail follows the focused pair, commit, file or totals row.
+A replacing read off the event loop follows pair selection, filling Commits with native Ahead/Behind sections (or interleaved rows when `compare.commits.split=false`) and Files with statuses, paths, numstats and totals. While Commits has focus, Files follows the selected commit against its first parent, or the empty tree for a root commit. `enter` focuses those files. The Files title identifies that commit; Escape in Files or focusing Pairs restores comparison files. Detail follows the focused pair, commit, file or totals row. Fetch ages update in compact units, with the last-fetch age also shown in pair Detail. Raw endpoint diagnostics remain in JSON `detail`; fetch failures have a plain reason and next step, with raw diagnostics available through `--verbose`.
 
 `enter` on a file opens its structured diff beside a file list in a modal. The same path works for commit files. Diffview owns rendering, hunk/line scrolling and file-navigation keys; its `diff.file` callback loads the next or previous actual file without visiting totals. `q` or Escape closes the diff and restores its file selection. The app calls the merged Go readers directly; no subprocess invokes o-git itself. Fetch remains explicit only.
 
 | Key | Where | Does |
 |---|---|---|
 | `f` / `t` | Compare | choose the from / to endpoint |
-| `tab` / `shift+tab` | side chooser | next / previous source: Endpoints, Log, All, Refs, Graph, Worktrees |
+| `tab` / `shift+tab` | side chooser | next / previous match mode |
+| `ctrl+o` / `alt+o` | side chooser | next / previous source: Endpoints, Log, All, Refs, Graph, Worktrees |
 | `enter` | side chooser | take the highlighted row, including the typed ref/spec create row |
 | `~` | Compare | swap the two sides |
-| `F` | Compare | fetch only remotes used by the selected pair, as an explicit job; re-resolve on completion |
+| `F` | Compare | fetch the union of remotes used by every name in the selected group, or all configured remotes when no dependency is known; re-resolve on completion |
 | `F` | Git rows | fetch that repository's configured remotes |
 | `enter` | pair | focus Commits |
 | `enter` | commit | show that commit's files |
 | `enter` | file | open its diff |
+| `esc` | Files | return to the pair's files |
 | `f` / `t` | commit | set from / to to that commit |
 | `y y` | commit / file | copy SHA / path through the shared register |
 | `] f` / `[ f` | diff | next / previous file (counts supported) |
@@ -212,10 +214,20 @@ The chooser's Log/All/Graph sources preserve git's order. Graph connector lines 
 |---|---|
 | `compare.diff.layout` | `auto`: unified below 140 diff-content columns, split at 140 or more; `unified` and `split` force either layout |
 | `compare.diff.highlight` | `true`: syntax highlighting; false disables it |
+| `compare.pairs.width-percent` | `40`: maximum wide-layout share for Pairs; `60` restores the former share |
+| `compare.files.follow-commit` | `true`: Files follows the focused commit; false loads only on Enter |
+| `compare.chooser.resolve-typed` | `true`: preview and prioritize the exact typed spec; false keeps the ordinary create row |
+| `compare.copy-feedback` | `true`: show a plain notice after copying a comparison range; false silences it |
 
 The diff view reads layout and highlighting every frame; the merged reader's `compare.diff.context` and `compare.diff.max-lines` apply when a file loads. The existing `compare.files.find-copies-harder` and commit split/limit settings apply on refresh. All bindings remain individually overridable or removable.
 
 Compared with Vim: Vim's `f`/`t` (`:help f`, `:help t`) find characters in text; these lists have no text cursor, so the keys pick from/to. Vim's `~` (`:help ~`) changes character case; Compare uses it to swap endpoints. List `j`/`k` retain the framework's visual row motion and spill rules. Diff hunk `] c`/`[ c` follow Vim `:help ]c`/`:help [c`, with counts. Split layout is similar to `:diffsplit`, comparing Git endpoints instead of editor buffers. No staging or diff-get/put action is added.
+
+| Vim form | Help tag | Compare behavior |
+|---|---|---|
+| `CTRL-W w` / `CTRL-W W` | `CTRL-W_w`, `CTRL-W_W` | Similar: `}` / `{` walk lists in screen order, Pairs then Commits then Files |
+| `CTRL-W j` / `CTRL-W k` | `CTRL-W_j`, `CTRL-W_k` | Similar: list `j` / `k` spill at their edges in screen order; they do not wrap at the page edge |
+| Git endpoint selection and fetch | n/a | Domain operations with no Vim counterpart |
 
 ## Build
 

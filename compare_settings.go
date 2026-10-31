@@ -33,6 +33,15 @@ type CompareConfig struct {
 
 func declareCompareSettings(r *ochazuke.Runtime) error {
 	return r.DeclareSetting(
+		ochazuke.Setting{Name: "compare.pairs.width-percent", Type: ochazuke.SettingInteger, Default: 40, Description: "Maximum wide-layout share for Pairs; 60 restores the former share", Validate: func(v any) error {
+			if n := v.(int); n < 25 || n > 75 {
+				return fmt.Errorf("width-percent must be between 25 and 75")
+			}
+			return nil
+		}},
+		ochazuke.Setting{Name: "compare.files.follow-commit", Type: ochazuke.SettingBoolean, Default: true, Description: "Follow the focused commit's files; off loads only on Enter"},
+		ochazuke.Setting{Name: "compare.chooser.resolve-typed", Type: ochazuke.SettingBoolean, Default: true, Description: "Resolve typed endpoint specs in the chooser and rank them first"},
+		ochazuke.Setting{Name: "compare.copy-feedback", Type: ochazuke.SettingBoolean, Default: true, Description: "Show a plain notice after copying a comparison range"},
 		ochazuke.Setting{Name: "compare.endpoints", Type: ochazuke.SettingList, Default: defaultEndpoints, Description: "Named endpoint specs, NAME=SPEC; names may be used in pairs"},
 		ochazuke.Setting{Name: "compare.pairs", Type: ochazuke.SettingList, Default: defaultPairs, Description: "Saved comparisons, NAME=FROM..TO; omitted TO means HEAD"},
 		ochazuke.Setting{Name: "compare.main", Type: ochazuke.SettingString, Default: "", Description: "Main branch override; empty detects the remote default then main-names"},

@@ -1,0 +1,39 @@
+  ◆ o-git                                                        NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair          from  to        ↑  ↓  files  fetched  state                ┃
+  ┃ dirty         HEAD  WORKTREE  -  -  1      -        the working tree is… ┃
+  ┃ upstream      -     HEAD      -  -  -      -        no upstream          ┃
+  ┃ main +2       main  HEAD      2  0  2      -        ready                ┃
+  ┃ origin/main   -     HEAD      -  -  -      -        no ref named origin… ┃
+  ┃ no remot… +1  -     HEAD      -  -  -      -        no remotes           ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ sha      decorations    subject     author  age  parents                 │
+  │ Ahead                                                                    │
+  │ <sha>  HEAD -> topic  third       Test    1h   1                       │
+  │ <sha>                 feat: next  Test    1h   1                       │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Files ──────────────────────────────────────────────────────────────────╮
+  │ XY  path     added  removed                                              │
+  │ A   next     +1     -0                                                   │
+  │ A   third    +1     -0                                                   │
+  │ t…  2 files  +2     -0                                                   │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Detail ─────────────────────────────────────────────────────────────────╮
+  │ main · merge-base · fork-point                                           │
+  │ from  main ({main})                                                      │
+  │ to    HEAD                                                               │
+  │ ↑2 ↓0                                                                    │
+  │ ready                                                                    │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ────────────────────────────────────────────────────────────────────────────
+  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …

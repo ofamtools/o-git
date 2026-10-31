@@ -7,11 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/x/ansi"
 	"github.com/unixsuperhero/ochazuke"
 )
 
 var compareFileColumns = []ochazuke.Column{
-	{Title: "status", Min: 2, Priority: 1}, {Title: "path", Min: 8},
+	{Title: "XY", Width: 2, Priority: 1}, {Title: "path", Min: 8},
 	{Title: "added", Priority: 2}, {Title: "removed", Priority: 3},
 }
 
@@ -52,7 +53,12 @@ func pairItems(pairs []Comparison, counts map[string]int, now time.Time) ([]ocha
 		row := comparisonRow(pair, now)
 		label := pair.Name
 		if len(pair.Names) > 1 {
-			label = fmt.Sprintf("%s +%d", pair.Names[0], len(pair.Names)-1)
+			name := pair.Names[0]
+			if !pair.Available {
+				name = pair.Reason
+			}
+			suffix := fmt.Sprintf(" +%d", len(pair.Names)-1)
+			label = ansi.Truncate(name, max(1, cols[0].Min-ansi.StringWidth(suffix)), "…") + suffix
 		}
 		files := "-"
 		if count, ok := counts[comparisonFileKey(pair)]; ok {
@@ -89,17 +95,24 @@ type compareDetailData struct {
 
 func (a *App) followCompare() bool {
 	p := a.compare
+	if a.r.TopModal() == "compare-side" {
+		return a.followCompareChooser()
+	}
 	if a.r.Page != comparePageID || a.r.TopModal() != "" {
 		return false
 	}
 	row, ok := p.pairs.Selected()
-	if !ok || row.ID == p.following {
+	if !ok {
 		return false
+	}
+	if row.ID == p.following {
+		return a.followCompareFiles()
 	}
 	p.following = row.ID
 	pair := row.Data.(Comparison)
 	p.shown = nil
 	p.fileCommit = ""
+	p.fileFollowing = ""
 	p.commitReason = "Reading commits…"
 	p.fileReason = "Reading files…"
 	_ = p.commits.SetItems(nil)
@@ -127,6 +140,7 @@ func (a *App) followCompare() bool {
 		}
 		fresh := resolved[0]
 		fresh.Name, fresh.Names, fresh.Members = pair.Name, pair.Names, pair.Members
+		fresh.Remotes, fresh.Fetched, fresh.Stale = pair.Remotes, pair.Fetched, pair.Stale
 		commits, err := ReadCommits(r.ctx, r.dir, fresh, limit, split, r.now)
 		if err != nil {
 			return nil, err
@@ -145,15 +159,21 @@ func (a *App) followCompare() bool {
 		p.shown = &data.Pair
 		p.commitReason = data.Commits.Reason
 		p.fileReason = data.Changes.Reason
+		p.pairFileReason = data.Changes.Reason
+		p.pairFiles = nil
 		_ = p.commits.SetItems(data.Commits.Items)
 		if data.Pair.Available {
-			_ = p.files.SetItems(data.Changes.Items(data.Pair.Repo))
+			p.pairFiles = data.Changes.Items(data.Pair.Repo)
+			_ = p.files.SetItems(p.pairFiles)
 		}
 	})
 	return a.launch(pairsID, "compare.show", res)
 }
 
 func endpointDetail(e Endpoint) string {
+	if !e.Available {
+		return e.Spec + ": " + e.Reason
+	}
 	ref := resolvedRef(e)
 	if ref == "" {
 		ref = e.Spec
@@ -169,14 +189,14 @@ func (a *App) compareDetail() string {
 	if inst := a.r.Instances[a.r.BaseFocus()]; inst != nil {
 		switch row := inst.Data.(type) {
 		case Commit:
-			detail = fmt.Sprintf("%s %s\n%s\n%s · %s\n%d parents", row.ShortSHA, row.Decorations, row.Subject, row.Author, row.Age, row.ParentCount)
+			detail = fmt.Sprintf("%s %s\n%s\n%s · %s\n%s", row.ShortSHA, row.Decorations, row.Subject, row.Author, row.Age, counted(row.ParentCount, "parent"))
 		case Change:
 			detail = fmt.Sprintf("%s %s\n+%d -%d", row.Status, row.Path, row.Added, row.Removed)
 			if row.OldPath != "" {
 				detail += "\nfrom " + row.OldPath
 			}
 		case ChangeTotals:
-			detail = fmt.Sprintf("%d files, +%d -%d", row.Files, row.Added, row.Removed)
+			detail = fmt.Sprintf("%s, +%d -%d", counted(row.Files, "file"), row.Added, row.Removed)
 		}
 	}
 	if detail != "" {
@@ -187,5 +207,33 @@ func (a *App) compareDetail() string {
 		return "Reading selected comparison…"
 	}
 	row := comparisonRow(*p, a.Now())
-	return fmt.Sprintf("%s\nfrom  %s\nto    %s\n↑%s ↓%s\n%s\n%s", strings.Join(p.Names, " · "), endpointDetail(p.From), endpointDetail(p.To), row.Cells[3], row.Cells[4], p.State, p.Detail)
+	text := fmt.Sprintf("%s\nfrom  %s\nto    %s\n↑%s ↓%s\n%s", strings.Join(p.Names, " · "), endpointDetail(p.From), endpointDetail(p.To), row.Cells[3], row.Cells[4], p.State)
+	if p.Fetched != nil {
+		text += "\nas of the last fetch, " + fetchedText(p.Fetched, false, a.Now()) + " ago"
+	}
+	return text
+}
+
+func counted(n int, noun string) string {
+	if n != 1 {
+		noun += "s"
+	}
+	return fmt.Sprintf("%d %s", n, noun)
+}
+
+// Render ages from the timestamps, without re-reading git or recreating rows.
+func (a *App) updateCompareAges() {
+	rows := a.compare.pairs.Items()
+	changed := false
+	for i, row := range rows {
+		p := row.Data.(Comparison)
+		if len(row.Cells) > 6 {
+			text := fetchedText(p.Fetched, false, a.Now())
+			changed = changed || row.Cells[6] != text
+			rows[i].Cells[6] = text
+		}
+	}
+	if changed {
+		_ = a.compare.pairs.SetItems(rows)
+	}
 }

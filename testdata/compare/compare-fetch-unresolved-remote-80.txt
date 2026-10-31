@@ -1,0 +1,39 @@
+  ◆ o-git                                                        NORMAL
+   Git  › Compare
+  ────────────────────────────────────────────────────────────────────────────
+  Compare /fixture/story
+  ╭━ Pairs 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┃ pair              from   to        ↑  ↓  files  fetched  state           ┃
+  ┃ (custom) -..WOR…  -      WORKTREE  -  -  -      -        upstream has n… ┃
+  ┃ dirty             HEAD   WORKTREE  -  -  1      -        the working tr… ┃
+  ┃ upstream          -      HEAD      -  -  -      -        no upstream     ┃
+  ┃ main +6           topic  HEAD      0  0  0      1h       same commit: n… ┃
+  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ╭─ Commits ────────────────────────────────────────────────────────────────╮
+  │ upstream has no missing branch (not pushed, or not fetched)              │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Files ──────────────────────────────────────────────────────────────────╮
+  │ upstream has no missing branch (not pushed, or not fetched)              │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ╭─ Detail ─────────────────────────────────────────────────────────────────╮
+  │ (custom)                                                                 │
+  │ from  upstream/missing: upstream has no missing branch (not pushed, or   │
+  │ not fetched)                                                             │
+  │ to    WORKTREE                                                           │
+  │ ↑- ↓-                                                                    │
+  │ upstream has no missing branch (not pushed, or not fetched)              │
+  │                                                                          │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+  ── compare.fetch done · compare.set done ───────────────────────────────────
+  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …

@@ -6,7 +6,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"strings"
+	"time"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/x/ansi"
@@ -45,6 +47,13 @@ func runTUI(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	extra := splitPaths(*paths)
 	for _, word := range flags.Args() {
 		extra = append(extra, splitPaths(word)...)
+	}
+	if *page == "compare" && len(extra) == 0 {
+		dir, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		extra = append(extra, dir)
 	}
 	a, err := New()
 	if err != nil {
@@ -88,11 +97,21 @@ func (a *App) Settle() error {
 // model is the ochazuke model plus the follow rule: after every message
 // the worktree and branch lists follow the selected repo row.
 type model struct{ a *App }
+type compareClockMsg struct{}
 
-func (m *model) Init() tea.Cmd { return tea.Batch(m.a.m.Init(), m.a.r.PendingCommands()) }
+func compareClock() tea.Cmd {
+	return tea.Tick(time.Second, func(time.Time) tea.Msg { return compareClockMsg{} })
+}
+
+func (m *model) Init() tea.Cmd {
+	return tea.Batch(m.a.m.Init(), m.a.r.PendingCommands(), compareClock())
+}
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	_, cmd := m.a.m.Update(msg)
+	if _, ok := msg.(compareClockMsg); ok {
+		cmd = tea.Batch(cmd, compareClock())
+	}
 	if m.a.r.Quit {
 		return m, cmd
 	}
