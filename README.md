@@ -1,8 +1,29 @@
-# o-git
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img alt="o-git" src="assets/logo-light.svg" width="360">
+  </picture>
+  <br>
+  <a href="https://github.com/ofamtools/o-git/tags"><img alt="Latest tag" src="https://img.shields.io/github/v/tag/ofamtools/o-git"></a>
+  <a href="https://pkg.go.dev/ofam.dev/o-git"><img alt="Go Reference" src="https://pkg.go.dev/badge/ofam.dev/o-git.svg"></a>
+  <a href="go.mod"><img alt="Go version" src="https://img.shields.io/github/go-mod/go-version/ofamtools/o-git"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/ofamtools/o-git"></a>
+</p>
+
+<p align="center">Repositories, worktrees, branches and comparisons, as JSON and a TUI page.</p>
 
 `o-git` (so `o git`) is the family's git extension: the repositories o-proj knows, plus any directory you name, with their status, worktrees, branches and comparisons. It has a command line that prints JSON (for people, scripts and a host such as mtm that mounts the bin through `o-git catalog`) and a TUI page, Git. Everything goes through the `git` CLI with timeouts. It fetches only through an explicit `repo fetch` or `compare fetch`; it never pulls, pushes or tags.
 
 o-proj keeps the repositories on disk (the manifest `~/hub/repos.json`, clone, sync, the family-wide status report); o-git looks inside one repository at a time and changes its worktrees and branches. It reads o-proj's list by running `o-proj list` (`$O_GIT_PROJ` names another bin; `none` turns it off), never the manifest file itself.
+
+## Install
+
+```sh
+go install ofam.dev/o-git@latest
+mtm extension register git       # mounts the Git page and the repo, worktree, branch and compare verbs in mtm
+```
+
+`o-git` with no command words, or `o-git view [--page git|compare]`, opens the pages on their own.
 
 ## Command line
 
@@ -244,5 +265,5 @@ Compared with Vim: Vim's `f`/`t` (`:help f`, `:help t`) find characters in text;
 ## Build
 
 ```sh
-go build -o ~/bin/o-git .
+go build -o ~/bin/o-git .        # from a checkout
 ```
