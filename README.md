@@ -19,28 +19,29 @@ o-proj keeps the repositories on disk (the manifest `~/hub/repos.json`, clone, s
 ## Install
 
 ```sh
+go install ofam.dev/oden/cmd/o@latest   # oden's o: o git runs o-git, no dash needed
 go install ofam.dev/o-git@latest
 mtm extension register git       # mounts the Git page and the repo, worktree, branch and compare verbs in mtm
 ```
 
-`o-git` with no command words, or `o-git view [--page git|compare]`, opens the pages on their own.
+`o-git` with no command words, or `o git view [--page git|compare]`, opens the pages on their own.
 
 ## Command line
 
 ```sh
-o-git repo list [--path DIR,...]          # every repo o-proj lists (+ DIRs), with status: rows
-o-git repo status [REPO]                  # one repo's status
-o-git repo show [REPO]                    # {repo, worktrees, branches}
-o-git repo state [--path DIR,...]         # every list's rows as JSON Lines (the catalog's state)
-o-git worktree list [REPO]
-o-git worktree add BRANCH [PATH] [--repo REPO] [--from REF]
-o-git worktree remove PATH [--force] [--yes]
-o-git branch list [REPO]
-o-git branch create NAME [FROM] [--repo REPO] [--switch]
-o-git branch switch NAME [--repo REPO]    # or --target branch/REPO:NAME
-o-git branch delete NAME [--repo REPO] [--force] [--yes]
-o-git catalog
-o-git NOUN --help                         # a noun's verbs and parameters
+o git repo list [--path DIR,...]          # every repo o-proj lists (+ DIRs), with status: rows
+o git repo status [REPO]                  # one repo's status
+o git repo show [REPO]                    # {repo, worktrees, branches}
+o git repo state [--path DIR,...]         # every list's rows as JSON Lines (the catalog's state)
+o git worktree list [REPO]
+o git worktree add BRANCH [PATH] [--repo REPO] [--from REF]
+o git worktree remove PATH [--force] [--yes]
+o git branch list [REPO]
+o git branch create NAME [FROM] [--repo REPO] [--switch]
+o git branch switch NAME [--repo REPO]    # or --target branch/REPO:NAME
+o git branch delete NAME [--repo REPO] [--force] [--yes]
+o git catalog
+o git NOUN --help                         # a noun's verbs and parameters
 ```
 
 `REPO` is a directory (anywhere inside a worktree) or a name o-proj lists; it defaults to the current directory. A list verb answers rows, `{noun, id, label, data, cells}`, where `id` is what `--target` takes:
@@ -56,17 +57,17 @@ o-git NOUN --help                         # a noun's verbs and parameters
 `sync` is `-` without an upstream, `gone`, `=` when even, else `↑ahead ↓behind`; `changes` is `clean` or `+staged ~unstaged ?untracked !conflicts`.
 
 ```sh
-$ o-git worktree add feat
+$ o git worktree add feat
 {
   "repo": "/Users/me/proj/app",
   "path": "/Users/me/proj/app-feat",
   "branch": "feat",
   "created": true
 }
-$ o-git repo state --path . | head -2
+$ o git repo state --path . | head -2
 {"noun":"repo","id":"repo//Users/me/proj/app","label":"app","data":{"name":"app","path":"/Users/me/proj/app","state":"dirty",...},"cells":["app","main","-","?1","~/proj/app"]}
 {"noun":"worktree","id":"worktree//Users/me/proj/app","label":"~/proj/app","data":{...},"cells":["main","dirty 1 main","~/proj/app","66fa358"]}
-$ o-git branch delete topic
+$ o git branch delete topic
 Delete branch topic? [y/N] n
 o-git: declined: Delete branch topic?
 ```
@@ -172,9 +173,9 @@ motions or bindings. The Compare page uses the shared diffview Vim `]c`/`[c` int
 
 ## The Git page
 
-The catalog declares it as a data page (`pages` in `o-git catalog`: layout `split`, the lists Repositories, Branches and Worktrees, and a detail of the selected row's record), so a host such as mtm draws this layout from the rows instead of a generic page. The host fills the lists from `repo state`, so there its branch and worktree lists hold every repository's rows; o-git's own page below shows one repository's at a time.
+The catalog declares it as a data page (`pages` in `o git catalog`: layout `split`, the lists Repositories, Branches and Worktrees, and a detail of the selected row's record), so a host such as mtm draws this layout from the rows instead of a generic page. The host fills the lists from `repo state`, so there its branch and worktree lists hold every repository's rows; o-git's own page below shows one repository's at a time.
 
-`o-git` (or `o-git view [--repo DIR] [--path DIR,...]`) opens it; `--smoke` renders one frame and exits. `--repo DIR` selects the repository containing DIR, including a subdirectory or linked worktree, independently of o-proj. It puts that repository first and keeps o-proj's other repositories; `--path` adds directories without changing the selection. If discovery fails, the explicit repository and extra paths still open. A directory outside a repository remains visible with its reason.
+`o-git` (or `o git view [--repo DIR] [--path DIR,...]`) opens it; `--smoke` renders one frame and exits. `--repo DIR` selects the repository containing DIR, including a subdirectory or linked worktree, independently of o-proj. It puts that repository first and keeps o-proj's other repositories; `--path` adds directories without changing the selection. If discovery fails, the explicit repository and extra paths still open. A directory outside a repository remains visible with its reason.
 
 The repo list is on the left; on the right are the selected repo's worktrees, its branches and the detail of the focused row. The worktree and branch lists follow the selection in the repo list (one read off the loop each time it moves).
 
@@ -198,7 +199,7 @@ The keys follow the family key map (`~/hub/o-plans/plans/mtm-keys-and-ux-review-
 
 ## The Compare page
 
-`o-git view --page compare [--repo DIR] [--path DIR]` opens Compare on the selected repository, using the current directory's repository when neither flag is given. An unavailable repository opens the page with a reason. The noun-only `o-git compare` remains the CLI noun's help; use the view flag to open the page. `c` on a repository, worktree or branch opens it with that row as the `to` side and the configured default pair's `from` side. The page is local to o-git's TUI; native host mounting is a later plan.
+`o git view --page compare [--repo DIR] [--path DIR]` opens Compare on the selected repository, using the current directory's repository when neither flag is given. An unavailable repository opens the page with a reason. The noun-only `o git compare` remains the CLI noun's help; use the view flag to open the page. `c` on a repository, worktree or branch opens it with that row as the `to` side and the configured default pair's `from` side. The page is local to o-git's TUI; native host mounting is a later plan.
 
 The catalog declares a `diff` side titled **Side diff**, with default terminal leader key `g`. Once mtm supports sides as data and o-git is registered as its Git extension, leader `g` opens this Compare page beside the current pane, using that pane's directory and environment. The command template is `{"command":["{bin}","view","--page","compare","--repo","{dir}"]}`; the host supplies the values as arguments. `q` on Compare quits o-git and closes the side; in a file diff, `q` first closes that modal. The repository stays fixed until the host restarts the side.
 
