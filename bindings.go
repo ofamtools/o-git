@@ -2,8 +2,7 @@ package main
 
 import "ofam.dev/ochazuke"
 
-// bind installs the key rows, following the family key map
-// (~/hub/o-plans/plans/mtm-keys-and-ux-review-2.md, "Key map"): n is new,
+// bind installs the key rows, following the family key map: n is new,
 // d d removes or deletes (through the verb's confirm), d D does it with
 // force, enter on a branch switches to it. On a repo row the stack is
 // [repo row, the repo list, git, app]; on a worktree or branch row it is

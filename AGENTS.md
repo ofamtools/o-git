@@ -1,12 +1,12 @@
 # o-git: agent guide
 
-`o-git` (so `o git`) is the family's git extension: nouns `repo`, `worktree` and `branch` on the command line (JSON, a `catalog` and a JSON Lines `state` for a host) and the TUI page Git. Usage and keys are in README.md. Design: `~/hub/o-plans/plans/cli-extensions.md` section 6 (where it is called `mtm-git`).
+`o-git` (so `o git`) is the family's git extension: nouns `repo`, `worktree` and `branch` on the command line (JSON, a `catalog` and a JSON Lines `state` for a host) and the TUI page Git. Usage and keys are in README.md. Its catalog exposes repository, worktree and branch operations to CLI and TUI hosts.
 
 It is an ochazuke application, so ochazuke's rules apply here unchanged. Read `~/proj/ochazuke/AGENTS.md` first, especially "Building an application on ochazuke" and the Invariants: keys are binding rows (no key-name switches), every row is atomic, motions are visual, hints derive from bindings, Bubble Tea v2 idioms only, never bind F1 to F12. `~/proj/o-csv` and `~/proj/o-json` are the siblings it copies its shape from.
 
 ## Plans and todos
 
-Family plans, todos and the roadmap live in `~/hub/o-plans/` (`README.md` is the index). Read it before planning work; add or update items there. Do not add a TODO.md or docs/plans/ to this repo.
+Keep planning work in the family planning workspace, separate from this repository. Do not add a TODO.md or docs/plans/ to this repo.
 
 ## Where does X live
 
@@ -30,7 +30,7 @@ Family plans, todos and the roadmap live in `~/hub/o-plans/` (`README.md` is the
 - Every verb declares its history kind (`Operation.HistoryKind`), none left to the default: the reads are `.Fetch()`, the mutations `change` and the prompt keys `action` (`setHistory` in `verbs.go`). `TestEveryVerbDeclaresItsHistory` walks the catalog.
 - Destructive verbs (`worktree.remove`, `branch.delete`) carry a confirm, take plain arguments (`worktree remove PATH`, `branch delete NAME [--repo R]`; the TUI's rows fill them with `Binding.FromRow`, so the confirm reads the same on both) or a host's `--target` row id (the arguments stay optional for that: `Required` would refuse a `--target` call), check first and refuse what git would lose without `--force`. They are tested on temp repos only.
 - o-proj is reached through its command line (`o-proj list`); o-git never reads or writes the manifest.
-- Tests create every repository under `t.TempDir()`, shut out the owner's git config (`GIT_CONFIG_GLOBAL`), and set `O_GIT_PROJ` (none, or a fake script); no test touches a real repository or `~/hub/repos.json`.
+- Tests create every repository under `t.TempDir()`, shut out the owner's git config (`GIT_CONFIG_GLOBAL`), and set `O_GIT_PROJ` (none, or a fake script); no test touches a real repository or `$HOME/hub/repos.json`.
 
 ## Checks
 

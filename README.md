@@ -14,7 +14,7 @@
 
 `o-git` (so `o git`) is the family's git extension: the repositories o-proj knows, plus any directory you name, with their status, worktrees, branches and comparisons. It has a command line that prints JSON (for people, scripts and a host such as mtm that mounts the bin through `o-git catalog`) and a TUI page, Git. Everything goes through the `git` CLI with timeouts. It fetches only through an explicit `repo fetch` or `compare fetch`; it never pulls, pushes or tags.
 
-o-proj keeps the repositories on disk (the manifest `~/hub/repos.json`, clone, sync, the family-wide status report); o-git looks inside one repository at a time and changes its worktrees and branches. It reads o-proj's list by running `o-proj list` (`$O_GIT_PROJ` names another bin; `none` turns it off), never the manifest file itself.
+o-proj keeps the repositories on disk (the manifest `$HOME/hub/repos.json`, clone, sync, the family-wide status report); o-git looks inside one repository at a time and changes its worktrees and branches. It reads o-proj's list by running `o-proj list` (`$O_GIT_PROJ` names another bin; `none` turns it off), never the manifest file itself.
 
 ## Install
 
@@ -179,7 +179,7 @@ The catalog declares it as a data page (`pages` in `o git catalog`: layout `spli
 
 The repo list is on the left; on the right are the selected repo's worktrees, its branches and the detail of the focused row. The worktree and branch lists follow the selection in the repo list (one read off the loop each time it moves).
 
-The keys follow the family key map (`~/hub/o-plans/plans/mtm-keys-and-ux-review-2.md`, "Key map"): `n` is new, `d d` removes or deletes, `enter` opens or switches.
+The keys follow the family key map: `n` is new, `d d` removes or deletes, `enter` opens or switches.
 
 | Key | Where | Does |
 |---|---|---|
