@@ -20,7 +20,7 @@
   ┃                 │   merge-base(main)  resolved <sha> (merge-base(main))                                       │ merge-base(main)                                             │                 │
   ┃                 │   + Use ref/spec merge-base(main)                                                             │                                                              │                 │
   ┃                 │   + Use ref/spec merge-base(main)                                                             │                                                              │                 │
-  ┃                 │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel                                                         │                 │
+  ┃                 │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal.close                                                            │                 │
   ┃                 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                 │
   ┃                                                                            ┃ │                                                                                                                   │
   ┃                                                                            ┃ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
@@ -36,4 +36,4 @@
   ┃                                                                            ┃ │                                                                                                                   │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal.close

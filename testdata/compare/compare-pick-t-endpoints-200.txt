@@ -22,7 +22,7 @@
   ┃                 │   upstream                         -         no upstream                                      │                                                              │                 │
   ┃                 │   origin/main                      -         no ref named origin/main; check the ref or fetc… │                                                              │                 │
   ┃                 │   {remote}/main · {remote}/branch  -         no remotes                                       │                                                              │                 │
-  ┃                 │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel                                                         │                 │
+  ┃                 │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal.close                                                            │                 │
   ┃                 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯─────────────────╯
   ┃                                                                            ┃ ╭─ Detail ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
   ┃                                                                            ┃ │ dirty                                                                                                             │
@@ -36,4 +36,4 @@
   ┃                                                                            ┃ │                                                                                                                   │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal.close

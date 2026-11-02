@@ -51,7 +51,7 @@ func (a *App) registerPrompt() {
 		}, "Close the prompt without running its verb").
 		Mode("insert").
 		Bind("enter", ochazuke.Do("field.commit")).
-		Bind("esc", ochazuke.Do("field.cancel"))
+		Bind("esc", ochazuke.Do("ochazuke.modal.close"))
 	// Both close the prompt; the verb commit runs records its own kind.
 	setHistory(r, ochazuke.HistoryAction, "field.commit", "field.cancel")
 	a.field = ochazuke.NewInput(fieldID, "", false)
@@ -75,7 +75,7 @@ func (a *App) prompt(c ochazuke.Ctx, label, noun, verb, arg string) ochazuke.Res
 	view.Title = label
 	a.m.ModalViews[promptFrame] = view
 	a.ask = &question{request: ochazuke.Request{Noun: noun, Verb: verb, Args: ochazuke.Arguments{"repo": a.repoWord(c)}}, arg: arg}
-	if _, err := a.r.OpenModal(promptFrame, ochazuke.Payload{Prompt: label + " (in " + a.currentName + ")"}, ochazuke.WithInput(a.field, ochazuke.Kind("field"))); err != nil {
+	if _, err := a.r.OpenModal(promptFrame, ochazuke.Payload{Prompt: label + " (in " + a.currentName + ")"}, ochazuke.WithInput(a.field, ochazuke.Kind("field")), ochazuke.CloseWith(ochazuke.Request{Noun: "field", Verb: "cancel"})); err != nil {
 		a.ask = nil
 		return ochazuke.Failed(err)
 	}

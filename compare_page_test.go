@@ -329,6 +329,27 @@ func TestComparePageStories(t *testing.T) {
 	})
 }
 
+func TestCompareDiffSharedClose(t *testing.T) {
+	a, _ := compareStory(t)
+	if err := a.compare.files.Focus(); err != nil {
+		t.Fatal(err)
+	}
+	keys(t, a, "enter")
+	if a.r.TopModal() != diffFrame || a.compare.diff == nil || a.compare.diffFiles == nil {
+		t.Fatal("file diff did not open")
+	}
+	if _, err := a.r.Execute(ochazuke.Request{Noun: "ochazuke.modal", Verb: "close"}); err != nil {
+		t.Fatal(err)
+	}
+	if a.r.TopModal() != "" || a.compare.diff != nil || a.compare.diffFiles != nil || !a.compare.files.Focused() {
+		t.Fatal("shared close did not release the diff and restore focus")
+	}
+	keys(t, a, "enter", "q")
+	if a.r.TopModal() != "" || a.compare.diff != nil || a.compare.diffFiles != nil {
+		t.Fatal("file diff could not be reopened and closed")
+	}
+}
+
 func TestComparePagePersistsCustomAndSavesThroughSettings(t *testing.T) {
 	a, dir := compareStory(t)
 	original := a.r.Settings().Strings("compare.pairs")

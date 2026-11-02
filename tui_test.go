@@ -306,6 +306,24 @@ func TestPromptCancel(t *testing.T) {
 	}
 }
 
+func TestPromptSharedClose(t *testing.T) {
+	a := open(t, newRepo(t, "r"))
+	if err := a.branches.Focus(); err != nil {
+		t.Fatal(err)
+	}
+	keys(t, a, "n")
+	if _, err := a.r.Execute(ochazuke.Request{Noun: "ochazuke.modal", Verb: "close"}); err != nil {
+		t.Fatal(err)
+	}
+	if a.ask != nil || a.r.TopModal() != "" || !a.branches.Focused() {
+		t.Fatal("shared close did not cancel the prompt and restore focus")
+	}
+	keys(t, a, "n", "esc")
+	if a.ask != nil || a.r.TopModal() != "" {
+		t.Fatal("prompt could not be reopened and cancelled")
+	}
+}
+
 // The page follows the family key map: a, x, X and s answer nowhere on
 // the page (n, d d, d D and enter replaced them).
 func TestRetiredKeysAreUnbound(t *testing.T) {

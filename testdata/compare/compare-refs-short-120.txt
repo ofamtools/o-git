@@ -20,7 +20,7 @@
   ┃         │   main   <sha>  first                                 │                                    │         │
   ┃         │   topic  <sha>  feat: next                            │                                    │         │
   ┃         │   v1.0   <sha>  feat: next                            │                                    │         │
-  ┃         │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc choos… │         │
+  ┃         │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal… │         │
   ┃         ╰──────────────────────────────────────────────────────────────────────────────────────────────╯         │
   ┃                                            ┃ │                                                                   │
   ┃                                            ┃ ╰───────────────────────────────────────────────────────────────────╯
@@ -36,4 +36,4 @@
   ┃                                            ┃ │                                                                   │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰───────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal.close

@@ -91,9 +91,6 @@ func (a *App) registerCompareViews() error {
    {"key":"enter","action":"compare.file-open","when":"compare-file-row"},
    {"key":"y y","action":"change.copy","when":"compare-file-row"}
   ]},
-  {"context":"compare-diff/normal","bindings":[
-   {"key":"q","action":"compare.close"},{"key":"esc","action":"compare.close"}
-  ]},
   {"instance":"compare/files","mode":"normal","bindings":[{"key":"esc","action":"compare.pair-files"}]}
  ]}`))
 }
@@ -208,7 +205,7 @@ func (a *App) loadCompareDiff(path string, opening bool) ochazuke.Result {
 		}
 		file := viewFile(data.Files[0])
 		if opening {
-			if _, err := a.r.OpenModal(diffFrame, ochazuke.Payload{}); err != nil {
+			if _, err := a.r.OpenModal(diffFrame, ochazuke.Payload{}, ochazuke.CloseWith(ochazuke.Request{Noun: "compare", Verb: "close"})); err != nil {
 				a.r.UI().Error(err.Error())
 				return
 			}

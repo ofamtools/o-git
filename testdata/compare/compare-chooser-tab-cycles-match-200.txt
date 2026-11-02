@@ -19,7 +19,7 @@
   ┃                 │ ›                                                                                       regex │ <sha> feat: next                                           │                 │
   ┃                 │   <sha>  HEAD -> topic  feat: next                                                          │ <sha>                     │                 │
   ┃                 │   <sha>  main           first                                                               │                                                              │                 │
-  ┃                 │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel · tab search.cycle-match                                │                 │
+  ┃                 │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal.close · tab search.cycle-match                                   │                 │
   ┃                 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                 │
   ┃                                                                            ┃ │                                                                                                                   │
   ┃                                                                            ┃ │                                                                                                                   │
@@ -36,4 +36,4 @@
   ┃                                                                            ┃ │                                                                                                                   │
   ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc chooser.cancel · tab search.cycle-match
+  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal.close · tab search.cycle-match
