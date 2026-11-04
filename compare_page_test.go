@@ -599,6 +599,9 @@ func TestComparePageCommitSetsSide(t *testing.T) {
 // (or any parent up to mount point /)\nStopping at filesystem boundary
 // ...") stays on the one status row, so the title keeps the repository.
 func TestCompareStatusFlattensMultiLineFailure(t *testing.T) {
+	// macOS temp paths are long enough to cut the status row before the
+	// failure text; a short root keeps the row about what this test checks.
+	t.Setenv("TMPDIR", "/tmp")
 	a, dir := compareStory(t)
 	a.compare.failure = dir + " is not in a git worktree: fatal: not a git repository\nStopping at filesystem boundary"
 	for _, width := range []int{120, 300} {
