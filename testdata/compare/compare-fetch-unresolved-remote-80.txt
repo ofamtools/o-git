@@ -2,13 +2,13 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┏━ Pairs 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ pair              from   to        ↑  ↓  files  fetched  state           ┃
   ┃ (custom) -..WOR…  -      WORKTREE  -  -  -      -        upstream has n… ┃
   ┃ dirty             HEAD   WORKTREE  -  -  1      -        the working tr… ┃
   ┃ upstream          -      HEAD      -  -  -      -        no upstream     ┃
   ┃ main +6           topic  HEAD      0  0  0      1h       same commit: n… ┃
-  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
   ╭─ Commits ────────────────────────────────────────────────────────────────╮
   │ upstream has no missing branch (not pushed, or not fetched)              │
   │                                                                          │
