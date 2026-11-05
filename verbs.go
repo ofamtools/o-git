@@ -16,7 +16,7 @@ import (
 // entry); the mutations show on the ticker and print their
 // "job #N VERB done" line on the CLI's stderr. The destructive verbs take plain
 // arguments (worktree remove PATH, branch delete NAME), which the TUI's rows
-// fill from the focused row (FromRow), or act on the row --target names (a
+// fill from the focused row (their parameters' From), or act on the row --target names (a
 // host's row id); the other row verbs act on the row they target (the
 // focused row, or --target ID on the command line); a REPO word is a
 // directory or a name o-proj lists, and defaults to the row's repository,
@@ -62,7 +62,7 @@ func (a *App) registerVerbs() {
 		"from":   {Type: "string", Description: "the commit a new branch starts at (default HEAD)"},
 	})
 	set("worktree.remove", "{repo, removed, force}", map[string]ochazuke.Parameter{
-		"path":  {Type: "string", Description: "the worktree's directory (default: the --target row's; the TUI passes the focused row's)"},
+		"path":  {Type: "string", Description: "the worktree's directory (default: the --target row's; from a key, the help or the palette, the focused row's)", From: "row:path"},
 		"force": force("remove it even with uncommitted changes or untracked files"),
 	})
 	set("branch.list", "row[]", map[string]ochazuke.Parameter{"repo": repo})
@@ -72,13 +72,15 @@ func (a *App) registerVerbs() {
 		"from":   {Type: "string", Description: "the commit it starts at (default HEAD)"},
 		"switch": force("check the new branch out in REPO's worktree"),
 	})
+	rowRepo := repo
+	rowRepo.From = "row:repo"
 	set("branch.switch", "{repo, branch}", map[string]ochazuke.Parameter{
-		"repo": repo,
-		"name": {Type: "string", Description: "the branch (default: the targeted row's)"},
+		"repo": rowRepo,
+		"name": {Type: "string", Description: "the branch (default: the targeted row's; from a key, the help or the palette, the focused row's)", From: "row:name"},
 	})
 	set("branch.delete", "{repo, deleted, force}", map[string]ochazuke.Parameter{
-		"repo":  repo,
-		"name":  {Type: "string", Description: "the branch (default: the --target row's; the TUI passes the focused row's)"},
+		"repo":  rowRepo,
+		"name":  {Type: "string", Description: "the branch (default: the --target row's; from a key, the help or the palette, the focused row's)", From: "row:name"},
 		"force": force("delete it even when it is not merged"),
 	})
 }

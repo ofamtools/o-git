@@ -292,6 +292,35 @@ func TestPageBranches(t *testing.T) {
 	}
 }
 
+// The verbs declare the focused row as their parameters' sources, with no
+// binding from: the help's run of an unbound verb switches to the focused
+// branch and names the focused worktree.
+func TestParameterSourcesFillFromTheRow(t *testing.T) {
+	dir := newRepo(t, "r")
+	a := open(t, dir)
+	for _, p := range []struct{ op, arg, from string }{{"branch.switch", "name", "row:name"}, {"branch.switch", "repo", "row:repo"}, {"branch.delete", "name", "row:name"}, {"branch.delete", "repo", "row:repo"}, {"worktree.remove", "path", "row:path"}} {
+		if got := a.r.Operations[p.op].Parameters[p.arg].From; got != p.from {
+			t.Errorf("%s %s: From %q, want %q", p.op, p.arg, got, p.from)
+		}
+	}
+	if err := a.branches.Focus(); err != nil {
+		t.Fatal(err)
+	}
+	keys(t, a, "n")
+	typeText(t, a, "topic")
+	keys(t, a, "enter")
+	focusRow(t, a, a.branches, branchID(dir, "main"))
+	keys(t, a, "enter")
+	focusRow(t, a, a.branches, branchID(dir, "topic"))
+	if err := a.r.RunUnbound(a.r.BaseFocus(), ochazuke.Request{Noun: "branch", Verb: "switch"}); err != nil {
+		t.Fatal(err)
+	}
+	_ = a.Settle()
+	if s, _ := ReadStatus(t.Context(), dir); s.Branch != "topic" {
+		t.Fatalf("switched to %s", s.Branch)
+	}
+}
+
 // An empty prompt runs nothing; esc cancels.
 func TestPromptCancel(t *testing.T) {
 	dir := newRepo(t, "r")
