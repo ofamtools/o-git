@@ -2,14 +2,14 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┏━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ pair           from      to        ↑  ↓  files  fetched  state           ┃
   ┃ (custom) +1    origin/…  WORKTREE  -  -  1      0s       the working tr… ┃
   ┃ upstream       -         HEAD      -  -  -      -        no upstream     ┃
   ┃ main +1        main      HEAD      1  0  1      -        ready           ┃
   ┃ origin/m… +1   origin/…  HEAD      0  0  0      0s       same commit: n… ┃
   ┃ origin/branch  -         HEAD      -  -  -      -        origin has no … ┃
-  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
   ╭─ Commits ────────────────────────────────────────────────────────────────╮
   │ the working tree is not a commit                                         │
   │                                                                          │

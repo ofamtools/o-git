@@ -2,7 +2,7 @@
    Git  › Compare
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
-  ╭━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+  ┏━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃ pair          from     to        ↑  ↓  files  fetched  state             ┃
   ┃ dirty         HEAD     WORKTREE  -  -  1      -        the working tree… ┃
   ┃ upstream      -        HEAD      -  -  -      -        no upstream       ┃
@@ -10,7 +10,7 @@
   ┃ origin/main   -        HEAD      -  -  -      -        no ref named ori… ┃
   ┃ no remot… +1  -        HEAD      -  -  -      -        no remotes        ┃
   ┃ merge-ba… +1  <sha>  HEAD      1  0  1      -        ready             ┃
-  ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
   ╭─ Commits ────────────────────────────────────────────────────────────────╮
   │ sha      decorations    subject     author  age  parents                 │
   │ Ahead                                                                    │
