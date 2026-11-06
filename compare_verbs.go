@@ -206,7 +206,7 @@ func (a *App) compareShow(c ochazuke.Ctx) ochazuke.Result {
 func (a *App) copyRead(c ochazuke.Ctx, work func(*EndpointResolver) (any, error), feedback ...func(string)) ochazuke.Result {
 	return a.comparisonRead(c, work).Then(func(_ ochazuke.Ctx, value any, err error) {
 		if err == nil {
-			_, _ = a.r.Execute(ochazuke.Request{Noun: "ochazuke.register", Verb: "set", Args: ochazuke.Arguments{"name": "\"", "text": value.(string)}})
+			_, _ = a.r.Execute(ochazuke.Request{Noun: "ochazuke.register", Verb: "set", Args: ochazuke.Arguments{"name": "\"", "props": map[string]any{"text": value.(string)}}})
 			for _, notify := range feedback {
 				notify(value.(string))
 			}

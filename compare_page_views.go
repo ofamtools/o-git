@@ -70,7 +70,7 @@ func (a *App) registerCompareViews() error {
 	op = r.Operations["change.copy"]
 	op.App = func(c ochazuke.Ctx) ochazuke.Result {
 		if file, ok := rowData[Change](c); ok && a.r.Page == comparePageID {
-			_, err := r.Execute(ochazuke.Request{Noun: "ochazuke.register", Verb: "set", Args: ochazuke.Arguments{"name": "\"", "text": file.Path}})
+			_, err := r.Execute(ochazuke.Request{Noun: "ochazuke.register", Verb: "set", Args: ochazuke.Arguments{"name": "\"", "props": map[string]any{"text": file.Path}}})
 			if err != nil {
 				return ochazuke.Failed(err)
 			}
