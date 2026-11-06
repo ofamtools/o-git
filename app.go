@@ -93,6 +93,7 @@ func New() (*App, error) {
 	if err := a.registerDiffVerbs(); err != nil {
 		return nil, err
 	}
+	a.defineStores()
 	a.m = ochazuke.NewModel(r)
 	a.m.Title = "o-git"
 	a.registerPrompt()
