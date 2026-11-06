@@ -206,12 +206,32 @@ func (a *App) compareShow(c ochazuke.Ctx) ochazuke.Result {
 func (a *App) copyRead(c ochazuke.Ctx, work func(*EndpointResolver) (any, error), feedback ...func(string)) ochazuke.Result {
 	return a.comparisonRead(c, work).Then(func(_ ochazuke.Ctx, value any, err error) {
 		if err == nil {
-			_, _ = a.r.Execute(ochazuke.Request{Noun: "ochazuke.register", Verb: "set", Args: ochazuke.Arguments{"name": "\"", "props": map[string]any{"text": value.(string)}}})
-			for _, notify := range feedback {
-				notify(value.(string))
-			}
+			a.finishCopy(value.(string), feedback...)
 		}
 	})
+}
+
+// finishCopy yanks the read text and then runs the feedback. A register that
+// does not take the text is reported on the status line, with no feedback.
+func (a *App) finishCopy(text string, feedback ...func(string)) {
+	yank := a.yank
+	if yank == nil {
+		yank = a.yankText
+	}
+	if err := yank(text); err != nil {
+		a.r.UI().Error("copy failed: " + err.Error())
+		return
+	}
+	for _, notify := range feedback {
+		notify(text)
+	}
+}
+
+// yankText puts text in the unnamed register through the framework verb, so
+// yank history and clipboard policy apply. The error is the verb's.
+func (a *App) yankText(text string) error {
+	_, err := a.r.Execute(ochazuke.Request{Noun: "ochazuke.register", Verb: "set", Args: ochazuke.Arguments{"name": "\"", "props": map[string]any{"text": text}}})
+	return err
 }
 
 func (a *App) endpointCopy(c ochazuke.Ctx) ochazuke.Result {

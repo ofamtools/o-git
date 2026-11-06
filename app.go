@@ -41,7 +41,9 @@ type App struct {
 
 	compare      *comparePage
 	compareCache CompareCache
-	fetchRun     gitRunner
+	// yank writes copied text to the unnamed register; nil is yankText.
+	yank     func(string) error
+	fetchRun gitRunner
 
 	// The repository the worktree and branch lists show: its name and
 	// toplevel, "" before the first is read.
