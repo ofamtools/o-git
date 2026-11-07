@@ -116,6 +116,9 @@ func New() (*App, error) {
 	if err := r.OpenPage(pageID); err != nil {
 		return nil, err
 	}
+	if err := declarePickers(r); err != nil {
+		return nil, err
+	}
 	return a, nil
 }
 

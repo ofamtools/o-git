@@ -34,11 +34,11 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 	a.compare.chooserOther, a.compare.chooserRepo, a.compare.chooserFollowing = other, repo, ""
 	depth := a.r.Settings().Int("compare.commit-search-depth")
 	typed := a.r.Settings().Bool("compare.chooser.resolve-typed")
-	sources := []ochazuke.ChooserSource{}
+	sources := []ochazuke.PickerSource{}
 	for _, name := range []string{"Endpoints", "Log", "All", "Refs", "Graph", "Worktrees"} {
 		var continuation *commitSearch
-		sources = append(sources, ochazuke.ChooserSource{Name: name, Live: depth > 0,
-			Open: func(row ochazuke.ChooserRow) (string, bool) {
+		sources = append(sources, ochazuke.PickerSource{Name: name, Live: depth > 0,
+			Open: func(row ochazuke.PickerRow) (string, bool) {
 				choice, ok := row.Data.(sideChoice)
 				if !ok || choice.Search == nil {
 					return "", false
@@ -70,13 +70,13 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 					if depth == 0 {
 						return rows, nil
 					}
-					matches := []ochazuke.ChooserRow{}
+					matches := []ochazuke.PickerRow{}
 					for _, row := range rows {
 						if matcher.Match(row.Label) {
 							matches = append(matches, row)
 						}
 					}
-					slices.SortStableFunc(matches, func(x, y ochazuke.ChooserRow) int {
+					slices.SortStableFunc(matches, func(x, y ochazuke.PickerRow) int {
 						if cm.Contains(x.Label, query) == cm.Contains(y.Label, query) {
 							return 0
 						}
@@ -88,7 +88,7 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 					if strings.TrimSpace(query) == "" {
 						return matches, nil
 					}
-					var preview *ochazuke.ChooserRow
+					var preview *ochazuke.PickerRow
 					if typed {
 						var previews []string
 						for _, endpoint := range resolver.Resolve(query, other) {
@@ -99,12 +99,12 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 							}
 						}
 						text := strings.Join(previews, "\n")
-						row := ochazuke.ChooserRow{ID: "typed-spec", Label: "Use ref/spec " + query, Cells: []string{query, text}, Data: sideChoice{Spec: query, Graph: text}}
+						row := ochazuke.PickerRow{ID: "typed-spec", Label: "Use ref/spec " + query, Cells: []string{query, text}, Data: sideChoice{Spec: query, Graph: text}}
 						preview = &row
 					}
 					if len(matches) > 0 {
 						if preview != nil {
-							matches = append([]ochazuke.ChooserRow{*preview}, matches...)
+							matches = append([]ochazuke.PickerRow{*preview}, matches...)
 						}
 						return matches, nil
 					}
@@ -114,11 +114,11 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 			},
 		})
 	}
-	_, err := a.r.OpenChooser(ochazuke.ChooserSpec{
+	_, err := a.r.OpenPicker(ochazuke.PickerSpec{
 		Kind: "compare-side", Title: "Pick " + side, Sources: sources, CreateRow: true,
 		Create: choose, CreateLabel: func(query string) string { return "Use ref/spec " + query },
-		Choose: func(row ochazuke.ChooserRow) ochazuke.Result { return choose(row.Data.(sideChoice).Spec) },
-		Preview: func(row ochazuke.ChooserRow) string {
+		Choose: func(row ochazuke.PickerRow) ochazuke.Result { return choose(row.Data.(sideChoice).Spec) },
+		Preview: func(row ochazuke.PickerRow) string {
 			choice, _ := row.Data.(sideChoice)
 			return strings.TrimSpace(choice.Graph + "\n" + choice.Spec)
 		},
@@ -129,10 +129,10 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 	return ochazuke.Done(nil)
 }
 
-func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.ChooserRow, error) {
-	var rows []ochazuke.ChooserRow
+func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.PickerRow, error) {
+	var rows []ochazuke.PickerRow
 	add := func(spec, label string, cells ...string) {
-		rows = append(rows, ochazuke.ChooserRow{ID: fmt.Sprintf("%s/%d", source, len(rows)), Label: label, Cells: cells, Data: sideChoice{Spec: spec}})
+		rows = append(rows, ochazuke.PickerRow{ID: fmt.Sprintf("%s/%d", source, len(rows)), Label: label, Cells: cells, Data: sideChoice{Spec: spec}})
 	}
 	switch source {
 	case "Endpoints":
@@ -154,7 +154,7 @@ func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.Choo
 				}
 				key := endpointKey(e)
 				// Distinct branch names may share a commit. Only aliases for
-				// the same resolved ref are joined in the endpoint chooser.
+				// the same resolved ref are joined in the endpoint picker.
 				key += "\x00" + e.Ref
 				if !e.Available {
 					key = "unavailable:" + e.Reason
@@ -234,7 +234,7 @@ func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.Choo
 	return rows, nil
 }
 
-// Typed resolution is an app read. The chooser keeps its standard matcher,
+// Typed resolution is an app read. The picker keeps its standard matcher,
 // source bindings and ordering; an exact spec is an ordinary first row.
 func (a *App) followCompareChooser() bool {
 	c := a.r.Chooser("compare-side")
@@ -270,11 +270,11 @@ func (a *App) followCompareChooser() bool {
 			}
 		}
 		preview := strings.Join(previews, "\n")
-		typed := ochazuke.ChooserRow{ID: "typed-spec", Label: "Use ref/spec " + query, Cells: []string{query, preview}, Data: sideChoice{Spec: query, Graph: preview}}
-		return append([]ochazuke.ChooserRow{typed}, rows...), nil
+		typed := ochazuke.PickerRow{ID: "typed-spec", Label: "Use ref/spec " + query, Cells: []string{query, preview}, Data: sideChoice{Spec: query, Graph: preview}}
+		return append([]ochazuke.PickerRow{typed}, rows...), nil
 	}).Replacing("typed-preview").Then(func(_ ochazuke.Ctx, v any, err error) {
 		if err == nil && a.r.Chooser("compare-side") == c && c.Query() == query && c.Source() == source {
-			c.SetRows(v.([]ochazuke.ChooserRow))
+			c.SetRows(v.([]ochazuke.PickerRow))
 		}
 	})
 	return a.launch("compare-side", "endpoint.resolve", res)

@@ -20,7 +20,7 @@
   ╰─────│   unliste…  "unlist…                 │ 2026-10-31            │─────╯
   ╭─ Fil│   + Use ref/spec unlisted subject n… │ <sha> │─────╮
   │ XY  │   + Use ref/spec unlisted subject n… │ <sha>   │     │
-  │  M  │ enter chooser.pick · ctrl+o chooser.next-source · alt+o cho… │     │
+  │  M  │ enter picker.pick · ctrl+o picker.next-source · alt+o picke… │     │
   │ t…  ╰──────────────────────────────────────────────────────────────╯     │
   │                                                                          │
   │                                                                          │
@@ -36,4 +36,4 @@
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-so…
+  enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-sourc…

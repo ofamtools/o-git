@@ -84,10 +84,10 @@ func searchFixture(t *testing.T, dir, head string, run gitRunner) (*ochazuke.Run
 		skips = append(skips, skip)
 		return run(ctx, timeout, dir, args...)
 	}
-	c, err := r.OpenChooser(ochazuke.ChooserSpec{Kind: "search-test", Sources: []ochazuke.ChooserSource{{Name: "history", Live: true,
+	c, err := r.OpenPicker(ochazuke.PickerSpec{Kind: "search-test", Sources: []ochazuke.PickerSource{{Name: "history", Live: true,
 		Load: func(q string) ochazuke.Result {
 			if q == "" {
-				return ochazuke.Done([]ochazuke.ChooserRow(nil))
+				return ochazuke.Done([]ochazuke.PickerRow(nil))
 			}
 			if resume != nil && resume.query == q {
 				s := resume
@@ -96,7 +96,7 @@ func searchFixture(t *testing.T, dir, head string, run gitRunner) (*ochazuke.Run
 			}
 			return (commitSearch{dir: dir, head: head, query: q, depth: 100, run: wrapped}).load()
 		},
-		Open: func(row ochazuke.ChooserRow) (string, bool) {
+		Open: func(row ochazuke.PickerRow) (string, bool) {
 			resume = row.Data.(sideChoice).Search
 			return resume.query, true
 		},
@@ -133,7 +133,7 @@ func TestCommitSearchChunksPrefixAndMore(t *testing.T) {
 		if len(rows) != 1 || rows[0].Label != "Search 100 more commits…" {
 			t.Fatalf("rows %+v", rows)
 		}
-		if _, err := r.Execute(ochazuke.Request{Noun: "ochazuke.chooser", Verb: "pick"}); err != nil {
+		if _, err := r.Execute(ochazuke.Request{Noun: "ochazuke.picker", Verb: "pick"}); err != nil {
 			t.Fatal(err)
 		}
 		if err := ocli.Settle(r, nil); err != nil {
@@ -161,11 +161,11 @@ func TestCommitSearchChunksPrefixAndMore(t *testing.T) {
 		}
 		// The first block's results survive navigation into the next block.
 		for range 100 {
-			if _, err := r.Execute(ochazuke.Request{Noun: "ochazuke.chooser", Verb: "move", Args: ochazuke.Arguments{"delta": 1}}); err != nil {
+			if _, err := r.Execute(ochazuke.Request{Noun: "ochazuke.picker", Verb: "move", Args: ochazuke.Arguments{"delta": 1}}); err != nil {
 				t.Fatal(err)
 			}
 		}
-		if _, err := r.Execute(ochazuke.Request{Noun: "ochazuke.chooser", Verb: "pick"}); err != nil {
+		if _, err := r.Execute(ochazuke.Request{Noun: "ochazuke.picker", Verb: "pick"}); err != nil {
 			t.Fatal(err)
 		}
 		if err := ocli.Settle(r, nil); err != nil {
@@ -213,7 +213,7 @@ func TestCommitSearchQueryCancelsAndRejectsStaleRows(t *testing.T) {
 		t.Fatal("stale rows landed", c.Matches())
 	}
 	// Closing also cancels the replacement before its Git call starts.
-	if _, err := r.Execute(ochazuke.Request{Noun: "ochazuke.chooser", Verb: "cancel"}); err != nil {
+	if _, err := r.Execute(ochazuke.Request{Noun: "ochazuke.picker", Verb: "cancel"}); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -270,7 +270,7 @@ func TestCompareCommitSearchContinuesRepeatedly(t *testing.T) {
 		if at < 0 {
 			t.Fatal("missing continuation", rows)
 		}
-		if _, err := a.r.Execute(ochazuke.Request{Noun: "ochazuke.chooser", Verb: "move", Args: ochazuke.Arguments{"delta": at}}); err != nil {
+		if _, err := a.r.Execute(ochazuke.Request{Noun: "ochazuke.picker", Verb: "move", Args: ochazuke.Arguments{"delta": at}}); err != nil {
 			t.Fatal(err)
 		}
 		keys(t, a, "enter")

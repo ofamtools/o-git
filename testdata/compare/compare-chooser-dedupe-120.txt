@@ -22,7 +22,7 @@
   ┃         │   upstream             -            no upstream         │                                    │         │
   ┃         │   origin/main · fork…  origin/main  ready               │                                    │         │
   ┃         │   origin/branch        -            origin has no topi… │                                    │         │
-  ┃         │ enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal… │         │
+  ┃         │ enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.cl… │         │
   ┃         ╰──────────────────────────────────────────────────────────────────────────────────────────────╯─────────╯
   ┃                                            ┃ ╭─ Detail ──────────────────────────────────────────────────────────╮
   ┃                                            ┃ │ dirty                                                             │
@@ -36,4 +36,4 @@
   ┃                                            ┃ │                                                                   │
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ╰───────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-source · esc modal.close
+  enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.close

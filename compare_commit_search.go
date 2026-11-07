@@ -10,14 +10,14 @@ import (
 
 const commitSearchChunk = 25
 
-// Each continuation is an immutable snapshot. Only a chooser's load job reads
+// Each continuation is an immutable snapshot. Only a picker's load job reads
 // git; opening the final row hands the next block to that same load pipeline.
 type commitSearch struct {
 	dir, head, query       string
 	depth, skip, remaining int
-	rows                   []ochazuke.ChooserRow
+	rows                   []ochazuke.PickerRow
 	run                    gitRunner
-	preview                *ochazuke.ChooserRow
+	preview                *ochazuke.PickerRow
 }
 
 func (s commitSearch) load() ochazuke.Result {
@@ -36,7 +36,7 @@ func (s commitSearch) load() ochazuke.Result {
 		if err != nil {
 			return nil, err
 		}
-		var rows []ochazuke.ChooserRow
+		var rows []ochazuke.PickerRow
 		scanned := 0
 		for _, line := range strings.Split(strings.TrimSuffix(string(out), "\n"), "\n") {
 			parts := strings.SplitN(line, "\x00", 5)
@@ -50,11 +50,11 @@ func (s commitSearch) load() ochazuke.Result {
 			if !(len(q) >= 4 && strings.HasPrefix(parts[0], q)) && !strings.Contains(strings.ToLower(parts[2]), q) {
 				continue
 			}
-			rows = append(rows, ochazuke.ChooserRow{ID: "commit-search/" + parts[0], Label: strings.Join(parts, " "), Cells: parts[1:], Data: sideChoice{Spec: parts[0], Graph: strings.Join(parts[1:], " ")}})
+			rows = append(rows, ochazuke.PickerRow{ID: "commit-search/" + parts[0], Label: strings.Join(parts, " "), Cells: parts[1:], Data: sideChoice{Spec: parts[0], Graph: strings.Join(parts[1:], " ")}})
 		}
 		s.skip += scanned
 		s.remaining -= scanned
-		s.rows = append(append([]ochazuke.ChooserRow(nil), s.rows...), rows...)
+		s.rows = append(append([]ochazuke.PickerRow(nil), s.rows...), rows...)
 		if scanned < count {
 			return append(rows, s.finish(false)...), nil
 		}
@@ -65,14 +65,14 @@ func (s commitSearch) load() ochazuke.Result {
 	})
 }
 
-func (s commitSearch) finish(more bool) []ochazuke.ChooserRow {
-	var rows []ochazuke.ChooserRow
+func (s commitSearch) finish(more bool) []ochazuke.PickerRow {
+	var rows []ochazuke.PickerRow
 	if s.preview != nil {
 		rows = append(rows, *s.preview)
 	}
 	if more {
 		s.remaining = 0
-		rows = append(rows, ochazuke.ChooserRow{ID: "commit-search/more", Label: fmt.Sprintf("Search %d more commits…", s.depth), Opens: true, NoPick: true, Data: sideChoice{Search: &s}})
+		rows = append(rows, ochazuke.PickerRow{ID: "commit-search/more", Label: fmt.Sprintf("Search %d more commits…", s.depth), Opens: true, NoPick: true, Data: sideChoice{Search: &s}})
 	}
 	return rows
 }

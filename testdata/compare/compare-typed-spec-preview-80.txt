@@ -20,7 +20,7 @@
   ╰─────│   merge-base(main)  resolved adc613… │ (merge-base(main))    │─────╯
   ╭─ Fil│   + Use ref/spec merge-base(main)    │ merge-base(main)      │─────╮
   │ XY  │   + Use ref/spec merge-base(main)    │                       │     │
-  │  M  │ enter chooser.pick · ctrl+o chooser.next-source · alt+o cho… │     │
+  │  M  │ enter picker.pick · ctrl+o picker.next-source · alt+o picke… │     │
   │ t…  ╰──────────────────────────────────────────────────────────────╯     │
   │                                                                          │
   │                                                                          │
@@ -36,4 +36,4 @@
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  enter chooser.pick · ctrl+o chooser.next-source · alt+o chooser.previous-so…
+  enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-sourc…

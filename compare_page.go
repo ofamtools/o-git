@@ -21,7 +21,7 @@ const pairsID = "compare/pairs"
 const commitsID = "compare/commits"
 const filesID = "compare/files"
 
-// comparePage holds domain state; ochazuke owns focus, chooser and delivery.
+// comparePage holds domain state; ochazuke owns focus, picker and delivery.
 type comparePage struct {
 	pairs, commits, files                       *ochazuke.List
 	repo, loadedRepo, following                 string
@@ -87,7 +87,7 @@ func (a *App) registerComparePage() error {
 	r.Define("compare").
 		Verb("open", a.compareOpen, "open Compare, or enter the selected pair's commits").
 		Verb("reload", func(c ochazuke.Ctx) ochazuke.Result { return a.loadComparePairs(a.compareRepo(c)) }, "resolve pairs again").Fetch().Quiet().
-		Verb("set", a.compareSet, "set --side from|to to ENDPOINT; omitted endpoint opens a chooser").Positional("endpoint").
+		Verb("set", a.compareSet, "set --side from|to to ENDPOINT; omitted endpoint opens a picker").Positional("endpoint").
 		Verb("swap", a.compareSwap, "swap from and to, remembering an ad hoc comparison").
 		Verb("save", a.compareSave, "append the current comparison to compare.pairs as NAME").Positional("name")
 	for _, noun := range []string{"repo", "worktree", "branch", "endpoint"} {
