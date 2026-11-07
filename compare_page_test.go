@@ -290,7 +290,7 @@ func TestComparePageStories(t *testing.T) {
 			t.Fatal("visual focus did not reach diff files")
 		}
 		keys(t, a, "}")
-		if a.r.Focus != diffID {
+		if a.r.FocusID() != diffID {
 			t.Fatal("visual focus did not return to diff")
 		}
 		keys(t, a, "]", "f")
@@ -619,5 +619,48 @@ func TestCompareStatusFlattensMultiLineFailure(t *testing.T) {
 		if width == 300 && !strings.Contains(status, "repository Stopping at filesystem boundary") {
 			t.Fatalf("the failure was not joined onto the status row: %q", status)
 		}
+	}
+}
+
+// TestOwnershipDiffUnderModal pins the ownership/diff-under-modal story: a
+// modal opened over the diff view leaves the diff's own focus and mode as
+// they were, and closing it returns them.
+func TestOwnershipDiffUnderModal(t *testing.T) {
+	a, _ := compareStory(t)
+	if err := a.compare.files.Focus(); err != nil {
+		t.Fatal(err)
+	}
+	keys(t, a, "enter")
+	if a.r.TopModal() != diffFrame {
+		t.Fatal("file did not open diff")
+	}
+	keys(t, a, "{", "}")
+	if a.r.FocusID() != diffID {
+		t.Fatalf("diff focus = %q, want %q", a.r.FocusID(), diffID)
+	}
+	focus, mode := a.r.FocusID(), a.r.CurrentMode().Name
+	if got := a.r.PresentationAt(diffID); got.Focus != diffID || got.Mode.Name != mode {
+		t.Fatalf("diff presentation = %q/%q, want %q/%q", got.Focus, got.Mode.Name, diffID, mode)
+	}
+	keys(t, a, "?")
+	over := a.r.TopModal()
+	if over == "" || over == diffFrame {
+		t.Fatalf("help did not open over the diff: top modal %q", over)
+	}
+	if a.r.FocusID() == diffID {
+		t.Fatalf("live focus stayed on the diff under %q", over)
+	}
+	if got := a.r.PresentationAt(diffID); got.Focus != focus || got.Mode.Name != mode {
+		t.Fatalf("diff drawn under %q as %q/%q, want %q/%q", over, got.Focus, got.Mode.Name, focus, mode)
+	}
+	keys(t, a, "esc")
+	if a.r.TopModal() != diffFrame {
+		t.Fatalf("esc left top modal %q, want the diff", a.r.TopModal())
+	}
+	if a.r.FocusID() != focus || a.r.CurrentMode().Name != mode {
+		t.Fatalf("after close %q/%q, want %q/%q", a.r.FocusID(), a.r.CurrentMode().Name, focus, mode)
+	}
+	if got := a.r.PresentationAt(diffID); got.Focus != focus || got.Mode.Name != mode {
+		t.Fatalf("diff presentation after close = %q/%q", got.Focus, got.Mode.Name)
 	}
 }

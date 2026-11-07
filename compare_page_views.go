@@ -321,7 +321,7 @@ func (a *App) renderCompareDiff(r *ochazuke.Runtime, _ *ochazuke.Instance, w, h 
 	}
 	diff := func(w, h int) ochazuke.Block {
 		cw, ch := ochazuke.PanelContentSize(w, h)
-		return l.PanelBlock(p.diffPath, ochazuke.Text(p.diff.View(s, cw, ch)), w, h, r.Focus == diffID)
+		return l.PanelBlock(p.diffPath, ochazuke.Text(p.diff.View(s, cw, ch)), w, h, r.PresentationAt(diffID).Focus == diffID)
 	}
 	if w < 90 {
 		fh := min(7, max(3, h/3))

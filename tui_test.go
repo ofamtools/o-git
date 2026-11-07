@@ -98,7 +98,7 @@ func TestPageFollowsTheSelectedRepo(t *testing.T) {
 	// enter moves to the repo's worktrees.
 	keys(t, a, "enter")
 	if !a.worktrees.Focused() {
-		t.Fatalf("focus %s", a.r.Focus)
+		t.Fatalf("focus %s", a.r.FocusID())
 	}
 	if s := screen(a); !strings.Contains(s, "state     clean main") {
 		t.Fatalf("worktree detail\n%s", s)
@@ -108,7 +108,7 @@ func TestPageFollowsTheSelectedRepo(t *testing.T) {
 	m := &model{a: a}
 	keys(t, a, "shift+tab")
 	if !a.repos.Focused() {
-		t.Fatalf("focus %s", a.r.Focus)
+		t.Fatalf("focus %s", a.r.FocusID())
 	}
 	if _, cmd := m.Update(keytest.Msg("k", false, false)); cmd == nil || a.loading != one {
 		t.Fatalf("k through the model: cmd %v, loading %q", cmd != nil, a.loading)
@@ -343,7 +343,7 @@ func TestRetiredKeysAreUnbound(t *testing.T) {
 		for _, key := range []string{"a", "x", "X", "s"} {
 			handled, err := a.r.Dispatch(ochazuke.MacroKey{Key: key})
 			if handled || err != nil || a.r.TopModal() != "" {
-				t.Fatalf("%s at %s: handled %v, %v, modal %q", key, a.r.Focus, handled, err, a.r.TopModal())
+				t.Fatalf("%s at %s: handled %v, %v, modal %q", key, a.r.FocusID(), handled, err, a.r.TopModal())
 			}
 		}
 	}
@@ -403,11 +403,11 @@ func TestListsTakeNoMarks(t *testing.T) {
 		_, _ = a.r.Dispatch(ochazuke.MacroKey{Key: "space"})
 		for _, list := range []*ochazuke.List{a.repos, a.worktrees, a.branches} {
 			if marked := list.Marked(); len(marked) != 0 {
-				t.Fatalf("space at %s marked %v", a.r.Focus, marked)
+				t.Fatalf("space at %s marked %v", a.r.FocusID(), marked)
 			}
 		}
 		if s := screen(a); strings.Contains(s, "list.mark") {
-			t.Fatalf("a hint offers list.mark at %s\n%s", a.r.Focus, s)
+			t.Fatalf("a hint offers list.mark at %s\n%s", a.r.FocusID(), s)
 		}
 	}
 }
