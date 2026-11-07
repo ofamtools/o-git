@@ -64,7 +64,6 @@ lists_verbs.go	App.registerListsVerbs	compare	"commit.files"	1
 lists_verbs.go	App.registerListsVerbs	compare	"commit.list"	1
 lists_verbs.go	App.registerListsVerbs	compare	"commit.show"	1
 lists_verbs.go	App.registerListsVerbs	compare	"compare.commits"	1
-prompt.go	App.registerPrompt	compare	"field"	1
 rows.go	revealed	case	"branch"	1
 rows.go	revealed	case	"repo"	1
 rows.go	revealed	case	"worktree"	1

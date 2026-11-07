@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 
@@ -311,7 +312,7 @@ func TestCatalog(t *testing.T) {
 		"endpoint": "archive compare copy create delete! edit get list=endpoint resolve set show",
 		"compare":  "archive close commit-open commits=commit copy create delete! edit fetch file-open files=change get list=compare open pair-files reload save set show swap",
 		"worktree": "add archive compare create delete! edit get list=worktree remove! set",
-		"branch":   "archive compare create delete! edit get list=branch set switch",
+		"branch":   "archive compare create delete! edit get list=branch names set switch",
 		"commit":   "archive compare copy create delete! diff edit files=change get list=commit set show",
 		"change":   "archive copy create delete! diff edit get list=change set show",
 	}
@@ -408,5 +409,27 @@ func TestCatalogDeclaresTheDataPage(t *testing.T) {
 		if !known[f] {
 			t.Errorf("detail field %q is in no row's record", f)
 		}
+	}
+}
+
+// Through the command line a missing required argument is refused by name
+// (there is no form), and branch names answers the choices of a branch
+// parameter as plain names.
+func TestCreatingVerbsAcceptArgsAndNameWhatIsMissing(t *testing.T) {
+	dir := newRepo(t, "r")
+	sh(t, dir, "branch", "alpha")
+	if _, _, err := try("", "branch", "create", "--repo", dir); err == nil || !strings.Contains(err.Error(), "name") {
+		t.Fatalf("branch create without a name: %v", err)
+	}
+	if _, _, err := try("", "worktree", "add", "--repo", dir); err == nil || !strings.Contains(err.Error(), "branch") {
+		t.Fatalf("worktree add without a branch: %v", err)
+	}
+	wt := filepath.Join(t.TempDir(), "elsewhere")
+	if add := decode[AddResult](t, run(t, "", "worktree", "add", "--branch", "alpha", "--path", wt, "--repo", dir)); add.Path != wt || add.Branch != "alpha" {
+		t.Fatalf("flags: %+v", add)
+	}
+	var names []string
+	if err := json.Unmarshal([]byte(run(t, "", "branch", "names", "--repo", dir)), &names); err != nil || !slices.Contains(names, "alpha") || !slices.Contains(names, "main") {
+		t.Fatalf("names %v: %v", names, err)
 	}
 }

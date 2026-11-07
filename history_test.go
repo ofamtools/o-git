@@ -40,7 +40,7 @@ func TestEveryVerbDeclaresItsHistory(t *testing.T) {
 }
 
 // A spot check of the kinds: reads are fetches, repository changes are
-// changes, the prompt's keys are actions.
+// changes.
 func TestVerbHistoryKinds(t *testing.T) {
 	a, err := New()
 	if err != nil {
@@ -50,7 +50,7 @@ func TestVerbHistoryKinds(t *testing.T) {
 		"repo.list": ochazuke.HistoryFetch, "repo.status": ochazuke.HistoryFetch, "repo.show": ochazuke.HistoryFetch,
 		"repo.state": ochazuke.HistoryFetch, "branch.list": ochazuke.HistoryFetch,
 		"worktree.add": ochazuke.HistoryChange, "branch.switch": ochazuke.HistoryChange, "branch.delete": ochazuke.HistoryChange,
-		"field.commit": ochazuke.HistoryAction, "field.cancel": ochazuke.HistoryAction,
+		"branch.names":  ochazuke.HistoryFetch,
 		"endpoint.list": ochazuke.HistoryFetch, "endpoint.resolve": ochazuke.HistoryFetch, "endpoint.show": ochazuke.HistoryFetch,
 		"compare.list": ochazuke.HistoryFetch, "compare.show": ochazuke.HistoryFetch,
 		"change.diff": ochazuke.HistoryFetch, "commit.diff": ochazuke.HistoryFetch,

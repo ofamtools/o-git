@@ -77,7 +77,7 @@ The destructive verbs take plain arguments, the same ones the page's `d d` passe
 - `worktree remove` refuses the main worktree always, and a worktree with any change, untracked files included, unless `--force`.
 - `branch delete` refuses the branch checked out in the repo's worktree always (switch first), and a branch not merged into its upstream or HEAD unless `--force`.
 
-`worktree add` checks out an existing branch, or creates it from `--from` (default HEAD); the default path is `REPO-BRANCH` beside the main worktree (`feat/x` becomes `app-feat-x`).
+`worktree add` checks out an existing branch, or creates it from `--from` (default HEAD); the default path is `REPO-BRANCH` beside the main worktree (`feat/x` becomes `app-feat-x`). Its branch and directory (a `path` parameter) and `branch create`'s name are declared parameters: on the page `n` opens the args form for what is missing, and `branch names [REPO]` lists the branch names that complete them.
 
 ## Compare command line
 

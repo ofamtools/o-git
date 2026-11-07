@@ -53,7 +53,7 @@ func keyErr(a *App, name string) error {
 	return a.Settle()
 }
 
-// typeText types into the open prompt.
+// typeText types into the open field.
 func typeText(t *testing.T, a *App, text string) {
 	t.Helper()
 	for _, r := range text {
@@ -219,8 +219,11 @@ func TestPageWorktreeAddAndRemove(t *testing.T) {
 	dir := newRepo(t, "r")
 	a := open(t, dir)
 	keys(t, a, "enter", "n")
-	if a.r.TopModal() == "" || !strings.Contains(screen(a), "New worktree for branch") {
-		t.Fatalf("no prompt\n%s", screen(a))
+	if a.r.TopModal() == "" {
+		t.Fatalf("no args form\n%s", screen(a))
+	}
+	if s := screen(a); !strings.Contains(s, "Run worktree.add") || !strings.Contains(s, "path (optional)") {
+		t.Fatalf("not the args form\n%s", s)
 	}
 	typeText(t, a, "feat")
 	keys(t, a, "enter")
@@ -318,38 +321,6 @@ func TestParameterSourcesFillFromTheRow(t *testing.T) {
 	_ = a.Settle()
 	if s, _ := ReadStatus(t.Context(), dir); s.Branch != "topic" {
 		t.Fatalf("switched to %s", s.Branch)
-	}
-}
-
-// An empty prompt runs nothing; esc cancels.
-func TestPromptCancel(t *testing.T) {
-	dir := newRepo(t, "r")
-	a := open(t, dir)
-	if err := a.branches.Focus(); err != nil {
-		t.Fatal(err)
-	}
-	keys(t, a, "n", "esc")
-	keys(t, a, "n", "enter")
-	if a.r.TopModal() != "" || a.branches.Len() != 1 {
-		t.Fatalf("modal %q branches %d", a.r.TopModal(), a.branches.Len())
-	}
-}
-
-func TestPromptSharedClose(t *testing.T) {
-	a := open(t, newRepo(t, "r"))
-	if err := a.branches.Focus(); err != nil {
-		t.Fatal(err)
-	}
-	keys(t, a, "n")
-	if _, err := a.r.Execute(ochazuke.Request{Noun: "ochazuke.modal", Verb: "close"}); err != nil {
-		t.Fatal(err)
-	}
-	if a.ask != nil || a.r.TopModal() != "" || !a.branches.Focused() {
-		t.Fatal("shared close did not cancel the prompt and restore focus")
-	}
-	keys(t, a, "n", "esc")
-	if a.ask != nil || a.r.TopModal() != "" {
-		t.Fatal("prompt could not be reopened and cancelled")
 	}
 }
 
@@ -484,5 +455,59 @@ func TestPaneKeysResizeTheRepoList(t *testing.T) {
 	keys(t, a, "3", "ctrl+w", ">")
 	if lower := row(); lower <= top {
 		t.Fatalf("3> did not grow the stacked repo list: %d -> %d", top, lower)
+	}
+}
+
+// The two creating verbs ask through the args form from their declared
+// parameters: the form opens on the missing required one, esc leaves it
+// and runs nothing, and a verb given its arguments never opens a form.
+func TestCreatingVerbsAskThroughTheArgsForm(t *testing.T) {
+	dir := newRepo(t, "r")
+	a := open(t, dir)
+	if err := a.branches.Focus(); err != nil {
+		t.Fatal(err)
+	}
+	keys(t, a, "n")
+	if s := screen(a); a.r.TopModal() != ochazuke.ArgsFormID || !strings.Contains(s, "Run branch.create") || !strings.Contains(s, "from (optional)") {
+		t.Fatalf("no args form for branch.create (%q)\n%s", a.r.TopModal(), s)
+	}
+	keys(t, a, "esc")
+	// insert -> normal on the first esc, the form closes on the second.
+	keys(t, a, "esc")
+	if a.r.TopModal() != "" || a.branches.Len() != 1 {
+		t.Fatalf("esc: modal %q branches %d", a.r.TopModal(), a.branches.Len())
+	}
+	keys(t, a, "n")
+	typeText(t, a, "topic")
+	keys(t, a, "enter")
+	if ok, _ := BranchExists(t.Context(), dir, "topic"); !ok || a.r.TopModal() != "" {
+		t.Fatalf("form run: exists %v modal %q", ok, a.r.TopModal())
+	}
+	// Arguments given: no form.
+	if _, err := a.r.Execute(ochazuke.Request{Noun: "branch", Verb: "create", Args: ochazuke.Arguments{"name": "direct", "repo": dir}}); err != nil {
+		t.Fatal(err)
+	}
+	_ = a.Settle()
+	if ok, _ := BranchExists(t.Context(), dir, "direct"); !ok || a.r.TopModal() != "" {
+		t.Fatalf("direct: exists %v modal %q", ok, a.r.TopModal())
+	}
+}
+
+// The inputs are declared: the names and the worktree's directory are
+// parameters the forms, the palette and the catalog all read.
+func TestCreatingVerbsDeclareTheirParameters(t *testing.T) {
+	a, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	add, create := a.r.Operations["worktree.add"].Parameters, a.r.Operations["branch.create"].Parameters
+	if !add["branch"].Required || add["branch"].Source != "branch.names" || !add["branch"].Free {
+		t.Errorf("worktree.add branch: %+v", add["branch"])
+	}
+	if p := add["path"]; p.Type != "path" || p.Path != "dir" || !p.New || p.Start == "" || p.Required {
+		t.Errorf("worktree.add path: %+v", p)
+	}
+	if !create["name"].Required || create["from"].Source != "branch.names" {
+		t.Errorf("branch.create: %+v %+v", create["name"], create["from"])
 	}
 }

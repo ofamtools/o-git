@@ -35,6 +35,7 @@ func (a *App) registerVerbs() {
 		Verb("remove", a.worktreeRemove, "remove the worktree at PATH; refuses the main one, and a dirty one unless --force").Destructive().Confirm("Remove worktree {{label}}?").Positional("path")
 	r.Define("branch").
 		Verb("list", a.branchList, "a repository's local branches, newest commit first: rows {noun, id: branch/REPO:NAME, label, data: {repo, name, current, worktree, upstream, gone, ahead, behind, merged, commit, subject, author, date}, cells}").Rows("branch").Fetch().Quiet().Positional("repo").
+		Verb("names", a.branchNames, "a repository's local branch names, newest commit first: the choices of a branch parameter (rows are branch list's)").Fetch().Quiet().Positional("repo").
 		Verb("create", a.branchCreate, "create branch NAME at FROM (default HEAD) without checking it out; --switch checks it out").Positional("name", "from").
 		Verb("switch", a.branchSwitch, "check out NAME (default: the targeted branch) in REPO's worktree").Positional("name").
 		Verb("delete", a.branchDelete, "delete branch NAME in REPO; refuses the checked-out one, and an unmerged one unless --force").Destructive().Confirm("Delete branch {{label}}?").Positional("name")
@@ -57,19 +58,20 @@ func (a *App) registerVerbs() {
 	set("worktree.list", "row[]", map[string]ochazuke.Parameter{"repo": repo})
 	set("worktree.add", "{repo, path, branch, created}", map[string]ochazuke.Parameter{
 		"repo":   repo,
-		"branch": {Type: "string", Description: "the branch to check out; a new one is created when it does not exist (the TUI asks)"},
-		"path":   {Type: "string", Description: "the new worktree's directory (default: REPO-BRANCH beside the main worktree)"},
-		"from":   {Type: "string", Description: "the commit a new branch starts at (default HEAD)"},
+		"branch": {Type: "string", Required: true, Description: "the branch to check out; a new one is created when it does not exist", Source: "branch.names", SourceArgs: map[string]string{"repo": "repo"}, Free: true},
+		"path":   {Type: "path", Path: "dir", New: true, Start: "browse", Description: "the new worktree's directory (default: REPO-BRANCH beside the main worktree)"},
+		"from":   {Type: "string", Description: "the commit a new branch starts at (default HEAD)", Source: "branch.names", SourceArgs: map[string]string{"repo": "repo"}, Free: true},
 	})
 	set("worktree.remove", "{repo, removed, force}", map[string]ochazuke.Parameter{
 		"path":  {Type: "string", Description: "the worktree's directory (default: the --target row's; from a key, the help or the palette, the focused row's)", From: "row:path"},
 		"force": force("remove it even with uncommitted changes or untracked files"),
 	})
 	set("branch.list", "row[]", map[string]ochazuke.Parameter{"repo": repo})
+	set("branch.names", "string[]", map[string]ochazuke.Parameter{"repo": repo})
 	set("branch.create", "{repo, branch, from, switched}", map[string]ochazuke.Parameter{
 		"repo":   repo,
-		"name":   {Type: "string", Description: "the new branch (the TUI asks)"},
-		"from":   {Type: "string", Description: "the commit it starts at (default HEAD)"},
+		"name":   {Type: "string", Required: true, Description: "the new branch"},
+		"from":   {Type: "string", Description: "the commit it starts at (default HEAD)", Source: "branch.names", SourceArgs: map[string]string{"repo": "repo"}, Free: true},
 		"switch": force("check the new branch out in REPO's worktree"),
 	})
 	rowRepo := repo
@@ -227,6 +229,27 @@ func (a *App) worktreeList(c ochazuke.Ctx) ochazuke.Result {
 	})
 }
 
+// branchNames is branch list's names alone: the choices of a branch
+// parameter (a row's id is branch/REPO:NAME, not a name git takes).
+func (a *App) branchNames(c ochazuke.Ctx) ochazuke.Result {
+	word := a.repoWord(c)
+	return ochazuke.Pending(func(ctx context.Context) (any, error) {
+		_, dir, err := resolve(ctx, word)
+		if err != nil {
+			return nil, err
+		}
+		list, err := listBranchRows(ctx, dir)
+		if err != nil {
+			return nil, err
+		}
+		names := make([]string, len(list))
+		for i, b := range list {
+			names[i] = b.Name
+		}
+		return names, nil
+	})
+}
+
 func (a *App) branchList(c ochazuke.Ctx) ochazuke.Result {
 	word := a.repoWord(c)
 	now := a.Now()
@@ -270,9 +293,6 @@ type AddResult struct {
 func (a *App) worktreeAdd(c ochazuke.Ctx) ochazuke.Result {
 	branch := ochazuke.StringArg(c.Args, "branch", "")
 	if branch == "" {
-		if a.tui {
-			return a.prompt(c, "New worktree for branch", "worktree", "add", "branch")
-		}
 		return ochazuke.Failed(errors.New("a branch is required: worktree add BRANCH [PATH]"))
 	}
 	word, path, from := a.repoWord(c), ochazuke.StringArg(c.Args, "path", ""), ochazuke.StringArg(c.Args, "from", "")
@@ -358,9 +378,6 @@ type BranchResult struct {
 func (a *App) branchCreate(c ochazuke.Ctx) ochazuke.Result {
 	name := ochazuke.StringArg(c.Args, "name", "")
 	if name == "" {
-		if a.tui {
-			return a.prompt(c, "New branch", "branch", "create", "name")
-		}
 		return ochazuke.Failed(errors.New("a name is required: branch create NAME [FROM]"))
 	}
 	word, from := a.repoWord(c), ochazuke.StringArg(c.Args, "from", "")

@@ -53,8 +53,6 @@ type App struct {
 	listErr              error  // the last repo list's failure
 	following            string // the repo row the lists last followed
 	tui                  bool   // a person is at the keys: prompts, and reads after a change
-	ask                  *question
-	field                *ochazuke.Input
 
 	Stdin          io.Reader
 	Stdout, Stderr io.Writer
@@ -96,7 +94,6 @@ func New() (*App, error) {
 	a.defineStores()
 	a.m = ochazuke.NewModel(r)
 	a.m.Title = "o-git"
-	a.registerPrompt()
 	if err := a.registerComparePage(); err != nil {
 		return nil, err
 	}
