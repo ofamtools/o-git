@@ -3,7 +3,7 @@ package main
 import "ofam.dev/ochazuke"
 
 // defineStores makes each list noun a thing noun over its list verb
-// (thing_store.go), so the core verbs get, list, create, set, delete,
+// (ochazuke.DefineListFacts), so the core verbs get, list, create, set, delete,
 // archive and edit exist on it: the tool only reads these, so they are
 // facts nouns, and the verbs the tool registers under a core name (branch
 // create and delete, compare set, every list) stay and win. The key is the
@@ -15,7 +15,7 @@ func (a *App) defineStores() {
 		"repo": repo,
 		"pair": {Type: "string", Description: "comparison as in compare.show; --pair excludes --from/--to"},
 	}
-	for _, s := range []listStore{
+	a.r.DefineListFacts([]ochazuke.ListFacts{
 		{Noun: "repo", Sample: Repo{}, Rename: map[string]string{"state": "condition"},
 			ListParams: map[string]ochazuke.Parameter{"path": {Type: "string", Description: "extra repository directories, comma-separated, listed after o-proj's"}}, List: a.repoList},
 		{Noun: "worktree", Sample: WorktreeRow{}, Rename: map[string]string{"state": "condition"}, ListParams: inRepo, List: a.worktreeList},
@@ -24,7 +24,5 @@ func (a *App) defineStores() {
 		{Noun: "change", Sample: Change{}, ListParams: pair, List: a.changeList},
 		{Noun: "endpoint", Sample: Endpoint{}, ListParams: inRepo, List: a.endpointList},
 		{Noun: "compare", Sample: Comparison{}, ListParams: inRepo, List: a.compareList},
-	} {
-		s.define(a.r)
-	}
+	}...)
 }
