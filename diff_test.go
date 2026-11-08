@@ -425,7 +425,7 @@ func TestDiffDegenerateRootUnbornAndSettings(t *testing.T) {
 		}
 	}
 	for _, key := range []string{"change.diff", "commit.diff"} {
-		op := a.r.Operations[key]
+		op := a.r.Operations.At(ochazuke.Key(key))
 		if op.HistoryKind != ochazuke.HistoryFetch || !op.Quiet {
 			t.Fatalf("read registration %+v", op)
 		}

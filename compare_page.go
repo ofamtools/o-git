@@ -96,7 +96,7 @@ func (a *App) registerComparePage() error {
 	setHistory(r, ochazuke.HistoryAction, "compare.open", "compare.set", "compare.swap", "repo.compare", "worktree.compare", "branch.compare", "endpoint.compare")
 	setHistory(r, ochazuke.HistoryChange, "compare.save")
 	for _, key := range []string{"compare.open", "compare.reload", "compare.set", "compare.swap", "compare.save", "repo.compare", "worktree.compare", "branch.compare", "endpoint.compare"} {
-		op := r.Operations[r.CanonicalKey(key)]
+		op := r.Operations.At(ochazuke.Key(r.CanonicalKey(key)))
 		op.Parameters = map[string]ochazuke.Parameter{"repo": {Type: "string", Description: "repository path or name"}}
 		switch key {
 		case "compare.set":
@@ -107,14 +107,14 @@ func (a *App) registerComparePage() error {
 		case "compare.save":
 			op.Parameters["name"] = ochazuke.Parameter{Type: "string", Required: true, Description: "saved pair name"}
 		}
-		r.Operations[r.CanonicalKey(key)] = op
+		r.Operations.Set(op)
 	}
 	// Reuse the core fetch verb and retain its non-quiet job and history kind.
-	copyOp := r.Operations[r.CanonicalKey("compare.copy")]
-	copyOp.App = func(c ochazuke.Ctx) ochazuke.Result { c.Args = a.compareArguments(c); return a.compareCopy(c) }
-	r.Operations[r.CanonicalKey("compare.copy")] = copyOp
-	op := r.Operations[r.CanonicalKey("compare.fetch")]
-	op.App = func(c ochazuke.Ctx) ochazuke.Result {
+	copyOp := r.Operations.At(ochazuke.Key(r.CanonicalKey("compare.copy")))
+	copyOp.AppHandler = func(c ochazuke.Ctx) ochazuke.Result { c.Args = a.compareArguments(c); return a.compareCopy(c) }
+	r.Operations.Set(copyOp)
+	op := r.Operations.At(ochazuke.Key(r.CanonicalKey("compare.fetch")))
+	op.AppHandler = func(c ochazuke.Ctx) ochazuke.Result {
 		c.Args = a.compareArguments(c)
 		return a.fetch(c, true).Then(func(_ ochazuke.Ctx, _ any, err error) {
 			if err == nil && a.tui {
@@ -122,16 +122,16 @@ func (a *App) registerComparePage() error {
 			}
 		})
 	}
-	r.Operations[r.CanonicalKey("compare.fetch")] = op
-	repoFetch := r.Operations[r.CanonicalKey("repo.fetch")]
-	repoFetch.App = func(c ochazuke.Ctx) ochazuke.Result {
+	r.Operations.Set(op)
+	repoFetch := r.Operations.At(ochazuke.Key(r.CanonicalKey("repo.fetch")))
+	repoFetch.AppHandler = func(c ochazuke.Ctx) ochazuke.Result {
 		return a.fetch(c, false).Then(func(_ ochazuke.Ctx, _ any, err error) {
 			if err == nil && a.tui {
 				a.refresh()
 			}
 		})
 	}
-	r.Operations[r.CanonicalKey("repo.fetch")] = repoFetch
+	r.Operations.Set(repoFetch)
 	if err := a.registerCompareViews(); err != nil {
 		return err
 	}

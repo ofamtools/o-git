@@ -29,7 +29,7 @@ func (a *App) registerCompareVerbs() {
 	repo := ochazuke.Parameter{Type: "string", Description: "repository directory or o-proj name (default current repository)"}
 	spec := ochazuke.Parameter{Type: "string", Description: "endpoint name, ref/SHA or endpoint spec"}
 	for _, key := range []string{"endpoint.list", "endpoint.resolve", "endpoint.show", "endpoint.copy", "compare.list", "compare.show", "compare.copy", "compare.fetch", "repo.fetch"} {
-		op := r.Operations[r.CanonicalKey(key)]
+		op := r.Operations.At(ochazuke.Key(r.CanonicalKey(key)))
 		op.Parameters = map[string]ochazuke.Parameter{"repo": repo}
 		switch key {
 		case "endpoint.resolve", "endpoint.show", "endpoint.copy":
@@ -52,7 +52,7 @@ func (a *App) registerCompareVerbs() {
 		if strings.HasSuffix(key, ".fetch") {
 			op.Parameters["verbose"] = ochazuke.Parameter{Type: "boolean", Description: "include raw git diagnostics on failure"}
 		}
-		r.Operations[r.CanonicalKey(key)] = op
+		r.Operations.Set(op)
 	}
 }
 

@@ -45,9 +45,9 @@ func (a *App) registerCompareViews() error {
 		}
 		return a.compareSet(ochazuke.Ctx{Args: ochazuke.Arguments{"repo": row.Repo, "side": ochazuke.StringArg(c.Args, "side", "to"), "endpoint": row.SHA}})
 	}, "set either comparison side to this commit")
-	op := r.Operations["commit.compare"]
+	op := r.Operations.At("commit.compare")
 	op.Parameters = map[string]ochazuke.Parameter{"side": {Type: "string", Enum: []string{"from", "to"}}}
-	r.Operations["commit.compare"] = op
+	r.Operations.Set(op)
 	setHistory(r, ochazuke.HistoryAction, "commit.compare", "compare.close", "compare.pair-files")
 	r.DefineGuard("compare-commit-row", func(r *ochazuke.Runtime, ev ochazuke.KeyEvent) bool {
 		inst := r.Instances[ev.Focus]
@@ -67,8 +67,8 @@ func (a *App) registerCompareViews() error {
 	})
 	// A live file row already supplies the path, including commit-file rows.
 	// Keep the CLI's existing copy handler for requests without a live row.
-	op = r.Operations["change.copy"]
-	op.App = func(c ochazuke.Ctx) ochazuke.Result {
+	op = r.Operations.At("change.copy")
+	op.AppHandler = func(c ochazuke.Ctx) ochazuke.Result {
 		if file, ok := rowData[Change](c); ok && a.r.Page == comparePageID {
 			_, err := r.Execute(ochazuke.Request{Noun: "ochazuke.register", Verb: "set", Args: ochazuke.Arguments{"name": "\"", "props": map[string]any{"text": file.Path}}})
 			if err != nil {
@@ -78,7 +78,7 @@ func (a *App) registerCompareViews() error {
 		}
 		return a.changeCopy(c)
 	}
-	r.Operations["change.copy"] = op
+	r.Operations.Set(op)
 	a.m.ModalViews[diffFrame] = ochazuke.ModalView{Title: "Diff", Render: a.renderCompareDiff}
 	return r.LoadDefaultBindings("compare-views", []byte(`{"bindings":[
   {"context":"commit/normal","bindings":[

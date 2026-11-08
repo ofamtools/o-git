@@ -14,7 +14,7 @@ func (a *App) registerDiffVerbs() error {
 	// The shared commit/change declarations live in registerListsVerbs;
 	// configure their diff parameters here after those verbs exist.
 	for _, key := range []string{"change.diff", "commit.diff"} {
-		op := a.r.Operations[key]
+		op := a.r.Operations.At(ochazuke.Key(key))
 		op.Parameters = map[string]ochazuke.Parameter{
 			"repo":    {Type: "string", Description: "repository directory or o-proj name; default current repository"},
 			"context": {Type: "integer", Description: "context lines; defaults to compare.diff.context"},
@@ -29,7 +29,7 @@ func (a *App) registerDiffVerbs() error {
 			op.Parameters["sha"] = ochazuke.Parameter{Type: "string", Required: true, Description: "commit SHA or ref"}
 		}
 		op.Result = "{comparison, reversed, files: diffview.File[]} or unified text"
-		a.r.Operations[key] = op
+		a.r.Operations.Set(op)
 	}
 	return nil
 }

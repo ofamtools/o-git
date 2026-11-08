@@ -302,7 +302,7 @@ func TestParameterSourcesFillFromTheRow(t *testing.T) {
 	dir := newRepo(t, "r")
 	a := open(t, dir)
 	for _, p := range []struct{ op, arg, from string }{{"branch.switch", "name", "row:name"}, {"branch.switch", "repo", "row:repo"}, {"branch.delete", "name", "row:name"}, {"branch.delete", "repo", "row:repo"}, {"worktree.remove", "path", "row:path"}} {
-		if got := a.r.Operations[p.op].Parameters[p.arg].From; got != p.from {
+		if got := a.r.Operations.At(ochazuke.Key(p.op)).Parameters[p.arg].From; got != p.from {
 			t.Errorf("%s %s: From %q, want %q", p.op, p.arg, got, p.from)
 		}
 	}
@@ -500,7 +500,7 @@ func TestCreatingVerbsDeclareTheirParameters(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	add, create := a.r.Operations["worktree.add"].Parameters, a.r.Operations["branch.create"].Parameters
+	add, create := a.r.Operations.At("worktree.add").Parameters, a.r.Operations.At("branch.create").Parameters
 	if !add["branch"].Required || add["branch"].Source != "branch.names" || !add["branch"].Free {
 		t.Errorf("worktree.add branch: %+v", add["branch"])
 	}

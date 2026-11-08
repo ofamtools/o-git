@@ -24,7 +24,7 @@ func (a *App) registerListsVerbs() {
 		Verb("files", a.changeList, "change.list for this comparison").Rows("change").Fetch().Quiet().Positional("repo")
 	setHistory(r, ochazuke.HistoryAction, "commit.copy", "change.copy")
 	for _, key := range []string{"commit.list", "commit.show", "commit.files", "commit.copy", "change.list", "change.show", "change.copy", "compare.commits", "compare.files"} {
-		op := r.Operations[r.CanonicalKey(key)]
+		op := r.Operations.At(ochazuke.Key(r.CanonicalKey(key)))
 		op.Parameters = map[string]ochazuke.Parameter{"repo": {Type: "string", Description: "repository directory or o-proj name"}}
 		if key == "commit.show" || key == "commit.files" || key == "commit.copy" {
 			op.Parameters["sha"] = ochazuke.Parameter{Type: "string", Description: "commit ref or SHA; default focused commit or HEAD"}
@@ -47,7 +47,7 @@ func (a *App) registerListsVerbs() {
 		default:
 			op.Result = strings.Split(key, ".")[0]
 		}
-		r.Operations[r.CanonicalKey(key)] = op
+		r.Operations.Set(op)
 	}
 }
 

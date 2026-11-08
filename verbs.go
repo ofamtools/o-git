@@ -47,9 +47,9 @@ func (a *App) registerVerbs() {
 		return ochazuke.Parameter{Type: "boolean", Description: what}
 	}
 	set := func(key, result string, params map[string]ochazuke.Parameter) {
-		op := r.Operations[r.CanonicalKey(key)]
+		op := r.Operations.At(ochazuke.Key(r.CanonicalKey(key)))
 		op.Parameters, op.Result = params, result
-		r.Operations[r.CanonicalKey(key)] = op
+		r.Operations.Set(op)
 	}
 	set("repo.list", "row[]", map[string]ochazuke.Parameter{"path": paths})
 	set("repo.status", "repo", map[string]ochazuke.Parameter{"repo": repo})
@@ -468,11 +468,11 @@ func rowData[T any](c ochazuke.Ctx) (T, bool) {
 // an action. An unknown key panics, so a renamed verb is renamed here too.
 func setHistory(r *ochazuke.Runtime, kind string, keys ...string) {
 	for _, key := range keys {
-		op, ok := r.Operations[r.CanonicalKey(key)]
+		op, ok := r.Operations.Find(ochazuke.Key(r.CanonicalKey(key)))
 		if !ok {
 			panic("setHistory: no operation " + key)
 		}
 		op.HistoryKind = kind
-		r.Operations[r.CanonicalKey(key)] = op
+		r.Operations.Set(op)
 	}
 }

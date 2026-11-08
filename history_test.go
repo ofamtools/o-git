@@ -27,12 +27,12 @@ func TestEveryVerbDeclaresItsHistory(t *testing.T) {
 		for _, v := range noun.Verbs {
 			key := noun.Name + "." + v.Name
 			seen[key] = true
-			if declared := r.Operations[r.CanonicalKey(key)].HistoryKind; declared == "" || v.History != declared {
+			if declared := r.Operations.At(ochazuke.Key(r.CanonicalKey(key))).HistoryKind; declared == "" || v.History != declared {
 				t.Errorf("catalog verb %s: history %q, declared %q", key, v.History, declared)
 			}
 		}
 	}
-	for key := range r.Operations {
+	for key := range r.Operations.Entries() {
 		if !seen[key] {
 			t.Errorf("verb %s is not in the catalog", key)
 		}
@@ -61,7 +61,7 @@ func TestVerbHistoryKinds(t *testing.T) {
 		"compare.commits": ochazuke.HistoryFetch, "compare.files": ochazuke.HistoryFetch,
 		"commit.copy": ochazuke.HistoryAction, "change.copy": ochazuke.HistoryAction,
 	} {
-		if got := a.r.Operations[a.r.CanonicalKey(key)].HistoryKind; got != want {
+		if got := a.r.Operations.At(ochazuke.Key(a.r.CanonicalKey(key))).HistoryKind; got != want {
 			t.Errorf("%s: %q, want %q", key, got, want)
 		}
 	}
