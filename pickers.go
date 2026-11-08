@@ -13,7 +13,7 @@ func declarePickers(r *ochazuke.Runtime) error {
 		{Name: "branch", Noun: "branch", About: "The branches of the repository"},
 		{Name: "commit", Noun: "commit", About: "The commits of the current log"},
 		{Name: "change", Noun: "change", About: "The changed files of the working tree"},
-		{Name: "compare", Noun: "compare", About: "The saved comparisons"},
+		{Name: "compare", Noun: "comparison", About: "The saved comparisons"},
 		{Name: "endpoint", Noun: "endpoint", About: "The named endpoint specs a comparison side can take"},
 	} {
 		if err := r.AddPicker(d); err != nil {

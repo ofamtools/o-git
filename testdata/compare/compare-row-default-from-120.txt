@@ -35,5 +35,5 @@
   ┃                                            ┃ │                                                                   │
   ┃                                            ┃ │                                                                   │
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ╰───────────────────────────────────────────────────────────────────╯
-  ── branch.compare done · compare.set done ──────────────────────────────────────────────────────────────────────────
-  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F compare.fetch · R compare.reload · q app…
+  ── branch.compare done · comparison.set done ───────────────────────────────────────────────────────────────────────
+  enter comparison.open · y y comparison.yank · f from · t to · ~ comparison.swap · F comparison.fetch · R comparison…

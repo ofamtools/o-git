@@ -73,10 +73,10 @@ func listKnown(ctx context.Context) ([]Known, error) {
 // stands. State is clean, dirty, missing (no directory), not-repo or
 // error; Error says why for the last three.
 type Repo struct {
-	Name  string `json:"name"`
-	Path  string `json:"path"`
-	State string `json:"state"`
-	Status
+	Name   string `json:"name"`
+	Path   string `json:"path"`
+	Status string `json:"status"`
+	TreeStatus
 	Error string `json:"error,omitempty"`
 }
 
@@ -85,22 +85,22 @@ type Repo struct {
 func inspect(ctx context.Context, name, dir string) Repo {
 	r := Repo{Name: name, Path: dir}
 	if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
-		r.State, r.Error = "missing", "directory does not exist"
+		r.Status, r.Error = "missing", "directory does not exist"
 		return r
 	}
 	top, err := Toplevel(ctx, dir)
 	if err != nil {
-		r.State, r.Error = "not-repo", err.Error()
+		r.Status, r.Error = "not-repo", err.Error()
 		return r
 	}
 	r.Path = top
-	if r.Status, err = ReadStatus(ctx, top); err != nil {
-		r.State, r.Error = "error", err.Error()
+	if r.TreeStatus, err = ReadStatus(ctx, top); err != nil {
+		r.Status, r.Error = "error", err.Error()
 		return r
 	}
-	r.State = "clean"
+	r.Status = "clean"
 	if r.Dirty() {
-		r.State = "dirty"
+		r.Status = "dirty"
 	}
 	return r
 }
@@ -197,7 +197,7 @@ func listReposSelecting(ctx context.Context, extra []string, selected string) ([
 	})
 	out := make([]Repo, 0, len(repos))
 	for _, r := range repos {
-		if !slices.ContainsFunc(out, func(o Repo) bool { return o.State != "missing" && o.Path == r.Path }) {
+		if !slices.ContainsFunc(out, func(o Repo) bool { return o.Status != "missing" && o.Path == r.Path }) {
 			out = append(out, r)
 		}
 	}
@@ -228,7 +228,7 @@ func parallel(n int, fn func(int)) {
 type WorktreeRow struct {
 	Repo string `json:"repo"`
 	Worktree
-	State   string `json:"state"`
+	Status  string `json:"status"`
 	Changes int    `json:"changes"`
 	Error   string `json:"error,omitempty"`
 }
@@ -248,18 +248,18 @@ func listWorktreeRows(ctx context.Context, dir string) ([]WorktreeRow, error) {
 		w := WorktreeRow{Repo: repo, Worktree: list[i]}
 		switch {
 		case w.Bare:
-			w.State = "bare"
+			w.Status = "bare"
 		case w.Prunable != "":
-			w.State = "missing"
+			w.Status = "missing"
 		default:
 			s, err := ReadStatus(ctx, w.Path)
 			switch {
 			case err != nil:
-				w.State, w.Error = "error", err.Error()
+				w.Status, w.Error = "error", err.Error()
 			case s.Dirty():
-				w.State, w.Changes = "dirty", s.Changed()
+				w.Status, w.Changes = "dirty", s.Changed()
 			default:
-				w.State = "clean"
+				w.Status = "clean"
 			}
 		}
 		rows[i] = w

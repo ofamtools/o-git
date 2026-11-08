@@ -32,8 +32,8 @@ func (a *App) pickCompareSide(c ochazuke.Ctx, side string) ochazuke.Result {
 		return a.compareSet(ochazuke.Ctx{Args: ochazuke.Arguments{"repo": repo, "side": side, "endpoint": spec}})
 	}
 	a.compare.chooserOther, a.compare.chooserRepo, a.compare.chooserFollowing = other, repo, ""
-	depth := a.r.Settings().Int("compare.commit-search-depth")
-	typed := a.r.Settings().Bool("compare.chooser.resolve-typed")
+	depth := a.r.Settings().Int("comparison.commit-search-depth")
+	typed := a.r.Settings().Bool("comparison.chooser.resolve-typed")
 	sources := []ochazuke.PickerSource{}
 	for _, name := range []string{"Endpoints", "Log", "All", "Refs", "Graph", "Worktrees"} {
 		var continuation *commitSearch
@@ -238,7 +238,7 @@ func loadSideChoices(r *EndpointResolver, source, other string) ([]ochazuke.Pick
 // source bindings and ordering; an exact spec is an ordinary first row.
 func (a *App) followCompareChooser() bool {
 	c := a.r.Chooser("compare-side")
-	if c == nil || a.r.Settings().Int("compare.commit-search-depth") > 0 || !a.r.Settings().Bool("compare.chooser.resolve-typed") {
+	if c == nil || a.r.Settings().Int("comparison.commit-search-depth") > 0 || !a.r.Settings().Bool("comparison.chooser.resolve-typed") {
 		return false
 	}
 	query, source := c.Query(), c.Source()

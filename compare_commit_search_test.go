@@ -220,13 +220,13 @@ func TestCommitSearchQueryCancelsAndRejectsStaleRows(t *testing.T) {
 
 func TestCompareCommitSearchSetting(t *testing.T) {
 	a, _ := compareStory(t)
-	if a.r.Settings().Int("compare.commit-search-depth") != 100 {
+	if a.r.Settings().Int("comparison.commit-search-depth") != 100 {
 		t.Fatal("default depth")
 	}
-	if _, err := a.r.Settings().SetSession("compare.commit-search-depth", -1); err == nil {
+	if _, err := a.r.Settings().SetSession("comparison.commit-search-depth", -1); err == nil {
 		t.Fatal("negative depth accepted")
 	}
-	if _, err := a.r.Settings().SetSession("compare.commit-search-depth", 0); err != nil {
+	if _, err := a.r.Settings().SetSession("comparison.commit-search-depth", 0); err != nil {
 		t.Fatal(err)
 	}
 	keys(t, a, "f")
@@ -247,7 +247,7 @@ func TestCompareCommitSearchContinuesRepeatedly(t *testing.T) {
 	a := open(t, dir)
 	a.r.Config().StateDir = t.TempDir()
 	storyRequest(t, a, "open", nil)
-	if _, err := a.r.Settings().SetSession("compare.commit-search-depth", 25); err != nil {
+	if _, err := a.r.Settings().SetSession("comparison.commit-search-depth", 25); err != nil {
 		t.Fatal(err)
 	}
 	keys(t, a, "t")

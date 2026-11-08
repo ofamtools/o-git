@@ -196,14 +196,14 @@ func TestCommitSettingsFormatsAndCopies(t *testing.T) {
 		t.Fatal(err)
 	}
 	a.r.Config().Disable()
-	if !a.r.Settings().Bool("compare.commits.split") || a.r.Settings().Int("compare.commits.limit") != 500 {
+	if !a.r.Settings().Bool("comparison.commits.split") || a.r.Settings().Int("comparison.commits.limit") != 500 {
 		t.Fatal("wrong defaults")
 	}
-	if _, err := a.r.Settings().SetSession("compare.commits.limit", -1); err == nil {
+	if _, err := a.r.Settings().SetSession("comparison.commits.limit", -1); err == nil {
 		t.Fatal("negative setting accepted")
 	}
 	for _, split := range []bool{true, false} {
-		if _, err := a.r.Settings().SetSession("compare.commits.split", split); err != nil {
+		if _, err := a.r.Settings().SetSession("comparison.commits.split", split); err != nil {
 			t.Fatal(err)
 		}
 		for _, format := range []string{"table", "markdown", "toon"} {
@@ -219,13 +219,13 @@ func TestCommitSettingsFormatsAndCopies(t *testing.T) {
 	}
 	var out, stderr strings.Builder
 	a.Stdout, a.Stderr = &out, &stderr
-	if err := a.Shell().Run(context.Background(), []string{"commit", "copy", "HEAD", "--repo", dir}); err != nil {
+	if err := a.Shell().Run(context.Background(), []string{"commit", "yank", "HEAD", "--repo", dir}); err != nil {
 		t.Fatal(err)
 	}
 	if got := a.r.Registers().Named["\""].Yank.Text; got != sh(t, dir, "rev-parse", "HEAD") {
 		t.Fatalf("copied %q", got)
 	}
-	rows := decode[[]ochazuke.ListItem](t, run(t, "", "compare", "commits", "--from", "HEAD~1", "--to", "HEAD", "--repo", dir, "--limit", "0"))
+	rows := decode[[]ochazuke.ListItem](t, run(t, "", "comparison", "commits", "--from", "HEAD~1", "--to", "HEAD", "--repo", dir, "--limit", "0"))
 	if len(rows) != 1 || commitData(t, rows[0]).More != 1 {
 		t.Fatalf("limit override %+v", rows)
 	}

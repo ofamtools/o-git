@@ -17,7 +17,7 @@ func (a *App) registerDiffVerbs() error {
 		op := a.r.Operations.At(ochazuke.Key(key))
 		op.Parameters = map[string]ochazuke.Parameter{
 			"repo":    {Type: "string", Description: "repository directory or o-proj name; default current repository"},
-			"context": {Type: "integer", Description: "context lines; defaults to compare.diff.context"},
+			"context": {Type: "integer", Description: "context lines; defaults to comparison.diff.context"},
 			"output":  {Type: "string", Enum: []string{"plain", "json"}, Description: "exact unified patch text (default plain), or structured JSON"},
 		}
 		if key == "change.diff" {
@@ -35,7 +35,7 @@ func (a *App) registerDiffVerbs() error {
 }
 
 func (a *App) diffOptions(c ochazuke.Ctx) DiffOptions {
-	return DiffOptions{Path: ochazuke.StringArg(c.Args, "path", ""), Context: ochazuke.IntArg(c.Args, "context", a.r.Settings().Int("compare.diff.context")), MaxLines: a.r.Settings().Int("compare.diff.max-lines"), Plain: ochazuke.StringArg(c.Args, "output", "plain") == "plain"}
+	return DiffOptions{Path: ochazuke.StringArg(c.Args, "path", ""), Context: ochazuke.IntArg(c.Args, "context", a.r.Settings().Int("comparison.diff.context")), MaxLines: a.r.Settings().Int("comparison.diff.max-lines"), Plain: ochazuke.StringArg(c.Args, "output", "plain") == "plain"}
 }
 
 func diffOutput(results []DiffResult, plain bool) any {
@@ -111,7 +111,7 @@ func (a *App) commitDiff(c ochazuke.Ctx) ochazuke.Result {
 			}
 			p := makeComparison(r.dir, sha, from.Spec, sha, from, to)
 			if parent == "" {
-				p.State = "root commit: empty tree"
+				p.Status = "root commit: empty tree"
 			}
 			d, err := BuildDiff(r.ctx, p, opt)
 			if err != nil {

@@ -416,10 +416,10 @@ func TestDiffDegenerateRootUnbornAndSettings(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if a.r.Settings().Int("compare.diff.context") != 3 || a.r.Settings().Int("compare.diff.max-lines") != defaultDiffLines {
+	if a.r.Settings().Int("comparison.diff.context") != 3 || a.r.Settings().Int("comparison.diff.max-lines") != defaultDiffLines {
 		t.Fatal("setting defaults")
 	}
-	for name, value := range map[string]string{"compare.diff.context": "-1", "compare.diff.max-lines": "0"} {
+	for name, value := range map[string]string{"comparison.diff.context": "-1", "comparison.diff.max-lines": "0"} {
 		if err := a.r.Settings().Set(name, value); err == nil {
 			t.Errorf("accepted %s=%s", name, value)
 		}

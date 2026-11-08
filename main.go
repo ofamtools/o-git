@@ -2,13 +2,13 @@
 // knows (and any directory named), their worktrees and their branches,
 // through the git CLI. Fetches only on explicit request; never pulls, pushes or tags.
 //
-//	o-git repo list|status|show|state [REPO] [--path DIR,...]
+//	o-git repo list|show|lists [REPO] [--path DIR,...]
 //	o-git worktree list [REPO] | add BRANCH [PATH] [--repo R] [--from REF] | remove PATH [--force] [--yes]
 //	o-git branch list [REPO] | create NAME [FROM] [--switch] | switch NAME | delete NAME [--repo R] [--force] [--yes]
 //	o-git [view] [--page git|compare] [--repo DIR] [--path DIR,...] [--smoke]
 //	o-git catalog
 //
-// Every NOUN VERB command prints JSON (repo state: JSON Lines).
+// Every NOUN VERB command prints JSON (repo lists: JSON Lines).
 package main
 
 import (

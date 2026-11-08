@@ -175,7 +175,7 @@ func TestChangeCopyDetectionSetting(t *testing.T) {
 		t.Fatal(err)
 	}
 	a.r.Config().Disable()
-	const setting = "compare.files.find-copies-harder"
+	const setting = "comparison.files.find-copies-harder"
 	if a.r.Settings().Bool(setting) {
 		t.Fatal("harder copy search must default to false")
 	}
@@ -198,7 +198,7 @@ func TestChangeCopyDetectionSetting(t *testing.T) {
 		}
 		for _, command := range [][]string{
 			{"change", "list", "--from", "HEAD~1", "--to", "HEAD"},
-			{"compare", "files", "--from", "HEAD~1", "--to", "HEAD"},
+			{"comparison", "files", "--from", "HEAD~1", "--to", "HEAD"},
 			{"commit", "files", "HEAD"},
 			{"change", "show", "copied", "--from", "HEAD~1", "--to", "HEAD"},
 		} {
@@ -327,7 +327,7 @@ func TestChangeShowCopyAndPinnedFlags(t *testing.T) {
 	a.r.Config().Disable()
 	var out, stderr strings.Builder
 	a.Stdout, a.Stderr = &out, &stderr
-	if err := a.Shell().Run(context.Background(), []string{"change", "copy", "README", "--repo", dir}); err != nil {
+	if err := a.Shell().Run(context.Background(), []string{"change", "yank", "README", "--repo", dir}); err != nil {
 		t.Fatal(err)
 	}
 	if got := a.r.Registers().Named["\""].Yank.Text; got != "README" {

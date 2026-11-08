@@ -3,7 +3,7 @@
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ┏━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ pair          from     to        ↑  ↓  files  fetched  state             ┃
+  ┃ pair          from     to        ↑  ↓  files  fetched  status            ┃
   ┃ (custom) +1   <sha>  WORKTREE  -  -  1      -        the working tree… ┃
   ┃ upstream      -        HEAD      -  -  -      -        no upstream       ┃
   ┃ main +2       main     HEAD      1  0  1      -        ready             ┃
@@ -36,4 +36,4 @@
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ── picker.pick done ────────────────────────────────────────────────────────
-  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …
+  enter comparison.open · y y comparison.yank · f from · t to · ~ comparison.…

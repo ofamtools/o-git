@@ -24,13 +24,13 @@ import (
 
 func (a *App) registerVerbs() {
 	r := a.r
+	r.Define("repo").Main() // the tool's main noun: `o-git list` is `repo list`
 	r.Define("repo").
-		Verb("list", a.repoList, "every repository o-proj lists, plus --path directories, with its status: rows {noun, id: repo/DIR, label, data: {name, path, state, branch, head, upstream, ahead, behind, staged, unstaged, untracked, conflicts}, cells}").Rows("repo").Fetch().Quiet().Positional("path").
-		Verb("status", a.repoStatus, "one repository's status: {name, path, state, branch, head, detached, upstream, gone, ahead, behind, staged, unstaged, untracked, conflicts}").Fetch().Quiet().Positional("repo").
+		Verb("list", a.repoList, "every repository o-proj lists, plus --path directories, with its status: rows {noun, id: repo/DIR, label, data: {name, path, status, branch, head, upstream, ahead, behind, staged, unstaged, untracked, conflicts}, cells}").Rows("repo").Fetch().Quiet().Positional("path").
 		Verb("show", a.repoShow, "one repository's status, worktrees and branches: {repo, worktrees, branches}; the TUI shows them and moves to its worktrees").Fetch().Quiet().Positional("repo").
-		Verb("state", a.repoState, "every list's rows in one answer, JSON Lines {noun, id, label, data, cells}: each repository, then every repository's worktrees, then its branches (the catalog's state)").State().Fetch().Quiet().Positional("path")
+		Verb("lists", a.repoLists, "every list's rows in one answer, JSON Lines {noun, id, label, data, cells}: each repository, then every repository's worktrees, then its branches (the catalog's state source)").Lists().Fetch().Quiet().Positional("path")
 	r.Define("worktree").
-		Verb("list", a.worktreeList, "a repository's worktrees, the main one first: rows {noun, id: worktree/PATH, label, data: {repo, path, head, branch, detached, bare, main, locked, prunable, state, changes}, cells}").Rows("worktree").Fetch().Quiet().Positional("repo").
+		Verb("list", a.worktreeList, "a repository's worktrees, the main one first: rows {noun, id: worktree/PATH, label, data: {repo, path, head, branch, detached, bare, main, locked, prunable, status, changes}, cells}").Rows("worktree").Fetch().Quiet().Positional("repo").
 		Verb("add", a.worktreeAdd, "add a worktree for BRANCH (created from --from, else HEAD, when it does not exist) at PATH, default REPO-BRANCH beside the main worktree").Positional("branch", "path").
 		Verb("remove", a.worktreeRemove, "remove the worktree at PATH; refuses the main one, and a dirty one unless --force").Destructive().Confirm("Remove worktree {{label}}?").Positional("path")
 	r.Define("branch").
@@ -52,9 +52,8 @@ func (a *App) registerVerbs() {
 		r.Operations.Set(op)
 	}
 	set("repo.list", "row[]", map[string]ochazuke.Parameter{"path": paths})
-	set("repo.status", "repo", map[string]ochazuke.Parameter{"repo": repo})
 	set("repo.show", "{repo, worktrees, branches}", map[string]ochazuke.Parameter{"repo": repo})
-	set("repo.state", "JSON Lines of rows", map[string]ochazuke.Parameter{"path": paths})
+	set("repo.lists", ochazuke.ResultLists, map[string]ochazuke.Parameter{"path": paths})
 	set("worktree.list", "row[]", map[string]ochazuke.Parameter{"repo": repo})
 	set("worktree.add", "{repo, path, branch, created}", map[string]ochazuke.Parameter{
 		"repo":   repo,
@@ -142,17 +141,6 @@ func (a *App) repoList(c ochazuke.Ctx) ochazuke.Result {
 	})
 }
 
-func (a *App) repoStatus(c ochazuke.Ctx) ochazuke.Result {
-	word := a.repoWord(c)
-	return ochazuke.Pending(func(ctx context.Context) (any, error) {
-		name, dir, err := resolve(ctx, word)
-		if err != nil {
-			return nil, err
-		}
-		return inspect(ctx, name, dir), nil
-	})
-}
-
 func (a *App) repoShow(c ochazuke.Ctx) ochazuke.Result {
 	name := ""
 	if r, ok := rowData[Repo](c); ok && ochazuke.StringArg(c.Args, "repo", "") == "" {
@@ -185,7 +173,7 @@ func (a *App) show(word, name string, focus bool) ochazuke.Result {
 	})
 }
 
-func (a *App) repoState(c ochazuke.Ctx) ochazuke.Result {
+func (a *App) repoLists(c ochazuke.Ctx) ochazuke.Result {
 	extra := append(append([]string{}, a.Paths...), splitPaths(ochazuke.StringArg(c.Args, "path", ""))...)
 	now := a.Now()
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {

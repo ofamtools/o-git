@@ -166,9 +166,9 @@ func Toplevel(ctx context.Context, dir string) (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
-// Status is one worktree's state: its branch, how it stands against its
+// TreeStatus is one worktree's state: its branch, how it stands against its
 // upstream, and its changes by kind.
-type Status struct {
+type TreeStatus struct {
 	Branch    string `json:"branch,omitempty"` // "" when detached or before the first commit's branch exists
 	Head      string `json:"head,omitempty"`   // the short commit id, "" before the first commit
 	Detached  bool   `json:"detached,omitempty"`
@@ -183,16 +183,16 @@ type Status struct {
 }
 
 // Changed is the number of paths with any change.
-func (s Status) Changed() int { return s.Staged + s.Unstaged + s.Untracked + s.Conflicts }
+func (s TreeStatus) Changed() int { return s.Staged + s.Unstaged + s.Untracked + s.Conflicts }
 
 // Dirty reports whether the worktree has changes, untracked files included.
-func (s Status) Dirty() bool { return s.Changed() > 0 }
+func (s TreeStatus) Dirty() bool { return s.Changed() > 0 }
 
 // ReadStatus reads dir's status (git status --porcelain=v2).
-func ReadStatus(ctx context.Context, dir string) (Status, error) {
+func ReadStatus(ctx context.Context, dir string) (TreeStatus, error) {
 	out, err := git(ctx, readTimeout, dir, "status", "--porcelain=v2", "-z", "--branch", "--untracked-files=all", "--ignore-submodules=none")
 	if err != nil {
-		return Status{}, err
+		return TreeStatus{}, err
 	}
 	return parseStatus(out)
 }
@@ -200,8 +200,8 @@ func ReadStatus(ctx context.Context, dir string) (Status, error) {
 // parseStatus reads porcelain v2 -z output: "# branch.*" headers, then one
 // NUL-terminated record per path (a rename's record is followed by its
 // source path). A staged and unstaged change to one path counts in both.
-func parseStatus(out []byte) (Status, error) {
-	var s Status
+func parseStatus(out []byte) (TreeStatus, error) {
+	var s TreeStatus
 	upstream := false
 	fields := strings.Split(string(out), "\x00")
 	for i := 0; i < len(fields); i++ {

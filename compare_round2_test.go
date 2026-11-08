@@ -274,7 +274,7 @@ func TestCompareRound2ResolvedColumns(t *testing.T) {
 		t.Errorf("lost spec: %+v", p.From)
 	}
 	found := false
-	for i, c := range columns["compare"] {
+	for i, c := range columns["comparison"] {
 		if c.Title == "spec" {
 			found = true
 			if row.Cells[i] != "{upstream}..HEAD" {
@@ -323,7 +323,7 @@ func TestCompareRound2ShallowCounts(t *testing.T) {
 	sh(t, d, "clone", "-q", "--depth=1", "file://"+d, clone)
 	r := compareResolver(t, clone, compareDefaults())
 	p := r.Show("", "HEAD", "HEAD")[0]
-	if !p.Available || p.Ahead != 0 || p.Behind != 0 || !strings.Contains(p.State, "counts limited by shallow clone") {
+	if !p.Available || p.Ahead != 0 || p.Behind != 0 || !strings.Contains(p.Status, "counts limited by shallow clone") {
 		t.Fatalf("%+v", p)
 	}
 }

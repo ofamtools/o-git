@@ -1,0 +1,4 @@
+# lexiconcheck baseline: rule, subject. Only shrinks.
+# Both rows are ochazuke/diffview's framework noun ochazuke.diff (a noun that is also the verb diff, which o-git uses on commit and change). Fix upstream in diffview.
+noun-action	diff
+word-part	diff

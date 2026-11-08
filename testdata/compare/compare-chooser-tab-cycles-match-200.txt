@@ -3,7 +3,7 @@
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ╭─ Pairs 5 ──────────────────────────────────────────────────────────────────╮ ╭─ Commits ─────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-  │ pair          from  to        ↑  ↓  files  fetched  state                  │ │ the working tree is not a commit                                                                                  │
+  │ pair          from  to        ↑  ↓  files  fetched  status                 │ │ the working tree is not a commit                                                                                  │
   │ dirty         HEAD  WORKTREE  -  -  1      -        the working tree is n… │ │                                                                                                                   │
   │ upstream      -     HEAD      -  -  -      -        no upstream            │ │                                                                                                                   │
   │ main +2       main  HEAD      1  0  1      -        ready                  │ │                                                                                                                   │

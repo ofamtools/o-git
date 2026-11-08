@@ -1,0 +1,42 @@
+kind	old	new	note
+noun	git.compare	git.comparison	word compare is only a verb; the noun is the saved pair. CLI: `o-git comparison list|show|fetch|yank|...`; row ids comparison/REPO:SOURCE:NAME; binding context compare/normal is comparison/normal
+verb	git.compare.copy	git.comparison.yank	clipboard copy is yank
+verb	git.commit.copy	git.commit.yank	clipboard copy is yank; binding rows `y y` follow
+verb	git.change.copy	git.change.yank	clipboard copy is yank
+verb	git.endpoint.copy	git.endpoint.yank	clipboard copy is yank
+verb	git.repo.state	git.repo.lists	every list's rows (the catalog's state source, Result lists); the word state is a status field, never a verb. A host finds it by Result, not by name
+verb	git.repo.status	git.repo.get {prop: status}	status is a prop (clean, dirty, missing, not-repo, error); the full record is `repo show REPO` (its repo field) or `repo get`
+prop	git.repo.state / condition	git.repo.status	field and JSON key state (store prop was condition) is status
+prop	git.worktree.state / condition	git.worktree.status	field and JSON key state (store prop was condition) is status
+prop	git.comparison.state	git.comparison.status	Comparison.State / JSON key state is status
+prop	git.comparison.pairs[].state	git.comparison.pairs[].status	pair rows
+column	state (repos, worktrees, endpoints, comparisons)	status	list column title and the detail pane line
+setting	compare.commit-search-depth	comparison.commit-search-depth	settings follow the noun
+setting	compare.pairs	comparison.pairs	settings follow the noun
+setting	compare.pairs.width-percent	comparison.pairs.width-percent	
+setting	compare.chooser.resolve-typed	comparison.chooser.resolve-typed	
+setting	compare.copy-feedback	comparison.copy-feedback	
+setting	compare.endpoints	comparison.endpoints	
+setting	compare.main	comparison.main	
+setting	compare.main-names	comparison.main-names	
+setting	compare.collapse	comparison.collapse	
+setting	compare.default-pair	comparison.default-pair	
+setting	compare.stale-after	comparison.stale-after	
+setting	compare.files.follow-commit	comparison.files.follow-commit	
+setting	compare.files.find-copies-harder	comparison.files.find-copies-harder	
+setting	compare.commits.split	comparison.commits.split	
+setting	compare.commits.limit	comparison.commits.limit	
+setting	compare.diff.layout	comparison.diff.layout	
+setting	compare.diff.highlight	comparison.diff.highlight	
+setting	compare.diff.context	comparison.diff.context	
+setting	compare.diff.max-lines	comparison.diff.max-lines	
+binding	git.compare.*  (compare.set/swap/fetch/reload/open/show/save/close/commit-open/file-open/pair-files/commits/files)	git.comparison.*	bindings.json / actions.json rows naming the verbs
+binding	commit.copy, change.copy, compare.copy (y y)	commit.yank, change.yank, comparison.yank	default rows are already rewritten; user rows need the rewrite
+binding-context	compare/normal	comparison/normal	list-row context of the saved pairs
+noun	git (page kind)	git-page	the page's instance kind no longer collides with the namespace; page id git, --page git and --page compare are unchanged
+noun	compare-page	compare-page	unchanged; classified in the word list
+go	git.Status (type)	git.TreeStatus	freed the name for the Status field of Repo; embedded in Repo
+go	ochazuke.List	ochazuke.Collection	framework v0.104.0
+go	NounBuilder.State()	NounBuilder.Lists()	framework v0.105.0
+namespace	git	git	unchanged; main noun repo (`o-git list` is `repo list`)
+lexiconcheck	noun-action diff; word-part diff	(baseline rows)	ochazuke/diffview registers the framework noun ochazuke.diff, a noun and an action word; fixed upstream in diffview

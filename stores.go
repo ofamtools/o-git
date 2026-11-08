@@ -16,13 +16,12 @@ func (a *App) defineStores() {
 		"pair": {Type: "string", Description: "comparison as in compare.show; --pair excludes --from/--to"},
 	}
 	a.r.DefineListFacts([]ochazuke.ListFacts{
-		{Noun: "repo", Sample: Repo{}, Rename: map[string]string{"state": "condition"},
-			ListParams: map[string]ochazuke.Parameter{"path": {Type: "string", Description: "extra repository directories, comma-separated, listed after o-proj's"}}, List: a.repoList},
-		{Noun: "worktree", Sample: WorktreeRow{}, Rename: map[string]string{"state": "condition"}, ListParams: inRepo, List: a.worktreeList},
+		{Noun: "repo", Sample: Repo{}, ListParams: map[string]ochazuke.Parameter{"path": {Type: "string", Description: "extra repository directories, comma-separated, listed after o-proj's"}}, List: a.repoList},
+		{Noun: "worktree", Sample: WorktreeRow{}, ListParams: inRepo, List: a.worktreeList},
 		{Noun: "branch", Sample: BranchRow{}, ListParams: inRepo, List: a.branchList},
 		{Noun: "commit", Sample: Commit{}, ListParams: pair, List: a.commitList},
 		{Noun: "change", Sample: Change{}, ListParams: pair, List: a.changeList},
 		{Noun: "endpoint", Sample: Endpoint{}, ListParams: inRepo, List: a.endpointList},
-		{Noun: "compare", Sample: Comparison{}, ListParams: inRepo, List: a.compareList},
+		{Noun: "comparison", Sample: Comparison{}, ListParams: inRepo, List: a.compareList},
 	}...)
 }

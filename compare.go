@@ -23,7 +23,7 @@ type Comparison struct {
 	Available     bool         `json:"available"`
 	Reason        string       `json:"reason"`
 	Detail        string       `json:"detail,omitempty"`
-	State         string       `json:"state"`
+	Status        string       `json:"status"`
 	CommitsReason string       `json:"commits_reason,omitempty"`
 	Reversed      bool         `json:"reversed"`
 	Remotes       []string     `json:"remotes,omitempty"`
@@ -86,27 +86,27 @@ func makeComparison(dir, name, from, to string, f, t Endpoint) Comparison {
 		c.Stale = c.Stale || e.Stale
 	}
 	if !c.Available {
-		c.State = c.Reason
+		c.Status = c.Reason
 		return c
 	}
-	c.State = "ready"
+	c.Status = "ready"
 	if isMutable(f) || isMutable(t) {
 		c.CommitsReason = "the working tree is not a commit"
-		c.State = c.CommitsReason
+		c.Status = c.CommitsReason
 		if isMutable(f) && !isMutable(t) {
 			c.Reversed = true
-			c.State = "reversed: the working tree is on the left"
+			c.Status = "reversed: the working tree is on the left"
 		}
 	}
 	if endpointKey(f) == endpointKey(t) {
-		c.State = "same commit: nothing differs"
+		c.Status = "same commit: nothing differs"
 	}
 	if f.Kind == "empty" || t.Kind == "empty" {
-		c.State = "unborn HEAD: empty tree"
+		c.Status = "unborn HEAD: empty tree"
 	}
 	for _, e := range []Endpoint{f, t} {
-		if e.Note != "" && !strings.Contains(c.State, e.Note) {
-			c.State += "; " + e.Note
+		if e.Note != "" && !strings.Contains(c.Status, e.Note) {
+			c.Status += "; " + e.Note
 		}
 	}
 	return c
@@ -286,7 +286,7 @@ func (r *EndpointResolver) countPairs(pairs []Comparison) {
 	var keys []string
 	for i, c := range pairs {
 		if r.shallow != "" && c.Available && !isMutable(c.From) && !isMutable(c.To) {
-			pairs[i].State += "; counts limited by shallow clone"
+			pairs[i].Status += "; counts limited by shallow clone"
 		}
 		if !c.Available || isMutable(c.From) || isMutable(c.To) || endpointKey(c.From) == endpointKey(c.To) {
 			continue
@@ -306,7 +306,7 @@ func (r *EndpointResolver) countPairs(pairs []Comparison) {
 				if timedOut(err) {
 					reason = "commit counts timed out"
 				}
-				pairs[j].Available, pairs[j].Reason, pairs[j].State, pairs[j].Detail = false, reason, reason, err.Error()
+				pairs[j].Available, pairs[j].Reason, pairs[j].Status, pairs[j].Detail = false, reason, reason, err.Error()
 			} else {
 				pairs[j].Ahead, pairs[j].Behind = counts.Ahead, counts.Behind
 			}

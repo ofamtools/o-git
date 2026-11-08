@@ -36,7 +36,7 @@ func pageFileCounts(ctx context.Context, data comparePageData, copies bool) comp
 			continue
 		}
 		if errs[i] != nil {
-			data.Pairs[i].State = "files unavailable"
+			data.Pairs[i].Status = "files unavailable"
 			data.Pairs[i].Detail = errs[i].Error()
 			continue
 		}
@@ -118,7 +118,7 @@ func (a *App) followCompare() bool {
 	_ = p.commits.SetItems(nil)
 	_ = p.files.SetItems(nil)
 	s := a.r.Settings()
-	limit, split, copies := s.Int("compare.commits.limit"), s.Bool("compare.commits.split"), s.Bool("compare.files.find-copies-harder")
+	limit, split, copies := s.Int("comparison.commits.limit"), s.Bool("comparison.commits.split"), s.Bool("comparison.files.find-copies-harder")
 	cols := commitColumns(split)
 	for i := range cols {
 		switch cols[i].Title {
@@ -167,7 +167,7 @@ func (a *App) followCompare() bool {
 			_ = p.files.SetItems(p.pairFiles)
 		}
 	})
-	return a.launch(pairsID, "compare.show", res)
+	return a.launch(pairsID, "comparison.show", res)
 }
 
 func endpointDetail(e Endpoint) string {
@@ -210,7 +210,7 @@ func (a *App) compareDetail() string {
 		return "Reading selected comparison…"
 	}
 	row := comparisonRow(*p, a.Now())
-	text := fmt.Sprintf("%s\nfrom  %s\nto    %s\n↑%s ↓%s\n%s", strings.Join(p.Names, " · "), endpointDetail(p.From), endpointDetail(p.To), row.Cells[3], row.Cells[4], p.State)
+	text := fmt.Sprintf("%s\nfrom  %s\nto    %s\n↑%s ↓%s\n%s", strings.Join(p.Names, " · "), endpointDetail(p.From), endpointDetail(p.To), row.Cells[3], row.Cells[4], p.Status)
 	if p.Fetched != nil {
 		text += "\nas of the last fetch, " + fetchedText(p.Fetched, false, a.Now()) + " ago"
 	}

@@ -324,7 +324,7 @@ func TestCompareDegeneratePairs(t *testing.T) {
 	} {
 		t.Run(tc.from+".."+tc.to, func(t *testing.T) {
 			p := r.Show("", tc.from, tc.to)[0]
-			if p.Available != tc.available || !strings.Contains(p.State, tc.state) || p.Ahead != tc.ahead || p.Behind != tc.behind {
+			if p.Available != tc.available || !strings.Contains(p.Status, tc.state) || p.Ahead != tc.ahead || p.Behind != tc.behind {
 				t.Fatalf("%+v", p)
 			}
 		})
@@ -416,7 +416,7 @@ func TestCompareSettingsAndCLI(t *testing.T) {
 	d := newRepo(t, "r")
 	addBareRemote(t, d, "origin")
 	addBareRemote(t, d, "upstream")
-	for _, noun := range []string{"endpoint", "compare"} {
+	for _, noun := range []string{"endpoint", "comparison"} {
 		rows := decode[[]row[map[string]any]](t, run(t, "", noun, "list", d))
 		if len(rows) == 0 {
 			t.Fatal("no rows")
@@ -433,7 +433,7 @@ func TestCompareSettingsAndCLI(t *testing.T) {
 		}
 		for _, format := range []string{"table", "markdown", "toon"} {
 			text := run(t, "", noun, "list", d, "--format", format)
-			if !strings.Contains(text, map[string]string{"endpoint": "head", "compare": "dirty"}[noun]) {
+			if !strings.Contains(text, map[string]string{"endpoint": "head", "comparison": "dirty"}[noun]) {
 				t.Fatalf("%s: %s", format, text)
 			}
 		}
@@ -442,11 +442,11 @@ func TestCompareSettingsAndCLI(t *testing.T) {
 	if !e.Available || e.SHA != sh(t, d, "rev-parse", "HEAD") {
 		t.Fatalf("%+v", e)
 	}
-	p := decode[Comparison](t, run(t, "", "compare", "show", "--pair", "dirty", "--repo", d))
+	p := decode[Comparison](t, run(t, "", "comparison", "show", "--pair", "dirty", "--repo", d))
 	if !p.Available || p.To.Kind != "worktree" {
 		t.Fatalf("%+v", p)
 	}
-	if _, _, err := try("", "compare", "show", "--pair", "dirty", "--from", "HEAD", "--repo", d); err == nil {
+	if _, _, err := try("", "comparison", "show", "--pair", "dirty", "--from", "HEAD", "--repo", d); err == nil {
 		t.Fatal("accepted ambiguous selector")
 	}
 	a, err := New()
@@ -459,13 +459,13 @@ func TestCompareSettingsAndCLI(t *testing.T) {
 		t.Fatalf("%+v", cfg)
 	}
 	s := a.r.Settings()
-	if !s.Bool("compare.commits.split") || s.Int("compare.commits.limit") != 500 || s.Int("compare.diff.context") != 3 || s.Int("compare.diff.max-lines") != defaultDiffLines {
+	if !s.Bool("comparison.commits.split") || s.Int("comparison.commits.limit") != 500 || s.Int("comparison.diff.context") != 3 || s.Int("comparison.diff.max-lines") != defaultDiffLines {
 		t.Fatal("combined commit and diff setting defaults")
 	}
-	if err := a.r.Settings().Set("compare.stale-after", "-1s"); err == nil {
+	if err := a.r.Settings().Set("comparison.stale-after", "-1s"); err == nil {
 		t.Fatal("negative stale age")
 	}
-	if err := a.r.Settings().Set("compare.main", "absent"); err != nil {
+	if err := a.r.Settings().Set("comparison.main", "absent"); err != nil {
 		t.Fatal(err)
 	}
 	if oneEndpoint(t, compareResolver(t, d, a.compareConfig()), "{main}").Available {
@@ -493,13 +493,13 @@ func TestCompareCopyUsesRegisters(t *testing.T) {
 		want string
 	}{
 		{"endpoint", ochazuke.Arguments{"repo": d, "spec": "HEAD"}, sh(t, d, "rev-parse", "HEAD")},
-		{"compare", ochazuke.Arguments{"repo": d, "from": "HEAD", "to": "HEAD"}, sh(t, d, "rev-parse", "HEAD") + ".." + sh(t, d, "rev-parse", "HEAD")},
+		{"comparison", ochazuke.Arguments{"repo": d, "from": "HEAD", "to": "HEAD"}, sh(t, d, "rev-parse", "HEAD") + ".." + sh(t, d, "rev-parse", "HEAD")},
 	} {
 		// Shell settles pending work and delivers the register write on its loop.
 		var out strings.Builder
 		a.Stdout = &out
 		a.Stderr = &strings.Builder{}
-		args := []string{tc.noun, "copy", "--repo", d}
+		args := []string{tc.noun, "yank", "--repo", d}
 		for _, key := range []string{"spec", "from", "to"} {
 			if v, ok := tc.args[key]; ok {
 				args = append(args, "--"+key, v.(string))

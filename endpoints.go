@@ -206,7 +206,7 @@ func (r *EndpointResolver) detectMain() {
 			}
 		}
 	}
-	r.mainReason = "no main branch (set compare.main or compare.main-names)"
+	r.mainReason = "no main branch (set comparison.main or comparison.main-names)"
 }
 
 // expandAlias keeps cycles visible rather than falling through to a different

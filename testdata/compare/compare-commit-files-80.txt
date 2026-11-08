@@ -3,7 +3,7 @@
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ╭─ Pairs 6 ────────────────────────────────────────────────────────────────╮
-  │ pair          from     to        ↑  ↓  files  fetched  state             │
+  │ pair          from     to        ↑  ↓  files  fetched  status            │
   │ dirty         HEAD     WORKTREE  -  -  1      -        the working tree… │
   │ upstream      -        HEAD      -  -  -      -        no upstream       │
   │ main          main     HEAD      1  1  2      -        ready             │
@@ -36,4 +36,4 @@
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  enter compare.file-open · y y change.copy · esc compare.pair-files · f from…
+  enter comparison.file-open · y y change.yank · esc comparison.pair-files · …

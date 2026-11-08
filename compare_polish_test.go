@@ -34,7 +34,7 @@ func TestComparePolishStories(t *testing.T) {
 	})
 	t.Run("git/compare-chooser-tab-cycles-match", func(t *testing.T) {
 		a, _ := compareStory(t)
-		if _, err := a.r.Settings().SetSession("compare.commit-search-depth", 0); err != nil {
+		if _, err := a.r.Settings().SetSession("comparison.commit-search-depth", 0); err != nil {
 			t.Fatal(err)
 		}
 		keys(t, a, "f")

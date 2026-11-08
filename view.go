@@ -35,7 +35,7 @@ func dataPage() ocli.CatalogPage {
 			{ID: worktreesID, Noun: "worktree", Title: "Worktrees"},
 		},
 		Detail: &ocli.CatalogDetail{Fields: []string{
-			"name", "repo", "path", "branch", "state", "error", "head",
+			"name", "repo", "path", "branch", "status", "error", "head",
 			"commit", "subject", "author", "date",
 			"current", "worktree", "main", "upstream", "gone", "ahead", "behind", "merged",
 			"staged", "unstaged", "untracked", "conflicts", "changes",
@@ -55,7 +55,7 @@ func (a *App) render(r *ochazuke.Runtime, width, height int) ochazuke.Block {
 	if bh < 8 || width < 20 {
 		return ochazuke.Text(status)
 	}
-	panel := func(title string, list *ochazuke.List, w, h int) ochazuke.Block {
+	panel := func(title string, list *ochazuke.Collection, w, h int) ochazuke.Block {
 		cw, ch := ochazuke.PanelContentSize(w, h)
 		return l.PanelBlock(title, ochazuke.Text(list.View(cw, ch)), w, h, list.Focused())
 	}
@@ -103,7 +103,7 @@ func (a *App) render(r *ochazuke.Runtime, width, height int) ochazuke.Block {
 func (a *App) statusLine() string {
 	parts := []string{fmt.Sprintf("%d repos", a.repos.Len())}
 	if s := a.shown; s != nil {
-		parts = append(parts, s.Name+" "+tilde(s.Path)+" on "+branchText(s.Status)+" "+changesText(s.Status))
+		parts = append(parts, s.Name+" "+tilde(s.Path)+" on "+branchText(s.TreeStatus)+" "+changesText(s.TreeStatus))
 	}
 	if a.loading != "" {
 		parts = append(parts, "reading "+tilde(a.loading)+"…")
@@ -133,19 +133,19 @@ func (a *App) detailText() string {
 	switch d := data.(type) {
 	case Repo:
 		line("repo", d.Name+"  "+tilde(d.Path))
-		line("state", d.State)
+		line("status", d.Status)
 		line("error", d.Error)
 		if d.Error == "" {
-			line("branch", strings.TrimSpace(branchText(d.Status)+" "+shortSHA(d.Head)))
+			line("branch", strings.TrimSpace(branchText(d.TreeStatus)+" "+shortSHA(d.Head)))
 			if d.Upstream != "" {
 				line("upstream", d.Upstream+" "+syncText(d.Upstream, d.Gone, d.Ahead, d.Behind))
 			}
-			line("changes", changeWords(d.Status))
+			line("changes", changeWords(d.TreeStatus))
 		}
 	case WorktreeRow:
 		line("worktree", tilde(d.Path))
 		line("branch", strings.TrimSpace(worktreeCells(d)[0]+" "+shortSHA(d.Head)))
-		line("state", worktreeState(d))
+		line("status", worktreeState(d))
 		line("locked", d.Locked)
 		line("prunable", d.Prunable)
 		line("error", d.Error)
@@ -177,7 +177,7 @@ func (a *App) detailText() string {
 }
 
 // changeWords is a status's changes in words, the nonzero kinds only.
-func changeWords(s Status) string {
+func changeWords(s TreeStatus) string {
 	var parts []string
 	for _, p := range []struct {
 		n    int

@@ -3,7 +3,7 @@
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ┏━ Pairs 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ╭─ Commits ─────────────────────────────────────────────────────────╮
-  ┃ pair          ↑  ↓  fil…  state         3› ┃ │ same commit: nothing differs                                      │
+  ┃ pair          ↑  ↓  fil…  status        3› ┃ │ same commit: nothing differs                                      │
   ┃ dirty         -  -  1     the working…     ┃ │                                                                   │
   ┃ upstream      -  -  -     no upstream      ┃ │                                                                   │
   ┃ main +6       0  0  0     same commit…     ┃ │                                                                   │
@@ -35,5 +35,5 @@
   ┃                                            ┃ │                                                                   │
   ┃                                            ┃ │                                                                   │
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ╰───────────────────────────────────────────────────────────────────╯
-  ── compare.fetch done ──────────────────────────────────────────────────────────────────────────────────────────────
-  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F compare.fetch · R compare.reload · q app…
+  ── comparison.fetch done ───────────────────────────────────────────────────────────────────────────────────────────
+  enter comparison.open · y y comparison.yank · f from · t to · ~ comparison.swap · F comparison.fetch · R comparison…

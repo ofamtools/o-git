@@ -94,7 +94,7 @@ func TestCompareFetchLocalRemote(t *testing.T) {
 	}
 	var out, errOut strings.Builder
 	a.Stdout, a.Stderr = &out, &errOut
-	if err := a.Shell().Run(context.Background(), []string{"compare", "fetch", "--pair", "upstream", "--repo", d}); err != nil {
+	if err := a.Shell().Run(context.Background(), []string{"comparison", "fetch", "--pair", "upstream", "--repo", d}); err != nil {
 		t.Fatalf("%v: %s", err, errOut.String())
 	}
 	result := decode[FetchResult](t, out.String())
@@ -104,7 +104,7 @@ func TestCompareFetchLocalRemote(t *testing.T) {
 	if len(result.Comparisons) != 1 || result.Comparisons[0].Stale || result.Comparisons[0].Behind != 1 {
 		t.Fatalf("after fetch: %+v", result)
 	}
-	if !strings.Contains(errOut.String(), "compare.fetch done") {
+	if !strings.Contains(errOut.String(), "comparison.fetch done") {
 		t.Fatalf("no visible job: %s", errOut.String())
 	}
 	out.Reset()
@@ -120,7 +120,7 @@ func TestCompareFetchLocalRemote(t *testing.T) {
 	called = nil
 	out.Reset()
 	errOut.Reset()
-	if err := a.Shell().Run(context.Background(), []string{"compare", "list", "--repo", d}); err != nil {
+	if err := a.Shell().Run(context.Background(), []string{"comparison", "list", "--repo", d}); err != nil {
 		t.Fatal(err)
 	}
 	if len(called) != 0 {

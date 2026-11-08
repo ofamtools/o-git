@@ -64,7 +64,7 @@ func typeText(t *testing.T, a *App, text string) {
 func screen(a *App) string { return ansi.Strip(a.m.View().Content) }
 
 // focusRow puts the focus on a list's row.
-func focusRow(t *testing.T, a *App, list *ochazuke.List, id string) {
+func focusRow(t *testing.T, a *App, list *ochazuke.Collection, id string) {
 	t.Helper()
 	if err := list.Select(id); err != nil {
 		t.Fatal(err)
@@ -100,7 +100,7 @@ func TestPageFollowsTheSelectedRepo(t *testing.T) {
 	if !a.worktrees.Focused() {
 		t.Fatalf("focus %s", a.r.FocusID())
 	}
-	if s := screen(a); !strings.Contains(s, "state     clean main") {
+	if s := screen(a); !strings.Contains(s, "status    clean main") {
 		t.Fatalf("worktree detail\n%s", s)
 	}
 
@@ -401,7 +401,7 @@ func TestListsTakeNoMarks(t *testing.T) {
 	} {
 		focus()
 		_, _ = a.r.Dispatch(ochazuke.MacroKey{Key: "space"})
-		for _, list := range []*ochazuke.List{a.repos, a.worktrees, a.branches} {
+		for _, list := range []*ochazuke.Collection{a.repos, a.worktrees, a.branches} {
 			if marked := list.Marked(); len(marked) != 0 {
 				t.Fatalf("space at %s marked %v", a.r.FocusID(), marked)
 			}

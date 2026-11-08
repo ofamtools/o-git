@@ -3,7 +3,7 @@
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ┏━ Pairs 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ pair           from      to        ↑  ↓  files  fetched  state           ┃
+  ┃ pair           from      to        ↑  ↓  files  fetched  status          ┃
   ┃ (custom) +1    origin/…  WORKTREE  -  -  1      0s       the working tr… ┃
   ┃ upstream       -         HEAD      -  -  -      -        no upstream     ┃
   ┃ main +1        main      HEAD      1  0  1      -        ready           ┃
@@ -35,5 +35,5 @@
   │ as of the last fetch, 0s ago                                             │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
-  ── compare.fetch done · compare.set done ───────────────────────────────────
-  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …
+  ── comparison.fetch done · comparison.set done ─────────────────────────────
+  enter comparison.open · y y comparison.yank · f from · t to · ~ comparison.…

@@ -36,7 +36,7 @@ func compareStory(t *testing.T) (*App, string) {
 
 func storyRequest(t *testing.T, a *App, verb string, args ochazuke.Arguments) {
 	t.Helper()
-	if _, err := a.r.Execute(ochazuke.Request{Noun: "compare", Verb: verb, Args: args}); err != nil {
+	if _, err := a.r.Execute(ochazuke.Request{Noun: "comparison", Verb: verb, Args: args}); err != nil {
 		t.Fatal(err)
 	}
 	if err := a.Settle(); err != nil {
@@ -308,10 +308,10 @@ func TestComparePageStories(t *testing.T) {
 		if view == nil {
 			t.Fatal("diff view missing")
 		}
-		if _, err := a.r.Settings().SetSession("compare.diff.layout", "split"); err != nil {
+		if _, err := a.r.Settings().SetSession("comparison.diff.layout", "split"); err != nil {
 			t.Fatal(err)
 		}
-		if _, err := a.r.Settings().SetSession("compare.diff.highlight", false); err != nil {
+		if _, err := a.r.Settings().SetSession("comparison.diff.highlight", false); err != nil {
 			t.Fatal(err)
 		}
 		_ = screen(a)
@@ -352,13 +352,13 @@ func TestCompareDiffSharedClose(t *testing.T) {
 
 func TestComparePagePersistsCustomAndSavesThroughSettings(t *testing.T) {
 	a, dir := compareStory(t)
-	original := a.r.Settings().Strings("compare.pairs")
+	original := a.r.Settings().Strings("comparison.pairs")
 	storyRequest(t, a, "set", ochazuke.Arguments{"side": "from", "endpoint": "not-a-ref"})
 	row, _ := a.compare.pairs.Selected()
 	if p := row.Data.(Comparison); p.Available || p.Reason == "" {
 		t.Fatalf("typed unavailable spec lost: %+v", p)
 	}
-	if !slices.Equal(original, a.r.Settings().Strings("compare.pairs")) {
+	if !slices.Equal(original, a.r.Settings().Strings("comparison.pairs")) {
 		t.Fatal("editing a side changed settings")
 	}
 	state, err := readCustomPairs(a.r.Config().StateDirectory())
@@ -371,8 +371,8 @@ func TestComparePagePersistsCustomAndSavesThroughSettings(t *testing.T) {
 		t.Fatal("reload lost custom row")
 	}
 	storyRequest(t, a, "save", ochazuke.Arguments{"name": "review"})
-	if !slices.Contains(a.r.Settings().Strings("compare.pairs"), "review=not-a-ref..WORKTREE") {
-		t.Fatal(a.r.Settings().Strings("compare.pairs"))
+	if !slices.Contains(a.r.Settings().Strings("comparison.pairs"), "review=not-a-ref..WORKTREE") {
+		t.Fatal(a.r.Settings().Strings("comparison.pairs"))
 	}
 	b, err := New()
 	if err != nil {
@@ -401,7 +401,7 @@ func TestComparePageEntryPointsAndFollow(t *testing.T) {
 	if err := a.r.OpenPage(pageID); err != nil {
 		t.Fatal(err)
 	}
-	for _, list := range []*ochazuke.List{a.repos, a.worktrees, a.branches} {
+	for _, list := range []*ochazuke.Collection{a.repos, a.worktrees, a.branches} {
 		if err := list.Focus(); err != nil {
 			t.Fatal(err)
 		}

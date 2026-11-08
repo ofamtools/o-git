@@ -3,7 +3,7 @@
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ┏━ Pairs 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ pair      from   to        ↑  ↓  files  fetched  state                   ┃
+  ┃ pair      from   to        ↑  ↓  files  fetched  status                  ┃
   ┃ dirty     HEAD   WORKTREE  -  -  1      -        the working tree is no… ┃
   ┃ upstream  -      HEAD      -  -  -      -        no upstream             ┃
   ┃ main +6   topic  HEAD      0  0  0      0s       same commit: nothing d… ┃
@@ -35,5 +35,5 @@
   │ same commit: nothing differs                                             │
   │ as of the last fetch, 0s ago                                             │
   ╰──────────────────────────────────────────────────────────────────────────╯
-  ── compare.fetch done ──────────────────────────────────────────────────────
-  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …
+  ── comparison.fetch done ───────────────────────────────────────────────────
+  enter comparison.open · y y comparison.yank · f from · t to · ~ comparison.…

@@ -82,13 +82,13 @@ func TestRepoListAndStatus(t *testing.T) {
 	if len(rows) != 4 {
 		t.Fatalf("rows %+v", rows)
 	}
-	if rows[0].ID != "repo/"+a || rows[0].Label != "alpha" || rows[0].Data.State != "clean" || rows[0].Data.Branch != "main" {
+	if rows[0].ID != "repo/"+a || rows[0].Label != "alpha" || rows[0].Data.Status != "clean" || rows[0].Data.Branch != "main" {
 		t.Fatalf("alpha %+v", rows[0])
 	}
-	if rows[1].Label != "b-repo" || rows[1].Data.State != "dirty" || rows[1].Data.Unstaged != 1 || rows[1].Cells[3] != "~1" {
+	if rows[1].Label != "b-repo" || rows[1].Data.Status != "dirty" || rows[1].Data.Unstaged != 1 || rows[1].Cells[3] != "~1" {
 		t.Fatalf("beta %+v", rows[1])
 	}
-	if rows[2].Label != "gone" || rows[2].Data.State != "missing" {
+	if rows[2].Label != "gone" || rows[2].Data.Status != "missing" {
 		t.Fatalf("missing %+v", rows[2])
 	}
 	if rows[3].Label != "extra" || len(rows[3].Cells) != len(columns["repo"]) {
@@ -96,13 +96,13 @@ func TestRepoListAndStatus(t *testing.T) {
 	}
 
 	// REPO is a name o-proj lists or a directory.
-	if s := decode[Repo](t, run(t, "", "repo", "status", "b-repo")); s.Path != b || s.Unstaged != 1 {
+	if s := decode[RepoDetail](t, run(t, "", "repo", "show", "b-repo")).Repo; s.Path != b || s.Unstaged != 1 {
 		t.Fatalf("status by name %+v", s)
 	}
-	if s := decode[Repo](t, run(t, "", "repo", "status", extra, "--json")); s.Name != "extra" || s.State != "clean" {
+	if s := decode[RepoDetail](t, run(t, "", "repo", "show", extra, "--json")).Repo; s.Name != "extra" || s.Status != "clean" {
 		t.Fatalf("status by path %+v", s)
 	}
-	if _, _, err := try("", "repo", "status", "nope"); err == nil || !strings.Contains(err.Error(), `no repo "nope"`) {
+	if _, _, err := try("", "repo", "show", "nope"); err == nil || !strings.Contains(err.Error(), `no repo "nope"`) {
 		t.Fatalf("unknown repo: %v", err)
 	}
 
@@ -124,7 +124,7 @@ func TestRepoShowAndState(t *testing.T) {
 		t.Fatalf("show %+v", d)
 	}
 
-	out := run(t, "", "repo", "state", "--path", dir)
+	out := run(t, "", "repo", "lists", "--path", dir)
 	sc := bufio.NewScanner(strings.NewReader(out))
 	var nouns []string
 	for sc.Scan() {
@@ -275,7 +275,7 @@ func TestCatalog(t *testing.T) {
 			} `json:"verbs"`
 		} `json:"nouns"`
 	}](t, run(t, "", "catalog"))
-	if cat.Name != "o-git" || cat.Version != Version || cat.State != "repo.state" {
+	if cat.Name != "o-git" || cat.Version != Version || cat.State != "repo.lists" {
 		t.Fatalf("catalog %s %s %s", cat.Name, cat.Version, cat.State)
 	}
 	got := map[string]string{}
@@ -308,13 +308,13 @@ func TestCatalog(t *testing.T) {
 		got[n.Name] = strings.Join(verbs, " ")
 	}
 	want := map[string]string{
-		"repo":     "archive compare create delete! edit fetch get list=repo set show state status",
-		"endpoint": "archive compare copy create delete! edit get list=endpoint resolve set show",
-		"compare":  "archive close commit-open commits=commit copy create delete! edit fetch file-open files=change get list=compare open pair-files reload save set show swap",
-		"worktree": "add archive compare create delete! edit get list=worktree remove! set",
-		"branch":   "archive compare create delete! edit get list=branch names set switch",
-		"commit":   "archive compare copy create delete! diff edit files=change get list=commit set show",
-		"change":   "archive copy create delete! diff edit get list=change set show",
+		"repo":       "archive compare create delete! edit fetch get list=repo lists set show",
+		"endpoint":   "archive compare create delete! edit get list=endpoint resolve set show yank",
+		"comparison": "archive close commit-open commits=commit create delete! edit fetch file-open files=change get list=comparison open pair-files reload save set show swap yank",
+		"worktree":   "add archive compare create delete! edit get list=worktree remove! set",
+		"branch":     "archive compare create delete! edit get list=branch names set switch",
+		"commit":     "archive compare create delete! diff edit files=change get list=commit set show yank",
+		"change":     "archive create delete! diff edit get list=change set show yank",
 	}
 	for noun, verbs := range want {
 		if got[noun] != verbs {
@@ -353,15 +353,15 @@ func TestCatalogDeclaresSideDiff(t *testing.T) {
 func TestListFormats(t *testing.T) {
 	dir := newRepo(t, "r")
 	out := run(t, "", "worktree", "list", dir, "--format", "toon")
-	if want := "worktree[1]{branch,state,path,head}:\n  main,clean main," + tilde(dir) + ","; !strings.HasPrefix(out, want) {
+	if want := "worktree[1]{branch,status,path,head}:\n  main,clean main," + tilde(dir) + ","; !strings.HasPrefix(out, want) {
 		t.Fatalf("worktree toon:\n%s", out)
 	}
 	out = run(t, "", "branch", "list", dir, "--format", "markdown")
 	if !strings.HasPrefix(out, "| branch | sync | age | upstream | merged | subject |\n| --- | --- | ---: |") || !strings.Contains(out, "| * main | - |") {
 		t.Fatalf("branch markdown:\n%s", out)
 	}
-	out = run(t, "", "repo", "state", "--path", dir, "--format", "table")
-	for _, head := range []string{"repo  branch", "branch  state", "branch  sync"} {
+	out = run(t, "", "repo", "lists", "--path", dir, "--format", "table")
+	for _, head := range []string{"repo  branch", "branch  status", "branch  sync"} {
 		if !strings.Contains(out, head) {
 			t.Fatalf("state table has no %q:\n%s", head, out)
 		}

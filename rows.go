@@ -27,18 +27,18 @@ func worktreeLabel(w WorktreeRow) string { return tilde(w.Path) }
 
 var columns = map[string][]ochazuke.Column{
 	"endpoint": {
-		{Title: "endpoint"}, {Title: "spec"}, {Title: "kind"}, {Title: "ref"}, {Title: "sha"}, {Title: "fetched"}, {Title: "state"},
+		{Title: "endpoint"}, {Title: "spec"}, {Title: "kind"}, {Title: "ref"}, {Title: "sha"}, {Title: "fetched"}, {Title: "status"},
 	},
-	"compare": {
+	"comparison": {
 		{Title: "pair"}, {Title: "from"}, {Title: "to"}, {Title: "ahead", Align: ochazuke.AlignRight},
-		{Title: "behind", Align: ochazuke.AlignRight}, {Title: "fetched"}, {Title: "state"}, {Title: "spec", Priority: 99},
+		{Title: "behind", Align: ochazuke.AlignRight}, {Title: "fetched"}, {Title: "status"}, {Title: "spec", Priority: 99},
 	},
 	"repo": {
 		{Title: "repo", Min: 10}, {Title: "branch", Priority: 1}, {Title: "sync", Priority: 2},
 		{Title: "changes", Priority: 3}, {Title: "path", Priority: 4},
 	},
 	"worktree": {
-		{Title: "branch", Min: 10}, {Title: "state", Priority: 1}, {Title: "path", Priority: 2}, {Title: "head", Priority: 3},
+		{Title: "branch", Min: 10}, {Title: "status", Priority: 1}, {Title: "path", Priority: 2}, {Title: "head", Priority: 3},
 	},
 	"branch": {
 		{Title: "branch", Min: 10}, {Title: "sync", Priority: 1}, {Title: "age", Align: ochazuke.AlignRight, Priority: 2},
@@ -69,7 +69,7 @@ func syncText(upstream string, gone bool, ahead, behind int) string {
 
 // changesText is a status's changes by kind: +staged ~unstaged
 // ?untracked !conflicts, or clean.
-func changesText(s Status) string {
+func changesText(s TreeStatus) string {
 	var parts []string
 	for _, p := range []struct {
 		mark string
@@ -85,7 +85,7 @@ func changesText(s Status) string {
 	return strings.Join(parts, " ")
 }
 
-func branchText(s Status) string {
+func branchText(s TreeStatus) string {
 	switch {
 	case s.Detached:
 		return "(detached " + shortSHA(s.Head) + ")"
@@ -99,14 +99,14 @@ func shortSHA(sha string) string { return sha[:min(len(sha), 7)] }
 
 func repoCells(r Repo) []string {
 	if r.Error != "" {
-		return []string{r.Name, "-", "-", r.State, tilde(r.Path)}
+		return []string{r.Name, "-", "-", r.Status, tilde(r.Path)}
 	}
-	return []string{r.Name, branchText(r.Status), syncText(r.Upstream, r.Gone, r.Ahead, r.Behind), changesText(r.Status), tilde(r.Path)}
+	return []string{r.Name, branchText(r.TreeStatus), syncText(r.Upstream, r.Gone, r.Ahead, r.Behind), changesText(r.TreeStatus), tilde(r.Path)}
 }
 
 func worktreeState(w WorktreeRow) string {
-	state := w.State
-	if w.State == "dirty" {
+	state := w.Status
+	if w.Status == "dirty" {
 		state = fmt.Sprintf("dirty %d", w.Changes)
 	}
 	if w.Locked != "" {

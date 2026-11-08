@@ -18,23 +18,23 @@ func (a *App) registerCompareVerbs() {
 	r.Define("endpoint").Verb("list", a.endpointList, "named endpoint specs resolved in REPO; unavailable specs retain their reason").Rows("endpoint").Fetch().Quiet().Positional("repo").
 		Verb("resolve", a.endpointResolve, "resolve SPEC relative to --other (default HEAD); {remote} expands per remote").Fetch().Quiet().Positional("spec", "repo").
 		Verb("show", a.endpointResolve, "show a resolved endpoint (same as endpoint.resolve)").Fetch().Quiet().Positional("spec", "repo").
-		Verb("copy", a.endpointCopy, "copy the resolved SHA through the shared unnamed register").Quiet().Positional("spec", "repo")
-	r.Define("compare").Verb("list", a.compareList, "saved comparisons with resolved endpoints, counts, fetch age and reasons; identical pairs collapse when configured").Rows("compare").Fetch().Quiet().Positional("repo").
-		Verb("show", a.compareShow, "one saved --pair or ad hoc --from/--to comparison (default compare.default-pair)").Fetch().Quiet().Positional("repo").
-		Verb("copy", a.compareCopy, "copy the resolved A..B range through the shared unnamed register").Quiet().Positional("repo").
+		Verb("yank", a.endpointCopy, "copy the resolved SHA through the shared unnamed register").Quiet().Positional("spec", "repo")
+	r.Define("comparison").Verb("list", a.compareList, "saved comparisons with resolved endpoints, counts, fetch age and reasons; identical pairs collapse when configured").Rows("comparison").Fetch().Quiet().Positional("repo").
+		Verb("show", a.compareShow, "one saved --pair or ad hoc --from/--to comparison (default comparison.default-pair)").Fetch().Quiet().Positional("repo").
+		Verb("yank", a.compareCopy, "copy the resolved A..B range through the shared unnamed register").Quiet().Positional("repo").
 		Verb("fetch", func(c ochazuke.Ctx) ochazuke.Result { return a.fetch(c, true) }, "explicitly fetch --prune only the remotes the given comparison uses, then resolve it again").Positional("repo")
 	r.Define("repo").Verb("fetch", func(c ochazuke.Ctx) ochazuke.Result { return a.fetch(c, false) }, "explicitly fetch --prune from --remote, or every configured remote; never prompts").Positional("repo")
-	setHistory(r, ochazuke.HistoryAction, "endpoint.copy", "compare.copy")
-	setHistory(r, ochazuke.HistoryChange, "repo.fetch", "compare.fetch")
+	setHistory(r, ochazuke.HistoryAction, "endpoint.yank", "comparison.yank")
+	setHistory(r, ochazuke.HistoryChange, "repo.fetch", "comparison.fetch")
 	repo := ochazuke.Parameter{Type: "string", Description: "repository directory or o-proj name (default current repository)"}
 	spec := ochazuke.Parameter{Type: "string", Description: "endpoint name, ref/SHA or endpoint spec"}
-	for _, key := range []string{"endpoint.list", "endpoint.resolve", "endpoint.show", "endpoint.copy", "compare.list", "compare.show", "compare.copy", "compare.fetch", "repo.fetch"} {
+	for _, key := range []string{"endpoint.list", "endpoint.resolve", "endpoint.show", "endpoint.yank", "comparison.list", "comparison.show", "comparison.yank", "comparison.fetch", "repo.fetch"} {
 		op := r.Operations.At(ochazuke.Key(r.CanonicalKey(key)))
 		op.Parameters = map[string]ochazuke.Parameter{"repo": repo}
 		switch key {
-		case "endpoint.resolve", "endpoint.show", "endpoint.copy":
+		case "endpoint.resolve", "endpoint.show", "endpoint.yank":
 			op.Parameters["spec"], op.Parameters["other"] = spec, spec
-		case "compare.show", "compare.copy", "compare.fetch":
+		case "comparison.show", "comparison.yank", "comparison.fetch":
 			op.Parameters["pair"] = ochazuke.Parameter{Type: "string", Description: "saved pair name; mutually exclusive with --from/--to"}
 			op.Parameters["from"], op.Parameters["to"] = spec, spec
 		case "repo.fetch":
@@ -42,7 +42,7 @@ func (a *App) registerCompareVerbs() {
 		}
 		if strings.HasSuffix(key, ".list") {
 			op.Result = "row[]"
-		} else if strings.HasSuffix(key, ".copy") {
+		} else if strings.HasSuffix(key, ".yank") {
 			op.Result = "string"
 		} else if strings.HasSuffix(key, ".fetch") {
 			op.Result = "{repo, remotes, comparisons?}"
@@ -113,8 +113,8 @@ func comparisonRow(c Comparison, now time.Time) ocli.Row {
 	if !c.Available || (c.CommitsReason != "" && endpointKey(c.From) != endpointKey(c.To)) {
 		ahead, behind = "-", "-"
 	}
-	return ocli.Row{Noun: "compare", ID: "compare/" + c.Repo + ":" + c.Source + ":" + c.Names[0], Label: c.Name, Data: c,
-		Cells: []string{c.Name, resolvedRef(c.From), resolvedRef(c.To), ahead, behind, fetchedText(c.Fetched, c.Stale, now), c.State, c.From.Spec + ".." + c.To.Spec}}
+	return ocli.Row{Noun: "comparison", ID: "comparison/" + c.Repo + ":" + c.Source + ":" + c.Names[0], Label: c.Name, Data: c,
+		Cells: []string{c.Name, resolvedRef(c.From), resolvedRef(c.To), ahead, behind, fetchedText(c.Fetched, c.Stale, now), c.Status, c.From.Spec + ".." + c.To.Spec}}
 }
 
 func (a *App) endpointList(c ochazuke.Ctx) ochazuke.Result {
@@ -273,7 +273,7 @@ func (a *App) compareCopy(c ochazuke.Ctx) ochazuke.Result {
 		}
 		return strings.Join(ranges, "\n"), nil
 	}, func(text string) {
-		if a.tui && a.r.Settings().Bool("compare.copy-feedback") {
+		if a.tui && a.r.Settings().Bool("comparison.copy-feedback") {
 			lines := strings.Split(text, "\n")
 			for i, line := range lines {
 				from, to, _ := strings.Cut(line, "..")

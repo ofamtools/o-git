@@ -3,7 +3,7 @@
   ────────────────────────────────────────────────────────────────────────────
   Compare /fixture/story
   ┏━ Pairs 6 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ pair             from      to       ↑  ↓  files  fetched  state          ┃
+  ┃ pair             from      to       ↑  ↓  files  fetched  status         ┃
   ┃ (custom) WORKT…  WORKTREE  HEAD     -  -  1      -        reversed: the… ┃
   ┃ dirty            HEAD      WORKTR…  -  -  1      -        the working t… ┃
   ┃ upstream         -         HEAD     -  -  -      -        no upstream    ┃
@@ -35,5 +35,5 @@
   │ reversed: the working tree is on the left                                │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
-  ── compare.swap done ───────────────────────────────────────────────────────
-  enter compare.open · y y compare.copy · f from · t to · ~ compare.swap · F …
+  ── comparison.swap done ────────────────────────────────────────────────────
+  enter comparison.open · y y comparison.yank · f from · t to · ~ comparison.…

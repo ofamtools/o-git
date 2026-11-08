@@ -47,19 +47,19 @@ func TestVerbHistoryKinds(t *testing.T) {
 		t.Fatal(err)
 	}
 	for key, want := range map[string]string{
-		"repo.list": ochazuke.HistoryFetch, "repo.status": ochazuke.HistoryFetch, "repo.show": ochazuke.HistoryFetch,
-		"repo.state": ochazuke.HistoryFetch, "branch.list": ochazuke.HistoryFetch,
+		"repo.list": ochazuke.HistoryFetch, "repo.show": ochazuke.HistoryFetch,
+		"repo.lists": ochazuke.HistoryFetch, "branch.list": ochazuke.HistoryFetch,
 		"worktree.add": ochazuke.HistoryChange, "branch.switch": ochazuke.HistoryChange, "branch.delete": ochazuke.HistoryChange,
 		"branch.names":  ochazuke.HistoryFetch,
 		"endpoint.list": ochazuke.HistoryFetch, "endpoint.resolve": ochazuke.HistoryFetch, "endpoint.show": ochazuke.HistoryFetch,
-		"compare.list": ochazuke.HistoryFetch, "compare.show": ochazuke.HistoryFetch,
+		"comparison.list": ochazuke.HistoryFetch, "comparison.show": ochazuke.HistoryFetch,
 		"change.diff": ochazuke.HistoryFetch, "commit.diff": ochazuke.HistoryFetch,
-		"endpoint.copy": ochazuke.HistoryAction, "compare.copy": ochazuke.HistoryAction,
-		"repo.fetch": ochazuke.HistoryChange, "compare.fetch": ochazuke.HistoryChange,
+		"endpoint.yank": ochazuke.HistoryAction, "comparison.yank": ochazuke.HistoryAction,
+		"repo.fetch": ochazuke.HistoryChange, "comparison.fetch": ochazuke.HistoryChange,
 		"commit.list": ochazuke.HistoryFetch, "commit.show": ochazuke.HistoryFetch, "commit.files": ochazuke.HistoryFetch,
 		"change.list": ochazuke.HistoryFetch, "change.show": ochazuke.HistoryFetch,
-		"compare.commits": ochazuke.HistoryFetch, "compare.files": ochazuke.HistoryFetch,
-		"commit.copy": ochazuke.HistoryAction, "change.copy": ochazuke.HistoryAction,
+		"comparison.commits": ochazuke.HistoryFetch, "comparison.files": ochazuke.HistoryFetch,
+		"commit.yank": ochazuke.HistoryAction, "change.yank": ochazuke.HistoryAction,
 	} {
 		if got := a.r.Operations.At(ochazuke.Key(a.r.CanonicalKey(key))).HistoryKind; got != want {
 			t.Errorf("%s: %q, want %q", key, got, want)

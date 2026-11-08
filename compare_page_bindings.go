@@ -4,16 +4,16 @@ package main
 func (a *App) bindComparePage() error {
 	return a.r.LoadDefaultBindings("compare-page", []byte(`{"bindings":[
  {"context":"compare-page/normal","bindings":[
-  {"key":"f","action":"compare.set","args":{"side":"from"},"hint":"from"},
-  {"key":"t","action":"compare.set","args":{"side":"to"},"hint":"to"},
-  {"key":"~","action":"compare.swap"},
-  {"key":"F","action":"compare.fetch"},
-  {"key":"R","action":"compare.reload"},
+  {"key":"f","action":"comparison.set","args":{"side":"from"},"hint":"from"},
+  {"key":"t","action":"comparison.set","args":{"side":"to"},"hint":"to"},
+  {"key":"~","action":"comparison.swap"},
+  {"key":"F","action":"comparison.fetch"},
+  {"key":"R","action":"comparison.reload"},
   {"key":"q","action":"app.quit"}
  ]},
- {"context":"compare/normal","bindings":[
-  {"key":"enter","action":"compare.open"},
-  {"key":"y y","action":"compare.copy"}
+ {"context":"comparison/normal","bindings":[
+  {"key":"enter","action":"comparison.open"},
+  {"key":"y y","action":"comparison.yank"}
  ]},
  {"context":"repo/normal","bindings":[{"key":"c","action":"repo.compare"},{"key":"F","action":"repo.fetch"}]},
  {"context":"worktree/normal","bindings":[{"key":"c","action":"worktree.compare"},{"key":"F","action":"repo.fetch"}]},

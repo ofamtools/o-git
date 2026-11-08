@@ -29,7 +29,7 @@ type App struct {
 	r *ochazuke.Runtime
 	m *ochazuke.Model
 
-	repos, worktrees, branches *ochazuke.List
+	repos, worktrees, branches *ochazuke.Collection
 
 	// Paths are extra repository directories the repo list shows beside
 	// o-proj's (the TUI's --path flags).
@@ -65,7 +65,7 @@ type App struct {
 func New() (*App, error) {
 	r := ochazuke.NewRuntime()
 	a := &App{r: r, Now: time.Now, fetchRun: git, Stdin: os.Stdin, Stdout: os.Stdout, Stderr: os.Stderr}
-	r.Instance(pageID, ochazuke.Kind("git"))
+	r.Instance(pageID, ochazuke.Kind("git-page"))
 	var err error
 	if a.repos, err = r.AddList(reposID, nil, ochazuke.Parent(pageID), ochazuke.Columns(columns["repo"]...), ochazuke.NoMarks()); err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (a *App) Shell() *ocli.Shell {
 	return sh
 }
 
-func (a *App) listOf(noun string) *ochazuke.List {
+func (a *App) listOf(noun string) *ochazuke.Collection {
 	switch noun {
 	case "repo":
 		return a.repos

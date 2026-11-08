@@ -16,7 +16,7 @@ import "ofam.dev/ochazuke"
 // branch delete NAME --repo REPO.
 func (a *App) bind() error {
 	r := a.r
-	r.Define("git").Mode("normal").
+	r.Define("git-page").Mode("normal").
 		Bind("R", ochazuke.Do("repo.list")).
 		Bind("q", ochazuke.Do("app.quit"))
 	r.Define("repo").Mode("normal").

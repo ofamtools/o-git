@@ -23,7 +23,7 @@ const filesID = "compare/files"
 
 // comparePage holds domain state; ochazuke owns focus, picker and delivery.
 type comparePage struct {
-	pairs, commits, files                       *ochazuke.List
+	pairs, commits, files                       *ochazuke.Collection
 	repo, loadedRepo, following                 string
 	custom                                      map[string]customPair
 	shown                                       *Comparison
@@ -35,7 +35,7 @@ type comparePage struct {
 	chooserRepo, chooserOther, chooserFollowing string
 
 	diff      *diffview.View
-	diffFiles *ochazuke.List
+	diffFiles *ochazuke.Collection
 	diffPath  string
 }
 
@@ -53,7 +53,7 @@ type comparePageData struct {
 var pairColumns = []ochazuke.Column{
 	{Title: "pair", Min: 12, Max: 24}, {Title: "from", Min: 5, Priority: 3}, {Title: "to", Min: 5, Priority: 3},
 	{Title: "↑", Min: 1, Align: ochazuke.AlignRight}, {Title: "↓", Min: 1, Align: ochazuke.AlignRight},
-	{Title: "files", Min: 3}, {Title: "fetched", Min: 7, Max: 7, Priority: 4}, {Title: "state", Min: 12, Max: 32, Priority: 1},
+	{Title: "files", Min: 3}, {Title: "fetched", Min: 7, Max: 7, Priority: 4}, {Title: "status", Min: 12, Max: 32, Priority: 1},
 }
 
 func (a *App) registerComparePage() error {
@@ -66,7 +66,7 @@ func (a *App) registerComparePage() error {
 	}
 	for _, entry := range []struct {
 		id   string
-		dest **ochazuke.List
+		dest **ochazuke.Collection
 		cols []ochazuke.Column
 	}{
 		{pairsID, &p.pairs, pairColumns}, {commitsID, &p.commits, nil}, {filesID, &p.files, nil},
@@ -82,43 +82,43 @@ func (a *App) registerComparePage() error {
 		if p.repo == "" {
 			p.repo = a.current
 		}
-		a.launch(pairsID, "compare.reload", a.loadComparePairs(p.repo))
+		a.launch(pairsID, "comparison.reload", a.loadComparePairs(p.repo))
 	}
-	r.Define("compare").
+	r.Define("comparison").
 		Verb("open", a.compareOpen, "open Compare, or enter the selected pair's commits").
 		Verb("reload", func(c ochazuke.Ctx) ochazuke.Result { return a.loadComparePairs(a.compareRepo(c)) }, "resolve pairs again").Fetch().Quiet().
 		Verb("set", a.compareSet, "set --side from|to to ENDPOINT; omitted endpoint opens a picker").Positional("endpoint").
 		Verb("swap", a.compareSwap, "swap from and to, remembering an ad hoc comparison").
-		Verb("save", a.compareSave, "append the current comparison to compare.pairs as NAME").Positional("name")
+		Verb("save", a.compareSave, "append the current comparison to comparison.pairs as NAME").Positional("name")
 	for _, noun := range []string{"repo", "worktree", "branch", "endpoint"} {
 		r.Define(noun).Verb("compare", a.rowCompare, "open Compare with this row as the to side (or --side from)")
 	}
-	setHistory(r, ochazuke.HistoryAction, "compare.open", "compare.set", "compare.swap", "repo.compare", "worktree.compare", "branch.compare", "endpoint.compare")
-	setHistory(r, ochazuke.HistoryChange, "compare.save")
-	for _, key := range []string{"compare.open", "compare.reload", "compare.set", "compare.swap", "compare.save", "repo.compare", "worktree.compare", "branch.compare", "endpoint.compare"} {
+	setHistory(r, ochazuke.HistoryAction, "comparison.open", "comparison.set", "comparison.swap", "repo.compare", "worktree.compare", "branch.compare", "endpoint.compare")
+	setHistory(r, ochazuke.HistoryChange, "comparison.save")
+	for _, key := range []string{"comparison.open", "comparison.reload", "comparison.set", "comparison.swap", "comparison.save", "repo.compare", "worktree.compare", "branch.compare", "endpoint.compare"} {
 		op := r.Operations.At(ochazuke.Key(r.CanonicalKey(key)))
 		op.Parameters = map[string]ochazuke.Parameter{"repo": {Type: "string", Description: "repository path or name"}}
 		switch key {
-		case "compare.set":
+		case "comparison.set":
 			op.Parameters["endpoint"] = ochazuke.Parameter{Type: "string", Description: "endpoint name, ref, SHA or spec"}
 			fallthrough
 		case "repo.compare", "worktree.compare", "branch.compare", "endpoint.compare":
 			op.Parameters["side"] = ochazuke.Parameter{Type: "string", Enum: []string{"from", "to"}, Description: "side to replace (default to)"}
-		case "compare.save":
+		case "comparison.save":
 			op.Parameters["name"] = ochazuke.Parameter{Type: "string", Required: true, Description: "saved pair name"}
 		}
 		r.Operations.Set(op)
 	}
 	// Reuse the core fetch verb and retain its non-quiet job and history kind.
-	copyOp := r.Operations.At(ochazuke.Key(r.CanonicalKey("compare.copy")))
+	copyOp := r.Operations.At(ochazuke.Key(r.CanonicalKey("comparison.yank")))
 	copyOp.AppHandler = func(c ochazuke.Ctx) ochazuke.Result { c.Args = a.compareArguments(c); return a.compareCopy(c) }
 	r.Operations.Set(copyOp)
-	op := r.Operations.At(ochazuke.Key(r.CanonicalKey("compare.fetch")))
+	op := r.Operations.At(ochazuke.Key(r.CanonicalKey("comparison.fetch")))
 	op.AppHandler = func(c ochazuke.Ctx) ochazuke.Result {
 		c.Args = a.compareArguments(c)
 		return a.fetch(c, true).Then(func(_ ochazuke.Ctx, _ any, err error) {
 			if err == nil && a.tui {
-				a.launch(pairsID, "compare.reload", a.loadComparePairs(a.compare.repo))
+				a.launch(pairsID, "comparison.reload", a.loadComparePairs(a.compare.repo))
 			}
 		})
 	}
@@ -241,7 +241,7 @@ func pagePairs(r *EndpointResolver, custom *customPair) []Comparison {
 
 func (a *App) loadComparePairs(repo string) ochazuke.Result {
 	cfg, now := a.compareConfig(), a.Now()
-	copies := a.r.Settings().Bool("compare.files.find-copies-harder")
+	copies := a.r.Settings().Bool("comparison.files.find-copies-harder")
 	memory, hasMemory := a.compare.custom[repo]
 	a.compare.loading = "pairs"
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {
@@ -288,7 +288,7 @@ func (a *App) applyComparePairs(data comparePageData, selectCustom bool) {
 	if selectCustom && len(rows) > 0 {
 		_ = p.pairs.Select(rows[0].ID)
 	} else if changed {
-		want := a.r.Settings().String("compare.default-pair")
+		want := a.r.Settings().String("comparison.default-pair")
 		for _, row := range rows {
 			if slices.Contains(row.Data.(Comparison).Names, want) {
 				_ = p.pairs.Select(row.ID)
@@ -322,7 +322,7 @@ func (a *App) compareOpen(c ochazuke.Ctx) ochazuke.Result {
 // fall back to the remembered custom pair, then the configured default pair.
 func (a *App) editComparison(c ochazuke.Ctx, edit func(customPair) customPair) ochazuke.Result {
 	cfg, now, repo := a.compareConfig(), a.Now(), a.compareRepo(c)
-	copies := a.r.Settings().Bool("compare.files.find-copies-harder")
+	copies := a.r.Settings().Bool("comparison.files.find-copies-harder")
 	reset := a.r.Page != comparePageID
 	var selected *customPair
 	if pair, ok := a.selectedComparison(); ok && a.r.Page == comparePageID && (repo == pair.Repo || repo == "") {
@@ -399,7 +399,7 @@ func (a *App) compareSave(c ochazuke.Ctx) ochazuke.Result {
 	if !ok {
 		return ochazuke.Failed(fmt.Errorf("no comparison selected"))
 	}
-	values := a.r.Settings().Strings("compare.pairs")
+	values := a.r.Settings().Strings("comparison.pairs")
 	for _, entry := range values {
 		saved, _, _ := strings.Cut(entry, "=")
 		if strings.TrimSpace(saved) == name {
@@ -407,7 +407,7 @@ func (a *App) compareSave(c ochazuke.Ctx) ochazuke.Result {
 		}
 	}
 	values = append(values, name+"="+pair.From.Spec+".."+pair.To.Spec)
-	if err := a.r.Settings().Set("compare.pairs", values); err != nil {
+	if err := a.r.Settings().Set("comparison.pairs", values); err != nil {
 		return ochazuke.Failed(err)
 	}
 	return a.loadComparePairs(pair.Repo)
@@ -461,7 +461,7 @@ func (a *App) renderCompare(r *ochazuke.Runtime, width, height int) ochazuke.Blo
 	if width < 20 || bh < 8 {
 		return ochazuke.Text(ansi.Truncate(status, width, "…"))
 	}
-	panel := func(title string, list *ochazuke.List, w, h int) ochazuke.Block {
+	panel := func(title string, list *ochazuke.Collection, w, h int) ochazuke.Block {
 		cw, ch := ochazuke.PanelContentSize(w, h)
 		body := list.View(cw, ch)
 		if list.Len() == 0 {
@@ -489,7 +489,7 @@ func (a *App) renderCompare(r *ochazuke.Runtime, width, height int) ochazuke.Blo
 			detail(width, bh-ph-ch-fh).Text,
 		}, "\n"))
 	}
-	lw := l.Divide(max(32, width*r.Settings().Int("compare.pairs.width-percent")/100), width-1, ochazuke.PaneMinWidth)
+	lw := l.Divide(max(32, width*r.Settings().Int("comparison.pairs.width-percent")/100), width-1, ochazuke.PaneMinWidth)
 	rw := width - lw - 1
 	ch, fh := max(4, bh/3), max(4, bh/3)
 	left := panel(fmt.Sprintf("Pairs %d", p.pairs.Len()), p.pairs, lw, bh).Text
