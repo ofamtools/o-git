@@ -22,7 +22,7 @@
   │                 │   upstream                         -         no upstream                                      │                                                              │                 │
   │                 │   origin/main                      -         no ref named origin/main; check the ref or fetc… │                                                              │                 │
   │                 │   {remote}/main · {remote}/branch  -         no remotes                                       │                                                              │                 │
-  │                 │ enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.close                                                               │                 │
+  │                 │ esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source                                                                    │                 │
   │                 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯─────────────────╯
   │                                                                            │ ╭─ Detail ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
   │                                                                            │ │ dirty                                                                                                             │
@@ -36,4 +36,4 @@
   │                                                                            │ │                                                                                                                   │
   ╰────────────────────────────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.close
+  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source

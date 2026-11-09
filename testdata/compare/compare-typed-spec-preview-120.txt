@@ -20,7 +20,7 @@
   │         │   merge-base(main)  resolved <sha> (merge-base(main)) │ base(main))                        │         │
   │         │   + Use ref/spec merge-base(main)                       │ merge-base(main)                   │         │
   │         │   + Use ref/spec merge-base(main)                       │                                    │         │
-  │         │ enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.cl… │         │
+  │         │ esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source    │         │
   │         ╰──────────────────────────────────────────────────────────────────────────────────────────────╯         │
   │                                            │ │                                                                   │
   │                                            │ ╰───────────────────────────────────────────────────────────────────╯
@@ -36,4 +36,4 @@
   │                                            │ │                                                                   │
   ╰────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.close
+  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source

@@ -472,8 +472,8 @@ func TestCreatingVerbsAskThroughTheArgsForm(t *testing.T) {
 		t.Fatalf("no args form for branch.create (%q)\n%s", a.r.TopModal(), s)
 	}
 	keys(t, a, "esc")
-	// insert -> normal on the first esc, the form closes on the second.
-	keys(t, a, "esc")
+	// insert -> normal on esc, the form closes on q.
+	keys(t, a, "q")
 	if a.r.TopModal() != "" || a.branches.Len() != 1 {
 		t.Fatalf("esc: modal %q branches %d", a.r.TopModal(), a.branches.Len())
 	}

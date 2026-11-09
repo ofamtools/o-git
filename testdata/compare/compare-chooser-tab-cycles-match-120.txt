@@ -19,7 +19,7 @@
   │         │ ›                                                 regex │ <sha> feat: next                 │         │
   │         │   <sha>  HEAD -> topic  feat: next                    │ <sha> │         │
   │         │   <sha>  main           first                         │ 1c72f6                             │         │
-  │         │ enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.cl… │         │
+  │         │ esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source ·… │         │
   │         ╰──────────────────────────────────────────────────────────────────────────────────────────────╯         │
   │                                            │ │                                                                   │
   │                                            │ │                                                                   │
@@ -36,4 +36,4 @@
   │                                            │ │                                                                   │
   ╰────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.close · tab search.cycle-m…
+  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · tab search.cycle-match

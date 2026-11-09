@@ -20,7 +20,7 @@
   │         │   unlisted subjec…  "unlisted subjec…                   │ <sha> │         │
   │         │   + Use ref/spec unlisted subject needle                │ 102a37                             │         │
   │         │   + Use ref/spec unlisted subject needle                │                                    │         │
-  │         │ enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.cl… │         │
+  │         │ esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source    │         │
   │         ╰──────────────────────────────────────────────────────────────────────────────────────────────╯         │
   │                                            │ │                                                                   │
   │                                            │ ╰───────────────────────────────────────────────────────────────────╯
@@ -36,4 +36,4 @@
   │                                            │ │                                                                   │
   ╰────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source · esc modal.close
+  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source

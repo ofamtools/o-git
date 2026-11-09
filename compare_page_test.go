@@ -158,7 +158,7 @@ func TestComparePageStories(t *testing.T) {
 				compareFrame(t, a, "compare-pick-"+key+"-"+strings.ToLower(source))
 				keys(t, a, "ctrl+o")
 			}
-			keys(t, a, "esc")
+			keys(t, a, "esc", "q")
 		}
 		keys(t, a, "f")
 		typeText(t, a, "merge-base(topic)")
@@ -322,9 +322,9 @@ func TestComparePageStories(t *testing.T) {
 		if a.r.Quit || a.r.TopModal() != "" || !a.compare.files.Focused() {
 			t.Fatal("q did not return to files")
 		}
-		keys(t, a, "enter", "esc")
+		keys(t, a, "enter", "q")
 		if a.r.Quit || a.r.TopModal() != "" {
-			t.Fatal("esc did not close diff")
+			t.Fatal("q did not close diff")
 		}
 	})
 }
@@ -653,9 +653,9 @@ func TestOwnershipDiffUnderModal(t *testing.T) {
 	if got := a.r.PresentationAt(diffID); got.Focus != focus || got.Mode.Name != mode {
 		t.Fatalf("diff drawn under %q as %q/%q, want %q/%q", over, got.Focus, got.Mode.Name, focus, mode)
 	}
-	keys(t, a, "esc")
+	keys(t, a, "q")
 	if a.r.TopModal() != diffFrame {
-		t.Fatalf("esc left top modal %q, want the diff", a.r.TopModal())
+		t.Fatalf("q left top modal %q, want the diff", a.r.TopModal())
 	}
 	if a.r.FocusID() != focus || a.r.CurrentMode().Name != mode {
 		t.Fatalf("after close %q/%q, want %q/%q", a.r.FocusID(), a.r.CurrentMode().Name, focus, mode)

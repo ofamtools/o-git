@@ -22,7 +22,7 @@
   │ XY  │   upstream    -           no upstre… │                       │     │
   │  M  │   origin/ma…  origin/ma…  ready      │                       │     │
   │ t…  │   origin/br…  -           origin ha… │                       │     │
-  │     │ enter picker.pick · ctrl+o picker.next-source · alt+o picke… │     │
+  │     │ esc normal · enter picker.pick · ctrl+o picker.next-source … │     │
   │     ╰──────────────────────────────────────────────────────────────╯     │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
@@ -36,4 +36,4 @@
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-sourc…
+  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.p…
