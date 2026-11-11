@@ -48,8 +48,10 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 			}
 			return a.viewCLI(context.Background(), args)
 		}))
-	ocli.Mount(app, a.Shell())
+	// Mount's bare-verb reader preserves exact commands already registered.
+	// Keep the legacy argv adapter visible before it considers repo.view.
 	app.Add(viewCommand(a))
+	ocli.Mount(app, a.Shell())
 	app.HelpText += `
 Page:
   o-git (or o-git view) opens the Git page; --smoke renders one frame.`
