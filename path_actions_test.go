@@ -220,7 +220,7 @@ func TestDiffOutputDestinationAndAbsoluteChooserPaths(t *testing.T) {
 	isolateCompare(t)
 	dir := newRepo(t, "r")
 	write(t, dir, "README", "changed\n")
-	destination := filepath.Join(t.TempDir(), "change.patch")
+	destination := filepath.Join(t.TempDir(), "unified-output")
 	run(t, "", "change", "diff", filepath.Join(dir, "README"), "--repo", dir, "--destination", destination)
 	patch, err := os.ReadFile(destination)
 	if err != nil || string(patch) != diffOracle(t, dir, false, "HEAD", "--", "README") {

@@ -162,10 +162,7 @@ func (a *App) commitFiles(c ochazuke.Ctx) ochazuke.Result {
 			return nil, err
 		}
 		list := ChangeList{Files: files}
-		for i := range files {
-			files[i].Source, files[i].Revision = "commit", commit.SHA
-			files[i].BaseSource, files[i].BaseRevision = "commit", base
-		}
+		setChangeProvenance(files, "commit", base, "commit", commit.SHA)
 		list.count()
 		return list.Items(r.dir), nil
 	})

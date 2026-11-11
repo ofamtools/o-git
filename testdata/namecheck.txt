@@ -31,7 +31,7 @@ compare_verbs.go	App.registerCompareVerbs	case	"comparison.inspect"	1
 compare_verbs.go	App.registerCompareVerbs	case	"endpoint.yank"	1
 compare_verbs.go	App.registerCompareVerbs	case	"endpoint.resolve"	1
 compare_verbs.go	App.registerCompareVerbs	case	"repo.fetch"	1
-diff.go	BuildDiff	cyclo	"-"	33
+diff.go	BuildDiff	cyclo	"-"	28
 diff.go	diffShape	compare	"index"	3
 diff.go	diffShape	compare	"worktree"	3
 diff.go	diffSideSize	compare	"index"	1
