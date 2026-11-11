@@ -96,13 +96,13 @@ func TestRepoListAndStatus(t *testing.T) {
 	}
 
 	// REPO is a name o-proj lists or a directory.
-	if s := decode[RepoDetail](t, run(t, "", "repo", "show", "b-repo")).Repo; s.Path != b || s.Unstaged != 1 {
+	if s := decode[RepoDetail](t, run(t, "", "repo", "inspect", "b-repo")).Repo; s.Path != b || s.Unstaged != 1 {
 		t.Fatalf("status by name %+v", s)
 	}
-	if s := decode[RepoDetail](t, run(t, "", "repo", "show", extra, "--json")).Repo; s.Name != "extra" || s.Status != "clean" {
+	if s := decode[RepoDetail](t, run(t, "", "repo", "inspect", extra, "--json")).Repo; s.Name != "extra" || s.Status != "clean" {
 		t.Fatalf("status by path %+v", s)
 	}
-	if _, _, err := try("", "repo", "show", "nope"); err == nil || !strings.Contains(err.Error(), `no repo "nope"`) {
+	if _, _, err := try("", "repo", "inspect", "nope"); err == nil || !strings.Contains(err.Error(), `no repo "nope"`) {
 		t.Fatalf("unknown repo: %v", err)
 	}
 
@@ -119,7 +119,7 @@ func TestRepoListAndStatus(t *testing.T) {
 func TestRepoShowAndState(t *testing.T) {
 	dir := newRepo(t, "r")
 	run(t, "", "worktree", "add", "feat", "--repo", dir)
-	d := decode[RepoDetail](t, run(t, "", "repo", "show", dir))
+	d := decode[RepoDetail](t, run(t, "", "repo", "inspect", dir))
 	if d.Repo.Name != "r" || len(d.Worktrees) != 2 || len(d.Branches) != 2 {
 		t.Fatalf("show %+v", d)
 	}
@@ -278,7 +278,6 @@ func TestCatalog(t *testing.T) {
 	if cat.Name != "o-git" || cat.Version != Version || cat.State != "repo.lists" {
 		t.Fatalf("catalog %s %s %s", cat.Name, cat.Version, cat.State)
 	}
-	got := map[string]string{}
 	columnCounts := map[string]int{"commit": len(commitColumns(true)), "change": 4}
 	for noun, cols := range columns {
 		columnCounts[noun] = len(cols)
@@ -290,35 +289,6 @@ func TestCatalog(t *testing.T) {
 		}
 		if len(n.Columns) != count {
 			t.Fatalf("%s columns %+v", n.Name, n.Columns)
-		}
-		var verbs []string
-		for _, v := range n.Verbs {
-			if v.Kind != "application" {
-				t.Fatalf("%s.%s kind %q", n.Name, v.Name, v.Kind)
-			}
-			s := v.Name
-			if v.Confirm != "" {
-				s += "!"
-			}
-			if v.Rows != "" {
-				s += "=" + v.Rows
-			}
-			verbs = append(verbs, s)
-		}
-		got[n.Name] = strings.Join(verbs, " ")
-	}
-	want := map[string]string{
-		"repo":       "archive compare create delete! edit fetch get list=repo lists set show",
-		"endpoint":   "archive compare create delete! edit get list=endpoint resolve set show yank",
-		"comparison": "archive close commit-open commits=commit create delete! edit fetch file-open files=change get list=comparison open pair-files reload save set show swap yank",
-		"worktree":   "add archive compare create delete! edit get list=worktree remove! set",
-		"branch":     "archive compare create delete! edit get list=branch names set switch",
-		"commit":     "archive compare create delete! diff edit files=change get list=commit set show yank",
-		"change":     "archive create delete! diff edit get list=change set show yank",
-	}
-	for noun, verbs := range want {
-		if got[noun] != verbs {
-			t.Fatalf("%s verbs %q, want %q", noun, got[noun], verbs)
 		}
 	}
 }

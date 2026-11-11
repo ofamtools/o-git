@@ -178,8 +178,7 @@ func listReposSelecting(ctx context.Context, extra []string, selected string) ([
 	type want struct{ name, dir string }
 	var wants []want
 	if selected != "" {
-		// The empty name is filled from the resolved toplevel after inspection.
-		wants = append(wants, want{dir: absPath(selected)})
+		wants = append(wants, selectedRepo(selected, known))
 	}
 	for _, k := range known {
 		wants = append(wants, want{k.Name, k.Dir})
@@ -202,6 +201,15 @@ func listReposSelecting(ctx context.Context, extra []string, selected string) ([
 		}
 	}
 	return out, ctx.Err()
+}
+
+func selectedRepo(selected string, known []Known) struct{ name, dir string } {
+	for _, k := range known {
+		if k.Name == selected {
+			return struct{ name, dir string }{k.Name, k.Dir}
+		}
+	}
+	return struct{ name, dir string }{dir: absPath(selected)}
 }
 
 // workers bounds the git calls one command runs at once.
@@ -285,7 +293,7 @@ func listBranchRows(ctx context.Context, dir string) ([]BranchRow, error) {
 	return rows, nil
 }
 
-// RepoDetail is repo show's answer.
+// RepoDetail is repo inspect's answer.
 type RepoDetail struct {
 	Repo      Repo          `json:"repo"`
 	Worktrees []WorktreeRow `json:"worktrees"`

@@ -213,24 +213,45 @@ func lines(rows []ocli.Row) ocli.Lines {
 func revealed(target string) (ochazuke.ListItem, error) {
 	noun, rest, _ := strings.Cut(target, "/")
 	if rest == "" {
-		return ochazuke.ListItem{}, fmt.Errorf("not a row id (repo/DIR, worktree/PATH or branch/REPO:NAME): %s", target)
+		return ochazuke.ListItem{}, fmt.Errorf("not a row id: %s", target)
 	}
-	switch noun {
-	case "repo":
-		dir := absPath(rest)
-		return ochazuke.ListItem{ID: target, Label: filepath.Base(dir), Noun: noun, Data: Repo{Name: filepath.Base(dir), Path: dir}}, nil
-	case "worktree":
-		w := WorktreeRow{Worktree: Worktree{Path: absPath(rest)}}
-		return ochazuke.ListItem{ID: target, Label: worktreeLabel(w), Noun: noun, Data: w}, nil
-	case "branch":
-		repo, name := ".", rest
-		if i := strings.LastIndex(rest, ":"); i >= 0 {
-			repo, name = rest[:i], rest[i+1:]
+	for _, spec := range []struct {
+		noun string
+		row func(string) (string, any, error)
+	}{
+		{"repo", func(rest string) (string, any, error) {
+			dir := absPath(rest)
+			return filepath.Base(dir), Repo{Name: filepath.Base(dir), Path: dir}, nil
+		}},
+		{"worktree", func(rest string) (string, any, error) {
+			w := WorktreeRow{Worktree: Worktree{Path: absPath(rest)}}
+			return worktreeLabel(w), w, nil
+		}},
+		{"branch", func(rest string) (string, any, error) {
+			repo, name := ".", rest
+			if i := strings.LastIndex(rest, ":"); i >= 0 {
+				repo, name = rest[:i], rest[i+1:]
+			}
+			if name == "" {
+				return "", nil, fmt.Errorf("no branch name in %s", target)
+			}
+			return name, BranchRow{Repo: absPath(repo), Branch: Branch{Name: name}}, nil
+		}},
+		{"change", revealFile},
+		{"diff-file", revealFile},
+	} {
+		if noun == spec.noun {
+			label, data, err := spec.row(rest)
+			return ochazuke.ListItem{ID: target, Label: label, Noun: noun, Data: data}, err
 		}
-		if name == "" {
-			return ochazuke.ListItem{}, fmt.Errorf("no branch name in %s", target)
-		}
-		return ochazuke.ListItem{ID: target, Label: name, Noun: noun, Data: BranchRow{Repo: absPath(repo), Branch: Branch{Name: name}}}, nil
 	}
-	return ochazuke.ListItem{}, fmt.Errorf("not a row id (repo/DIR, worktree/PATH or branch/REPO:NAME): %s", target)
+	return ochazuke.ListItem{}, fmt.Errorf("not a supported row id: %s", target)
+}
+
+func revealFile(rest string) (string, any, error) {
+	repo, path, ok := strings.Cut(rest, ":")
+	if !ok || path == "" {
+		return "", nil, fmt.Errorf("file row id must contain REPO:PATH")
+	}
+	return path, Change{Repo: repo, Path: path}, nil
 }

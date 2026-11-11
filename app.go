@@ -91,12 +91,15 @@ func New() (*App, error) {
 	if err := a.registerDiffVerbs(); err != nil {
 		return nil, err
 	}
+	a.registerDiffFileVerbs()
 	a.defineStores()
 	a.m = ochazuke.NewModel(r)
 	a.m.Title = "o-git"
 	if err := a.registerComparePage(); err != nil {
 		return nil, err
 	}
+	a.registerPathVerbs()
+	a.registerViewVerb()
 	if err := a.bind(); err != nil {
 		return nil, err
 	}
@@ -134,20 +137,18 @@ func (a *App) Shell() *ocli.Shell {
 		if err != nil {
 			return err
 		}
-		return a.listOf(item.Noun).SetItems([]ochazuke.ListItem{item})
+		list := a.r.List("__cli-targets")
+		if list == nil {
+			list, err = a.r.AddList("__cli-targets", nil, ochazuke.NoMarks())
+			if err != nil {
+				return err
+			}
+		}
+		return list.SetItems([]ochazuke.ListItem{item})
 	}
 	return sh
 }
 
-func (a *App) listOf(noun string) *ochazuke.Collection {
-	switch noun {
-	case "repo":
-		return a.repos
-	case "worktree":
-		return a.worktrees
-	}
-	return a.branches
-}
 
 // items turns a list verb's rows back into list items.
 func items(rows []ocli.Row) []ochazuke.ListItem {
@@ -189,14 +190,14 @@ func (a *App) follow() bool {
 	}
 	a.following = item.ID
 	repo, _ := item.Data.(Repo)
-	return a.launch(reposID, "repo.show", a.show(repo.Path, repo.Name, false))
+	return a.launch(reposID, "repo.inspect", a.show(repo.Path, repo.Name, false))
 }
 
 // refresh reads the repositories and the shown one again (after a change).
 func (a *App) refresh() {
 	a.launch(reposID, "repo.list", a.repoList(ochazuke.Ctx{Args: ochazuke.Arguments{}}))
 	if a.current != "" {
-		a.launch(reposID, "repo.show", a.show(a.current, a.currentName, false))
+		a.launch(reposID, "repo.inspect", a.show(a.current, a.currentName, false))
 	}
 }
 

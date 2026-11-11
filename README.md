@@ -30,7 +30,7 @@ mtm extension register git       # mounts the Git page and the repo, worktree, b
 
 ```sh
 o git repo list [--path DIR,...]          # every repo o-proj lists (+ DIRs), with status: rows
-o git repo show [REPO]                    # {repo, worktrees, branches}
+o git repo inspect [REPO]                 # {repo, worktrees, branches}
 o git repo lists [--path DIR,...]         # every list's rows as JSON Lines (the catalog's state source)
 o git worktree list [REPO]
 o git worktree add BRANCH [PATH] [--repo REPO] [--from REF]
@@ -51,7 +51,7 @@ o git NOUN --help                         # a noun's verbs and parameters
 | `worktree` | `worktree/PATH` | branch, status, path, head |
 | `branch` | `branch/REPO:NAME` (`branch/NAME` is the current directory's) | branch, sync, age, upstream, merged, subject |
 
-`--format table|markdown|toon` prints a list verb's rows (and `repo lists`'s, one table per noun) as those columns, the cells the page draws; the branch cell keeps the page's `* ` mark on the checked-out branch (`data.current` in JSON). Verbs that answer one object (`repo show`, the mutations) print JSON with a note.
+`--format table|markdown|toon` prints a list verb's rows (and `repo lists`'s, one table per noun) as those columns, the cells the page draws; the branch cell keeps the page's `* ` mark on the checked-out branch (`data.current` in JSON). Verbs that answer one object (`repo inspect`, the mutations) print JSON with a note.
 
 `sync` is `-` without an upstream, `gone`, `=` when even, else `↑ahead ↓behind`; `changes` is `clean` or `+staged ~unstaged ?untracked !conflicts`.
 
@@ -78,29 +78,57 @@ The destructive verbs take plain arguments, the same ones the page's `d d` passe
 
 `worktree add` checks out an existing branch, or creates it from `--from` (default HEAD); the default path is `REPO-BRANCH` beside the main worktree (`feat/x` becomes `app-feat-x`). Its branch and directory (a `path` parameter) and `branch create`'s name are declared parameters: on the page `n` opens the args form for what is missing, and `branch names [REPO]` lists the branch names that complete them.
 
+## Files and record actions
+
+Requires published ochazuke v0.122.1 and oden v0.5.0. Repository selectors remain directories or o-proj names. Directory and file arguments now publish their path kind in the catalog, so the same picker and completion metadata reaches the standalone tool and mounted tools. `repo list`, `repo lists` and `repo view` keep their comma-separated `--path DIR,...` selector. A chooser supplies one directory; the existing multi-directory spelling still works. This selector is not a concrete path belonging to one record.
+
+Every facts noun has the shared `show`, `history` and `yank` actions where supported. `show KEY` opens the shared record form in the UI and returns the record on the CLI. The existing domain reads are `repo inspect`, `comparison inspect`, `commit inspect`, `change inspect` and `endpoint resolve`. Repo Enter retains the inspect-and-focus-worktrees behavior; `v` or the palette reaches the standard show form. The mounted Git detail requests the same record form. `detail.show-form`, on by default in ochazuke, turns it off.
+
+IDs remain keys and labels retain their label role. These are read-only Git facts, not editable documents. There is no invented rename, duplicate, annotation or relation store. Existing worktree and branch mutations remain available with their original safety checks. Mtm can add its own annotations, relations and history when it mounts the catalog.
+
+| Subject | Filesystem actions |
+|---|---|
+| `repo`, `worktree` | `reveal`, `open`, `open-with --with APP`, `yank-path`, `edit-file` |
+| `change`, `diff-file` | The same actions, plus `export PATH DESTINATION [--side from\|to] [--force]` |
+| `branch`, `commit`, `endpoint`, `comparison` | Shared path actions on their typed directory properties, without replacing domain actions such as `comparison open` |
+
+The first two rows accept a typed `--path`, a repository selector via `--repo`, or a row `--target`. `--prop` selects another path property. Repo and worktree prefer their own `path`, not the worktree's owning repo. `edit-file` invokes `$VISUAL`, then `$EDITOR`, then `vi`. It is separate from `edit`, which remains the shared record editor. The filename is a separate shell argument, so spaces and shell metacharacters in it remain literal. `open` uses `open.openers` and the system's kind handler by default; `open-with` names an application explicitly.
+
+File paths remain repository-relative in Git records. File actions resolve them against that record's actual repository, never the caller's working directory. Absolute paths from the chooser work when they are inside the repository. `yank-path` returns the absolute reference and whether it exists. It does not claim that a deleted file still exists. Open, reveal and editor actions refuse historical/index paths rather than opening a current file at the same name. They also refuse missing working files.
+
+`change export` and `diff-file export` write exact content from the selected side. Use `--side from` for a deleted file. Export a historical snapshot before opening it in another application. Git-side content streams through a reader into a writer; it is not reconstructed from displayed diff lines. Exports refuse an existing destination unless `--force` is given, and a failed read never replaces it. A row's source and revision travel as declared parameters when a host forwards an action, so the same path in a different revision cannot silently become a working file.
+
+`diff-file list [--repo REPO] [--pair NAME | --from REF --to REF]` returns structured file rows with typed `oldPath`/`newPath`, hunks and source revisions. Files already shown in the Compare diff modal remain change rows and have the same filesystem actions.
+
+`change diff` and `commit diff` accept `--destination FILE [--force]`. Their existing `--output plain|json` still chooses the representation. Without a destination they keep their original stdout result. Destination handling is writer-shaped for the shared output-sink parameter kind; Git path selectors are not input streams.
+
+`repo view` registers all standalone view options: `--page`, `--repo`, `--path`, `--smoke`, `--width` and `--height`. Bare `view` and bare view flags are thin calls of that verb. It remains an application noun action in catalogs, rather than a framework-only launcher that hosts can omit.
+
+Published v0.122.1 does not yet provide `PropSpec.Self` or typed-many metadata for the comma-directory selector. The actual repo/worktree path properties are typed and ordered first, with no fake Self flag or custom parameter kind. No URL property is declared because these records contain Git refs and remote names, not URL values.
+
 ## Compare command line
 
-The `endpoint`, `compare`, `commit` and `change` nouns provide comparison data, commit/file lists and content diffs. The Compare page is available in o-git's TUI.
+The `endpoint`, `comparison`, `commit`, `change` and `diff-file` nouns provide comparison data, commit/file lists and content diffs. The Compare page is available in o-git's TUI.
 
 | Command | Result |
 |---|---|
 | `endpoint list [REPO]` | Named endpoint rows: spec, kind, ref, SHA, fetched age and status |
-| `endpoint resolve SPEC [--other E] [REPO]` | A resolved endpoint; `show` has the same behavior. `--other` defaults to `HEAD` |
+| `endpoint resolve SPEC [--other E] [REPO]` | A resolved endpoint. `--other` defaults to `HEAD`; standard `show` displays an endpoint record by key |
 | `comparison list [REPO]` | Saved pair rows: from, to, ahead, behind, fetched age and status |
-| `comparison show [--pair NAME \| --from E --to E] [REPO]` | Both endpoints and counts; defaults to `comparison.default-pair` |
+| `comparison inspect [--pair NAME \| --from E --to E] [REPO]` | Both endpoints and counts; defaults to `comparison.default-pair` |
 | `endpoint yank SPEC [--other E] [REPO]` | Resolved SHA through the shared unnamed register |
 | `comparison yank [--pair NAME \| --from E --to E] [REPO]` | Resolved `A..B` range through that register |
 | `repo fetch [REPO] [--remote R]` | An explicit `git fetch --prune` job, one remote or all configured remotes |
 | `comparison fetch [--pair NAME \| --from E --to E] [REPO]` | Fetch only the remote endpoints the pair uses, then resolve it again |
 | `commit list [--pair NAME \| --from E --to E] [--limit N] [REPO]` | Ahead/Behind commit rows in git's order within each section; `comparison commits` is the same read |
-| `commit show SHA [REPO]` | Full message, parents, decorations, author and age |
+| `commit inspect SHA [REPO]` | Full message, parents, decorations, author and age |
 | `commit files SHA [REPO]` | Changes against its first parent; a root commit compares with the empty tree |
 | `commit yank SHA [REPO]` | Full SHA through the shared unnamed register |
 | `change list [--pair NAME \| --from E --to E] [REPO]` | Changed paths, status, numstats and a totals row; `comparison files` is the same read |
-| `change show PATH [--pair NAME \| --from E --to E] [REPO]` | One change, including separate index/worktree counts for an XY row |
+| `change inspect PATH [--pair NAME \| --from E --to E] [REPO]` | One change, including separate index/worktree counts for an XY row |
 | `change yank PATH [--pair NAME \| --from E --to E] [REPO]` | Path through the shared unnamed register |
 
-The list commands accept `--format table`, `markdown` and `toon`. Comparison `from`/`to` cells show resolved short refs (`master`, `origin/master`, `HEAD`); the original specs remain in JSON and in a separate, lowest-priority `spec` column. This ochazuke version has no default-hidden column flag, so the CLI includes that column. Short human reasons appear in `status`/`reason`; raw Git failures are retained separately in JSON `detail` for a detail view. Resolve/show return one object for one result and an array when `{remote}` expands to multiple results. Copy joins multiple results with newlines. `--repo R` is available everywhere; it has the same meaning as the positional `REPO`.
+The list commands accept `--format table`, `markdown` and `toon`. Comparison `from`/`to` cells show resolved short refs (`master`, `origin/master`, `HEAD`); the original specs remain in JSON and in a separate, lowest-priority `spec` column. The CLI includes that column. Short human reasons appear in `status`/`reason`; raw Git failures remain separately in JSON `detail` for a detail view. Resolve and comparison inspect return one object for one result and an array when `{remote}` expands to multiple results. Copy joins multiple results with newlines. `--repo R` has the same meaning as the positional `REPO`.
 
 Endpoints are `HEAD`, `WORKTREE`, `INDEX`, a ref/SHA, `{main}`, `{branch}`, `{upstream}`, `{remote}`, `worktree:PATH`, `merge-base(X)` or `fork-point(X)`. `A | B` takes the first available alternative. When **both sides** have alternatives, combinations are tried in this fixed order: left relative + right plain, left plain + right relative, then both plain; source order is preserved within each category. A single side's alternatives retain their written order. Two relative choices cannot resolve against each other, but available plain fallbacks are still tried. Named endpoints from `comparison.endpoints` work anywhere an endpoint is accepted, including inside relative specs; fully qualified refs disambiguate names that match a named endpoint. Remote identity comes from the canonical full ref, so a local `josh/feature` remains local even with a remote named `josh`; Git's ref precedence also applies when `{remote}` expands. Use `refs/remotes/josh/feature` to explicitly choose its remote-tracking ref. `{remote}` expands to one result per configured remote, with both sides of a pair using the same remote. Remote names containing `|`, `(` or `)` remain unavailable rows with a reason, rather than being reinterpreted as endpoint syntax. `worktree:PATH` uses a registered worktree's full HEAD SHA; relative paths start at REPO.
 

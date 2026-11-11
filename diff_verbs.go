@@ -16,12 +16,16 @@ func (a *App) registerDiffVerbs() error {
 	for _, key := range []string{"change.diff", "commit.diff"} {
 		op := a.r.Operations.At(ochazuke.Key(key))
 		op.Parameters = map[string]ochazuke.Parameter{
-			"repo":    {Type: "string", Description: "repository directory or o-proj name; default current repository"},
+			"repo":    repoParameter(),
 			"context": {Type: "integer", Description: "context lines; defaults to comparison.diff.context"},
 			"output":  {Type: "string", Enum: []string{"plain", "json"}, Description: "exact unified patch text (default plain), or structured JSON"},
+			"destination": {Type: "path", Path: "file", New: true, Description: "optional output file; output still selects plain patch or JSON"},
+			"force": {Type: "boolean", Description: "replace an existing destination after a successful diff read"},
 		}
 		if key == "change.diff" {
-			op.Parameters["path"] = ochazuke.Parameter{Type: "string", Required: true, Description: "literal path relative to repository root (either rename path)"}
+			path := changedPathParameter()
+			path.Required = true
+			op.Parameters["path"] = path
 			for _, name := range []string{"pair", "from", "to"} {
 				op.Parameters[name] = ochazuke.Parameter{Type: "string", Description: "comparison selector; use --pair or --from/--to"}
 			}
@@ -58,7 +62,8 @@ func (a *App) changeDiff(c ochazuke.Ctx) ochazuke.Result {
 		return ochazuke.Failed(err)
 	}
 	opt := a.diffOptions(c)
-	return a.comparisonRead(c, func(r *EndpointResolver) (any, error) {
+	sink := diffDestination(c.Args)
+	return a.comparisonRead(listContext(c), func(r *EndpointResolver) (any, error) {
 		results := []DiffResult{}
 		for _, p := range r.Show(pair, from, to) {
 			d, err := BuildDiff(r.ctx, p, opt)
@@ -67,13 +72,14 @@ func (a *App) changeDiff(c ochazuke.Ctx) ochazuke.Result {
 			}
 			results = append(results, d)
 		}
-		return diffOutput(results, opt.Plain), nil
+		return sink.write(results, opt.Plain)
 	})
 }
 
 func (a *App) commitDiff(c ochazuke.Ctx) ochazuke.Result {
 	sha, opt := ochazuke.StringArg(c.Args, "sha", ""), a.diffOptions(c)
-	return a.comparisonRead(c, func(r *EndpointResolver) (any, error) {
+	sink := diffDestination(c.Args)
+	return a.comparisonRead(listContext(c), func(r *EndpointResolver) (any, error) {
 		ends := r.Resolve(sha, "HEAD")
 		results := []DiffResult{}
 		for _, to := range ends {
@@ -119,6 +125,6 @@ func (a *App) commitDiff(c ochazuke.Ctx) ochazuke.Result {
 			}
 			results = append(results, d)
 		}
-		return diffOutput(results, opt.Plain), nil
+		return sink.write(results, opt.Plain)
 	})
 }

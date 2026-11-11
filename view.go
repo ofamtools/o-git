@@ -22,10 +22,10 @@ import (
 // dataPage is the Git page as the catalog declares it (ocli.DeclarePage),
 // so a host (mtm, nabe) draws it from o-git's rows through ocli.MountPage:
 // the repo, branch and worktree lists split beside the selected row's
-// record. The host fills every list from the state verb (repo.state), so
-// its branch and worktree lists hold the rows of every repository, not of
-// a selected one as the TUI's do. Detail fields are one order for all
-// three nouns; a field a row lacks is left out.
+// record. The host fills every list from repo.lists, so its branch and
+// worktree lists hold every repository's rows, not only the selected one's.
+// The shared record form is the detail; Fields retain the text fallback
+// when detail.show-form is off.
 func dataPage() ocli.CatalogPage {
 	return ocli.CatalogPage{
 		ID: pageID, Title: "Git", Layout: ocli.LayoutSplit,
@@ -34,7 +34,7 @@ func dataPage() ocli.CatalogPage {
 			{ID: branchesID, Noun: "branch", Title: "Branches"},
 			{ID: worktreesID, Noun: "worktree", Title: "Worktrees"},
 		},
-		Detail: &ocli.CatalogDetail{Fields: []string{
+		Detail: &ocli.CatalogDetail{Kind: ocli.DetailRecordForm, Fields: []string{
 			"name", "repo", "path", "branch", "status", "error", "head",
 			"commit", "subject", "author", "date",
 			"current", "worktree", "main", "upstream", "gone", "ahead", "behind", "merged",

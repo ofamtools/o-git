@@ -125,7 +125,7 @@ func TestCommitShowRootAndMergeFiles(t *testing.T) {
 	commit(t, dir, "main", "fix: main")
 	sh(t, dir, "merge", "-q", "--no-ff", "feature", "-m", "merge topic\n\nfull body\nmore")
 	sh(t, dir, "tag", "release")
-	c := decode[Commit](t, run(t, "", "commit", "show", "HEAD", "--repo", dir))
+	c := decode[Commit](t, run(t, "", "commit", "inspect", "HEAD", "--repo", dir))
 	if c.ParentCount != 2 || len(c.Parents) != 2 || !strings.Contains(c.Decorations, "tag: release") || !strings.Contains(c.Message, "full body\nmore\n") || c.ShortSHA == "" || c.Author != "Test" || c.Side != "" {
 		t.Fatalf("merge: %+v", c)
 	}

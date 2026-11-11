@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -17,58 +15,46 @@ import (
 	"ofam.dev/oden"
 )
 
-// viewCommand is o-git view: the Git page.
-func viewCommand(stdin io.Reader, stdout, stderr io.Writer) oden.Command {
+// viewCommand is only a spelling of the registered repo.view verb.
+func viewCommand(a *App) oden.Command {
 	return oden.Command{
 		Name: "view", Summary: "open the Git page: repos on the left, the selected repo's worktrees, branches and the focused row's detail on the right",
 		Usage: "[--page git|compare] [--repo DIR] [--path DIR,...] [--smoke] [--width N] [--height N]", Source: "o-git",
 		Details: "o-git with no command opens it too. Keys (the family key map): enter shows a repo or switches to a branch, n adds a worktree or branch, d d removes or deletes (confirm), d D forces, R reloads, q quits; ? on the page lists them all.",
-		Run: func(_ context.Context, args []string) error {
-			return runTUI(args, stdin, stdout, stderr)
+		Run: func(ctx context.Context, args []string) error {
+			return a.Shell().Run(ctx, append([]string{"repo", "view"}, args...))
 		},
 	}
 }
 
-// runTUI parses the page's flags and runs it (or renders one frame).
+// runTUI is retained for callers that launch a standalone page; the registered
+// verb owns every flag and is also reachable from a palette or mounted host.
 func runTUI(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
-	flags := flag.NewFlagSet("o-git view", flag.ContinueOnError)
-	flags.SetOutput(stderr)
-	page := flags.String("page", "git", "page to open: git or compare")
-	repo := flags.String("repo", "", "select the repository containing DIR, independent of o-proj")
-	paths := flags.String("path", "", "extra repository directories, comma-separated, listed after o-proj's")
-	smoke := flags.Bool("smoke", false, "read the repositories, render one frame to stdout and exit")
-	width := flags.Int("width", 100, "--smoke frame width")
-	height := flags.Int("height", 30, "--smoke frame height")
-	if err := flags.Parse(args); err != nil {
-		if errors.Is(err, flag.ErrHelp) {
-			return nil
-		}
-		return &oden.ExitError{Code: 2}
-	}
-	extra := splitPaths(*paths)
-	for _, word := range flags.Args() {
-		extra = append(extra, splitPaths(word)...)
-	}
-	if *page == "compare" && *repo == "" && len(extra) == 0 {
-		dir, err := os.Getwd()
-		if err != nil {
-			return err
-		}
-		*repo = dir
-	}
 	a, err := New()
 	if err != nil {
 		return err
 	}
-	a.Paths, a.Stdin, a.Stdout, a.Stderr = extra, stdin, stdout, stderr
-	a.viewRepo = *repo
+	a.Stdin, a.Stdout, a.Stderr = stdin, stdout, stderr
+	return a.Shell().Run(context.Background(), append([]string{"repo", "view"}, args...))
+}
+
+func (a *App) view(opt viewOptions) error {
+	page, repo, extra := opt.Page, opt.Repo, splitPaths(opt.Paths)
+	if page == "compare" && repo == "" && len(extra) == 0 {
+		dir, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		repo = dir
+	}
+	a.Paths, a.viewRepo = extra, repo
 	if _, err := a.r.Execute(ochazuke.Request{Noun: "repo", Verb: "list", Target: pageID}); err != nil {
 		return err
 	}
-	if *page != "git" && *page != "compare" {
-		return fmt.Errorf("unknown page %q", *page)
+	if page != "git" && page != "compare" {
+		return fmt.Errorf("unknown page %q", page)
 	}
-	if *page == "compare" {
+	if page == "compare" {
 		if err := a.Settle(); err != nil {
 			a.r.UI().Error(err.Error())
 		}
@@ -79,17 +65,17 @@ func runTUI(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 			return err
 		}
 	}
-	if *smoke {
+	if opt.Smoke {
 		// A failed read is shown, as the page would show it.
 		if err := a.Settle(); err != nil {
 			a.r.UI().Error(err.Error())
 		}
-		a.m.Width, a.m.Height = *width, *height
-		_, err := fmt.Fprintln(stdout, strings.TrimRight(ansi.Strip(a.m.View().Content), "\n"))
+		a.m.Width, a.m.Height = opt.Width, opt.Height
+		_, err := fmt.Fprintln(a.Stdout, strings.TrimRight(ansi.Strip(a.m.View().Content), "\n"))
 		return err
 	}
 	a.tui = true
-	_, err = tea.NewProgram(&model{a: a}).Run()
+	_, err := tea.NewProgram(&model{a: a}, tea.WithInput(a.Stdin), tea.WithOutput(a.Stdout)).Run()
 	return err
 }
 

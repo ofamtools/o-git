@@ -2,8 +2,6 @@
 # A row with a reason is a legitimate use that stays. A row without one is debt that may only shrink:
 # NAMECHECK_UPDATE=1 removes rows and lowers counts, never adds them. Adding a row is a reviewed edit.
 app.go	App.follow	compare	"compare"	1
-app.go	App.listOf	case	"repo"	1
-app.go	App.listOf	case	"worktree"	1
 changes.go	ReadChanges	compare	"index"	2
 changes.go	ReadChanges	compare	"worktree"	5
 changes.go	ReadChanges	cyclo	"-"	31
@@ -29,10 +27,9 @@ compare_page_views.go	App.registerCompareViews	compare	"compare"	1
 compare_reasons.go	EndpointResolver.refFailure	compare	"commit"	2
 compare_verbs.go	App.registerCompareVerbs	case	"comparison.yank"	1
 compare_verbs.go	App.registerCompareVerbs	case	"comparison.fetch"	1
-compare_verbs.go	App.registerCompareVerbs	case	"comparison.show"	1
+compare_verbs.go	App.registerCompareVerbs	case	"comparison.inspect"	1
 compare_verbs.go	App.registerCompareVerbs	case	"endpoint.yank"	1
 compare_verbs.go	App.registerCompareVerbs	case	"endpoint.resolve"	1
-compare_verbs.go	App.registerCompareVerbs	case	"endpoint.show"	1
 compare_verbs.go	App.registerCompareVerbs	case	"repo.fetch"	1
 diff.go	BuildDiff	cyclo	"-"	33
 diff.go	diffShape	compare	"index"	3
@@ -58,13 +55,14 @@ lists_verbs.go	App.registerListsVerbs	case	"commit.list"	1
 lists_verbs.go	App.registerListsVerbs	case	"comparison.commits"	1
 lists_verbs.go	App.registerListsVerbs	case	"comparison.files"	1
 lists_verbs.go	App.registerListsVerbs	compare	"change.yank"	1
-lists_verbs.go	App.registerListsVerbs	compare	"change.show"	1
+lists_verbs.go	App.registerListsVerbs	compare	"change.inspect"	1
 lists_verbs.go	App.registerListsVerbs	compare	"commit.yank"	1
 lists_verbs.go	App.registerListsVerbs	compare	"commit.files"	1
 lists_verbs.go	App.registerListsVerbs	compare	"commit.list"	1
-lists_verbs.go	App.registerListsVerbs	compare	"commit.show"	1
+lists_verbs.go	App.registerListsVerbs	compare	"commit.inspect"	1
 lists_verbs.go	App.registerListsVerbs	compare	"comparison.commits"	1
-rows.go	revealed	case	"branch"	1
-rows.go	revealed	case	"repo"	1
-rows.go	revealed	case	"worktree"	1
-tui.go	runTUI	compare	"compare"	3
+path_actions.go	App.readPath	compare	"worktree"	1	Git endpoint storage kind, not a dispatch branch on a noun
+file_exports.go	writeFileSide	compare	"from"	1	Git diff side selector
+file_exports.go	writeFileSide	compare	"worktree"	1	Git endpoint storage kind
+file_exports.go	writeFileSide	compare	"index"	1	Git endpoint storage kind
+tui.go	App.view	compare	"compare"	3	Page selection already exposed by the view entry point

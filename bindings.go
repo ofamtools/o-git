@@ -20,7 +20,7 @@ func (a *App) bind() error {
 		Bind("R", ochazuke.Do("repo.list")).
 		Bind("q", ochazuke.Do("app.quit"))
 	r.Define("repo").Mode("normal").
-		Bind("enter", ochazuke.Do("repo.show"))
+		Bind("enter", ochazuke.Do("repo.inspect"))
 	r.Define("worktree").Mode("normal").
 		Bind("d d", ochazuke.Do("worktree.remove")).
 		Bind("d D", ochazuke.Do("worktree.remove", ochazuke.Arguments{"force": true}).Hinted("force remove"))

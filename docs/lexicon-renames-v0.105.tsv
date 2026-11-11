@@ -5,7 +5,7 @@ verb	git.commit.copy	git.commit.yank	clipboard copy is yank; binding rows `y y` 
 verb	git.change.copy	git.change.yank	clipboard copy is yank
 verb	git.endpoint.copy	git.endpoint.yank	clipboard copy is yank
 verb	git.repo.state	git.repo.lists	every list's rows (the catalog's state source, Result lists); the word state is a status field, never a verb. A host finds it by Result, not by name
-verb	git.repo.status	git.repo.get {prop: status}	status is a prop (clean, dirty, missing, not-repo, error); the full record is `repo show REPO` (its repo field) or `repo get`
+verb	git.repo.status	git.repo.get {prop: status}	status is a prop (clean, dirty, missing, not-repo, error); the full record is `repo show KEY` or `repo get`, and the summary with worktrees/branches is `repo inspect REPO`
 prop	git.repo.state / condition	git.repo.status	field and JSON key state (store prop was condition) is status
 prop	git.worktree.state / condition	git.worktree.status	field and JSON key state (store prop was condition) is status
 prop	git.comparison.state	git.comparison.status	Comparison.State / JSON key state is status

@@ -442,11 +442,11 @@ func TestCompareSettingsAndCLI(t *testing.T) {
 	if !e.Available || e.SHA != sh(t, d, "rev-parse", "HEAD") {
 		t.Fatalf("%+v", e)
 	}
-	p := decode[Comparison](t, run(t, "", "comparison", "show", "--pair", "dirty", "--repo", d))
+	p := decode[Comparison](t, run(t, "", "comparison", "inspect", "--pair", "dirty", "--repo", d))
 	if !p.Available || p.To.Kind != "worktree" {
 		t.Fatalf("%+v", p)
 	}
-	if _, _, err := try("", "comparison", "show", "--pair", "dirty", "--from", "HEAD", "--repo", d); err == nil {
+	if _, _, err := try("", "comparison", "inspect", "--pair", "dirty", "--from", "HEAD", "--repo", d); err == nil {
 		t.Fatal("accepted ambiguous selector")
 	}
 	a, err := New()

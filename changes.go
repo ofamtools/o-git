@@ -23,6 +23,10 @@ type Change struct {
 	Untracked bool        `json:"untracked,omitempty"`
 	Index     *ChangeStat `json:"index,omitempty"`
 	Worktree  *ChangeStat `json:"worktree,omitempty"`
+	Source    string      `json:"source,omitempty"`
+	Revision  string      `json:"revision,omitempty"`
+	BaseSource string     `json:"base_source,omitempty"`
+	BaseRevision string   `json:"base_revision,omitempty"`
 }
 
 type ChangeStat struct {
@@ -308,6 +312,10 @@ func ReadChanges(ctx context.Context, dir string, pair Comparison, findCopiesHar
 	}
 	if err != nil {
 		return result, err
+	}
+	for i := range result.Files {
+		result.Files[i].Source, result.Files[i].Revision = pair.To.Kind, pair.To.SHA
+		result.Files[i].BaseSource, result.Files[i].BaseRevision = pair.From.Kind, pair.From.SHA
 	}
 	result.count()
 	return result, nil

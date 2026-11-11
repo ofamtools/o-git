@@ -96,18 +96,27 @@ func diffShape(c Comparison) (args []string, reversed, untracked bool) {
 	return
 }
 
+func comparisonDirectory(c Comparison) string {
+	for _, e := range []Endpoint{c.To, c.From} {
+		if isMutable(e) && e.Path != "" {
+			return e.Path
+		}
+	}
+	return c.Repo
+}
+
 // BuildDiff reads a resolved pair. Unavailable and equal pairs remain visible
 // as an empty result with the resolver's reason; no substitute base is chosen.
 func BuildDiff(ctx context.Context, c Comparison, opt DiffOptions) (DiffResult, error) {
+	c.Repo = comparisonDirectory(c)
 	d := DiffResult{Comparison: c, Reversed: c.Reversed, Files: []DiffFile{}}
 	if opt.Context < 0 || opt.MaxLines < 1 {
 		return d, fmt.Errorf("diff context must be nonnegative and max-lines positive")
 	}
-	if opt.Path != "" && (filepath.IsAbs(opt.Path) || filepath.Clean(opt.Path) == ".." || strings.HasPrefix(filepath.Clean(opt.Path), ".."+string(filepath.Separator)) || strings.ContainsRune(opt.Path, 0)) {
-		return d, fmt.Errorf("diff path must be relative to the repository")
-	}
-	if opt.Path != "" {
-		opt.Path = filepath.Clean(opt.Path)
+	var err error
+	opt.Path, err = repositoryPath(c.Repo, opt.Path)
+	if err != nil {
+		return d, err
 	}
 	if !c.Available || endpointKey(c.From) == endpointKey(c.To) {
 		return d, nil

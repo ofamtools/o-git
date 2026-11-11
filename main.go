@@ -2,7 +2,7 @@
 // knows (and any directory named), their worktrees and their branches,
 // through the git CLI. Fetches only on explicit request; never pulls, pushes or tags.
 //
-//	o-git repo list|show|lists [REPO] [--path DIR,...]
+//	o-git repo list|inspect|lists [REPO] [--path DIR,...]; repo show KEY displays the standard record
 //	o-git worktree list [REPO] | add BRANCH [PATH] [--repo R] [--from REF] | remove PATH [--force] [--yes]
 //	o-git branch list [REPO] | create NAME [FROM] [--switch] | switch NAME | delete NAME [--repo R] [--force] [--yes]
 //	o-git [view] [--page git|compare] [--repo DIR] [--path DIR,...] [--smoke]
@@ -46,10 +46,10 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 			if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
 				return oden.ErrNotFound
 			}
-			return runTUI(args, stdin, stdout, stderr)
+			return a.Shell().Run(context.Background(), append([]string{"repo", "view"}, args...))
 		}))
 	ocli.Mount(app, a.Shell())
-	app.Add(viewCommand(stdin, stdout, stderr))
+	app.Add(viewCommand(a))
 	app.HelpText += `
 Page:
   o-git (or o-git view) opens the Git page; --smoke renders one frame.`

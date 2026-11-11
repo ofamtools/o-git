@@ -368,7 +368,7 @@ import	action	seed
 in	action	seed	
 increase	action	seed	
 indent	action	seed	
-index	prop	seed	
+index	noun+prop	seed
 info	prop	seed	
 init	action	seed	
 input	noun	seed	
@@ -918,3 +918,27 @@ move-up	action	seed	ochazuke v0.110
 referrer	noun	seed	ochazuke v0.110
 related	noun	seed	ochazuke v0.110
 related-section	noun	seed	ochazuke v0.110
+diff-file	noun	tool-actions
+edit-file	action	tool-actions
+act	action	yes	ochazuke v0.122.1
+columns	action	seed	ochazuke v0.122.1
+show-archived	action	seed	ochazuke v0.122.1
+form-item	noun	yes	ochazuke v0.122.1
+form-read-only	noun	yes	ochazuke v0.122.1
+group-fold	action	yes	ochazuke v0.122.1
+item-add	action	yes	ochazuke v0.122.1
+item-delete	action	yes	ochazuke v0.122.1
+item-edit	action	yes	ochazuke v0.122.1
+item-first	action	yes	ochazuke v0.122.1
+item-last	action	yes	ochazuke v0.122.1
+item-move-down	action	yes	ochazuke v0.122.1
+item-move-up	action	yes	ochazuke v0.122.1
+item-next	action	yes	ochazuke v0.122.1
+item-previous	action	yes	ochazuke v0.122.1
+item-yank	action	yes	ochazuke v0.122.1
+next-scope	action	seed	ochazuke v0.122.1
+noun-browser	noun	seed	ochazuke v0.122.1
+open-with	action	seed	ochazuke v0.122.1
+opener	noun	yes	ochazuke v0.122.1
+previous-scope	action	seed	ochazuke v0.122.1
+relation-kind	noun	yes	ochazuke v0.122.1

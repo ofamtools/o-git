@@ -200,7 +200,7 @@ func TestChangeCopyDetectionSetting(t *testing.T) {
 			{"change", "list", "--from", "HEAD~1", "--to", "HEAD"},
 			{"comparison", "files", "--from", "HEAD~1", "--to", "HEAD"},
 			{"commit", "files", "HEAD"},
-			{"change", "show", "copied", "--from", "HEAD~1", "--to", "HEAD"},
+			{"change", "inspect", "copied", "--from", "HEAD~1", "--to", "HEAD"},
 		} {
 			var out, stderr strings.Builder
 			a.Stdout, a.Stderr = &out, &stderr
@@ -208,7 +208,7 @@ func TestChangeCopyDetectionSetting(t *testing.T) {
 				t.Fatal(err)
 			}
 			var file Change
-			if command[1] == "show" {
+			if command[1] == "inspect" {
 				file = decode[Change](t, out.String())
 			} else {
 				rows := decode[[]ochazuke.ListItem](t, out.String())
@@ -313,7 +313,7 @@ func TestChangeShowCopyAndPinnedFlags(t *testing.T) {
 	sh(t, dir, "config", "core.pager", driver)
 	sh(t, dir, "config", "diff.relative", "true")
 	write(t, dir, ".gitattributes", "README diff=custom\n")
-	file := decode[Change](t, run(t, "", "change", "show", "README", "--pair", "dirty", "--repo", dir))
+	file := decode[Change](t, run(t, "", "change", "inspect", "README", "--pair", "dirty", "--repo", dir))
 	if file.Path != "README" || file.Status != "MM" || file.Added != 2 {
 		t.Fatalf("show %+v", file)
 	}
@@ -334,7 +334,7 @@ func TestChangeShowCopyAndPinnedFlags(t *testing.T) {
 		t.Fatalf("copy %q", got)
 	}
 	for _, args := range [][]string{
-		{"change", "show", "missing", "--repo", dir},
+		{"change", "inspect", "missing", "--repo", dir},
 		{"change", "list", "--pair", "dirty", "--from", "HEAD", "--repo", dir},
 		{"commit", "list", "--limit", "-1", "--repo", dir},
 	} {

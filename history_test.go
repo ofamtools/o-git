@@ -47,17 +47,17 @@ func TestVerbHistoryKinds(t *testing.T) {
 		t.Fatal(err)
 	}
 	for key, want := range map[string]string{
-		"repo.list": ochazuke.HistoryFetch, "repo.show": ochazuke.HistoryFetch,
+		"repo.list": ochazuke.HistoryFetch, "repo.inspect": ochazuke.HistoryFetch,
 		"repo.lists": ochazuke.HistoryFetch, "branch.list": ochazuke.HistoryFetch,
 		"worktree.add": ochazuke.HistoryChange, "branch.switch": ochazuke.HistoryChange, "branch.delete": ochazuke.HistoryChange,
 		"branch.names":  ochazuke.HistoryFetch,
-		"endpoint.list": ochazuke.HistoryFetch, "endpoint.resolve": ochazuke.HistoryFetch, "endpoint.show": ochazuke.HistoryFetch,
-		"comparison.list": ochazuke.HistoryFetch, "comparison.show": ochazuke.HistoryFetch,
+		"endpoint.list": ochazuke.HistoryFetch, "endpoint.resolve": ochazuke.HistoryFetch,
+		"comparison.list": ochazuke.HistoryFetch, "comparison.inspect": ochazuke.HistoryFetch,
 		"change.diff": ochazuke.HistoryFetch, "commit.diff": ochazuke.HistoryFetch,
 		"endpoint.yank": ochazuke.HistoryAction, "comparison.yank": ochazuke.HistoryAction,
 		"repo.fetch": ochazuke.HistoryChange, "comparison.fetch": ochazuke.HistoryChange,
-		"commit.list": ochazuke.HistoryFetch, "commit.show": ochazuke.HistoryFetch, "commit.files": ochazuke.HistoryFetch,
-		"change.list": ochazuke.HistoryFetch, "change.show": ochazuke.HistoryFetch,
+		"commit.list": ochazuke.HistoryFetch, "commit.inspect": ochazuke.HistoryFetch, "commit.files": ochazuke.HistoryFetch,
+		"change.list": ochazuke.HistoryFetch, "change.inspect": ochazuke.HistoryFetch,
 		"comparison.commits": ochazuke.HistoryFetch, "comparison.files": ochazuke.HistoryFetch,
 		"commit.yank": ochazuke.HistoryAction, "change.yank": ochazuke.HistoryAction,
 	} {

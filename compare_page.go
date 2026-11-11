@@ -97,7 +97,7 @@ func (a *App) registerComparePage() error {
 	setHistory(r, ochazuke.HistoryChange, "comparison.save")
 	for _, key := range []string{"comparison.open", "comparison.reload", "comparison.set", "comparison.swap", "comparison.save", "repo.compare", "worktree.compare", "branch.compare", "endpoint.compare"} {
 		op := r.Operations.At(ochazuke.Key(r.CanonicalKey(key)))
-		op.Parameters = map[string]ochazuke.Parameter{"repo": {Type: "string", Description: "repository path or name"}}
+		op.Parameters = map[string]ochazuke.Parameter{"repo": repoParameter()}
 		switch key {
 		case "comparison.set":
 			op.Parameters["endpoint"] = ochazuke.Parameter{Type: "string", Description: "endpoint name, ref, SHA or spec"}

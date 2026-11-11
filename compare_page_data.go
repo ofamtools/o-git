@@ -167,7 +167,7 @@ func (a *App) followCompare() bool {
 			_ = p.files.SetItems(p.pairFiles)
 		}
 	})
-	return a.launch(pairsID, "comparison.show", res)
+	return a.launch(pairsID, "comparison.inspect", res)
 }
 
 func endpointDetail(e Endpoint) string {
