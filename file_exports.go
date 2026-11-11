@@ -36,7 +36,7 @@ func (a *App) registerFileExports() {
 		op := a.r.Operations.At(ochazuke.Key(a.r.CanonicalKey(spec.noun + ".export")))
 		op.HistoryKind, op.Result = ochazuke.HistoryAction, "{destination, bytes, source}"
 		op.Parameters = map[string]ochazuke.Parameter{
-			"repo": repoParameter(), "path": changedPathParameter(),
+			"repo": rowRepoParameter(), "path": changedPathParameter(),
 			"destination": {Type: "path", Path: "file", New: true, Required: true, Description: "output file; refuses replacement unless --force"},
 			"side":        {Type: "string", Enum: []string{"from", "to"}, Description: "side to export (default to); a deleted file's content is on from"},
 			"force":       {Type: "boolean", Description: "replace an existing destination after the content has been written successfully"},

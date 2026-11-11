@@ -73,8 +73,7 @@ func (a *App) registerVerbs() {
 		"from":   {Type: "string", Description: "the commit it starts at (default HEAD)", Source: "branch.names", SourceArgs: map[string]string{"repo": "repo"}, Free: true},
 		"switch": force("check the new branch out in REPO's worktree"),
 	})
-	rowRepo := repo
-	rowRepo.From = "row:repo"
+	rowRepo := rowRepoParameter()
 	set("branch.switch", "{repo, branch}", map[string]ochazuke.Parameter{
 		"repo": rowRepo,
 		"name": {Type: "string", Description: "the branch (default: the targeted row's; from a key, the help or the palette, the focused row's)", From: "row:name"},

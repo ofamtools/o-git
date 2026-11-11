@@ -44,6 +44,7 @@ func (a *App) registerPathVerbs() {
 			"prop": {Type: "string", Enum: append(slices.Clone(spec.files), spec.dirs...), Description: "path property; default path"},
 		}
 		if len(spec.files) > 0 {
+			params["repo"] = rowRepoParameter()
 			params["path"] = changedPathParameter()
 			for name, p := range fileProvenance(spec.previous[0]) {
 				params[name] = p

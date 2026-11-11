@@ -6,8 +6,23 @@ import (
 	"ofam.dev/ochazuke"
 )
 
+// repoParameter is the optional repository of a verb with a default of its
+// own (repoWord: the targeted row's repository, then the one the page shows,
+// then the current directory). It declares no row source: ochazuke asks for
+// a declared subject its row cannot fill, and a repository row, an empty
+// list and a page carry no repo field, so a sourced parameter would open
+// the path chooser where the default is already known.
 func repoParameter() ochazuke.Parameter {
-	return ochazuke.Parameter{Type: "path", Path: "dir", Free: true, From: "row:repo", Description: "repository directory or o-proj name; names remain literal selectors (default: the row's repository, then cwd)"}
+	return ochazuke.Parameter{Type: "path", Path: "dir", Free: true, Description: "repository directory or o-proj name; names remain literal selectors (default: the row's repository, then cwd)"}
+}
+
+// rowRepoParameter is the repository of a verb that acts on one row whose
+// record carries it (a branch, a changed file): the row is its source, so a
+// host that mounts the row passes it, and a request with no such row asks.
+func rowRepoParameter() ochazuke.Parameter {
+	p := repoParameter()
+	p.From = "row:repo"
+	return p
 }
 
 func directoriesParameter() ochazuke.Parameter {
