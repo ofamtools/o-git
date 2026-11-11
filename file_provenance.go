@@ -11,20 +11,26 @@ func fileProvenance(oldField string) map[string]ochazuke.Parameter {
 		{"source", "source"}, {"revision", "revision"},
 		{"base-source", "base_source"}, {"base-revision", "base_revision"},
 	} {
-		params[field.arg] = ochazuke.Parameter{Type: "string", From: "row:"+field.prop, Plumbing: true, Description: "selected file's Git endpoint provenance"}
+		params[field.arg] = ochazuke.Parameter{Type: "string", From: "row:" + field.prop, Plumbing: true, Description: "selected file's Git endpoint provenance"}
 	}
-	params["old-path"] = ochazuke.Parameter{Type: "path", Path: "file", New: true, From: "row:"+oldField, Plumbing: true, Description: "repository-relative path on the from side"}
+	params["old-path"] = ochazuke.Parameter{Type: "path", Path: "file", New: true, From: "row:" + oldField, Plumbing: true, Description: "repository-relative path on the from side"}
 	return params
 }
 
 func fillProvenance(in *pathInput, args ochazuke.Arguments) {
-	if in.row == nil { in.row = ochazuke.Thing{} }
+	if in.row == nil {
+		in.row = ochazuke.Thing{}
+	}
 	for _, field := range []struct{ arg, prop string }{
 		{"source", "source"}, {"revision", "revision"},
 		{"base-source", "base_source"}, {"base-revision", "base_revision"},
 		{"old-path", "old_path"}, {"old-path", "oldPath"},
 	} {
-		if value := ochazuke.StringArg(args, field.arg, ""); value != "" { in.row[field.prop] = value }
+		if value := ochazuke.StringArg(args, field.arg, ""); value != "" {
+			in.row[field.prop] = value
+		}
 	}
-	if in.row["path"] == nil { in.row["path"] = in.path }
+	if in.row["path"] == nil {
+		in.row["path"] = in.path
+	}
 }

@@ -23,9 +23,9 @@ func changedPathParameter() ochazuke.Parameter {
 // the supported standard verbs. The preferred path precedes ancillary paths.
 func (a *App) typePathProps() {
 	for _, spec := range []struct {
-		noun string
+		noun        string
 		files, dirs []string
-		preferred string
+		preferred   string
 	}{
 		{noun: "repo", dirs: []string{"path"}, preferred: "path"},
 		{noun: "worktree", dirs: []string{"path", "repo"}, preferred: "path"},
@@ -48,8 +48,12 @@ func (a *App) typePathProps() {
 		}
 		slices.SortStableFunc(n.Props, func(x, y ochazuke.PropSpec) int {
 			rank := func(p ochazuke.PropSpec) int {
-				if p.Key { return 0 }
-				if p.Name == spec.preferred { return 1 }
+				if p.Key {
+					return 0
+				}
+				if p.Name == spec.preferred {
+					return 1
+				}
 				return 2
 			}
 			return rank(x) - rank(y)

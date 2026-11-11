@@ -13,7 +13,7 @@ import (
 func (a *App) scopeFactGets() {
 	for _, spec := range []struct {
 		noun, scope string
-		compound bool
+		compound    bool
 	}{
 		{"repo", "path", false}, {"worktree", "repo", false},
 		{"branch", "repo", true}, {"commit", "repo", true},
@@ -25,10 +25,16 @@ func (a *App) scopeFactGets() {
 		get := store.Get
 		store.Get = func(c ochazuke.Ctx, key string) (ochazuke.Thing, error) {
 			repo := strings.TrimPrefix(key, spec.noun+"/")
-			if spec.compound { repo, _, _ = strings.Cut(repo, ":") }
+			if spec.compound {
+				repo, _, _ = strings.Cut(repo, ":")
+			}
 			args := ochazuke.Arguments{}
-			for name, value := range c.Args { args[name] = value }
-			if args[spec.scope] == nil { args[spec.scope] = repo }
+			for name, value := range c.Args {
+				args[name] = value
+			}
+			if args[spec.scope] == nil {
+				args[spec.scope] = repo
+			}
 			c.Args = args
 			return get(c, key)
 		}
@@ -51,14 +57,20 @@ func (a *App) commitFact(c ochazuke.Ctx, key string) (ochazuke.Thing, error) {
 	value, err := c.Await(ochazuke.StoreCall{Store: "commit", Op: "get", Key: key}, func() ochazuke.Result {
 		return ochazuke.Pending(func(ctx context.Context) (any, error) {
 			_, root, err := resolve(ctx, repo)
-			if err != nil { return nil, err }
+			if err != nil {
+				return nil, err
+			}
 			return ReadCommit(ctx, root, sha, now)
 		})
 	}, 0)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	record := value.(Commit)
 	thing, err := ochazuke.ThingOf(record)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	item := commitItem(record, false)
 	thing["id"], thing["label"] = item.ID, item.Label
 	return thing, nil
@@ -69,14 +81,20 @@ func (a *App) repoFact(c ochazuke.Ctx, key string) (ochazuke.Thing, error) {
 	value, err := c.Await(ochazuke.StoreCall{Store: "repo", Op: "get", Key: key}, func() ochazuke.Result {
 		return ochazuke.Pending(func(ctx context.Context) (any, error) {
 			name, root, err := resolve(ctx, selector)
-			if err != nil { return nil, err }
+			if err != nil {
+				return nil, err
+			}
 			return inspect(ctx, name, root), nil
 		})
 	}, 0)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	record := value.(Repo)
 	thing, err := ochazuke.ThingOf(record)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	thing["id"], thing["label"] = repoID(record.Path), record.Name
 	return thing, nil
 }

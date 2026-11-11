@@ -9,11 +9,11 @@ import (
 // DiffFileRow gives a structured diff file a stable subject and the same
 // provenance as a change. OldPath/NewPath remain repository-relative facts.
 type DiffFileRow struct {
-	Repo string `json:"repo"`
-	Path string `json:"path"`
-	Source string `json:"source"`
-	Revision string `json:"revision,omitempty"`
-	BaseSource string `json:"base_source"`
+	Repo         string `json:"repo"`
+	Path         string `json:"path"`
+	Source       string `json:"source"`
+	Revision     string `json:"revision,omitempty"`
+	BaseSource   string `json:"base_source"`
 	BaseRevision string `json:"base_revision,omitempty"`
 	DiffFile
 }
@@ -31,17 +31,23 @@ func (a *App) registerDiffFileVerbs() {
 
 func (a *App) diffFileList(c ochazuke.Ctx) ochazuke.Result {
 	pair, from, to, err := comparisonArgs(c)
-	if err != nil { return ochazuke.Failed(err) }
+	if err != nil {
+		return ochazuke.Failed(err)
+	}
 	opt := a.diffOptions(c)
 	opt.Plain = false
 	return a.comparisonRead(listContext(c), func(r *EndpointResolver) (any, error) {
 		rows := []ochazuke.ListItem{}
 		for _, p := range r.Show(pair, from, to) {
 			d, err := BuildDiff(r.ctx, p, opt)
-			if err != nil { return nil, err }
+			if err != nil {
+				return nil, err
+			}
 			for _, file := range d.Files {
 				path := file.NewPath
-				if path == "" { path = file.OldPath }
+				if path == "" {
+					path = file.OldPath
+				}
 				data := DiffFileRow{Repo: d.Comparison.Repo, Path: path, Source: p.To.Kind, Revision: p.To.SHA, BaseSource: p.From.Kind, BaseRevision: p.From.SHA, DiffFile: file}
 				rows = append(rows, ochazuke.ListItem{ID: "diff-file/" + data.Repo + ":" + path, Noun: "diff-file", Label: path, Data: data, Cells: []string{file.Status, path, fmt.Sprint(file.Added), fmt.Sprint(file.Removed)}})
 			}

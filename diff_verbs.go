@@ -16,11 +16,11 @@ func (a *App) registerDiffVerbs() error {
 	for _, key := range []string{"change.diff", "commit.diff"} {
 		op := a.r.Operations.At(ochazuke.Key(key))
 		op.Parameters = map[string]ochazuke.Parameter{
-			"repo":    repoParameter(),
-			"context": {Type: "integer", Description: "context lines; defaults to comparison.diff.context"},
-			"output":  {Type: "string", Enum: []string{"plain", "json"}, Description: "exact unified patch text (default plain), or structured JSON"},
+			"repo":        repoParameter(),
+			"context":     {Type: "integer", Description: "context lines; defaults to comparison.diff.context"},
+			"output":      {Type: "string", Enum: []string{"plain", "json"}, Description: "exact unified patch text (default plain), or structured JSON"},
 			"destination": {Type: "path", Path: "file", New: true, Description: "optional output file; output still selects plain patch or JSON"},
-			"force": {Type: "boolean", Description: "replace an existing destination after a successful diff read"},
+			"force":       {Type: "boolean", Description: "replace an existing destination after a successful diff read"},
 		}
 		if key == "change.diff" {
 			path := changedPathParameter()

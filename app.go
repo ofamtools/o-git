@@ -149,7 +149,6 @@ func (a *App) Shell() *ocli.Shell {
 	return sh
 }
 
-
 // items turns a list verb's rows back into list items.
 func items(rows []ocli.Row) []ochazuke.ListItem {
 	out := make([]ochazuke.ListItem, len(rows))

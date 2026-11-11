@@ -217,7 +217,7 @@ func revealed(target string) (ochazuke.ListItem, error) {
 	}
 	for _, spec := range []struct {
 		noun string
-		row func(string) (string, any, error)
+		row  func(string) (string, any, error)
 	}{
 		{"repo", func(rest string) (string, any, error) {
 			dir := absPath(rest)

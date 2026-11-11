@@ -13,20 +13,20 @@ import (
 // Change keeps paths unquoted and separate, including a rename/copy source.
 // Index and Worktree carry the individual numstats for an XY comparison.
 type Change struct {
-	Repo      string      `json:"repo"`
-	Path      string      `json:"path"`
-	OldPath   string      `json:"old_path,omitempty"`
-	Status    string      `json:"status"`
-	Added     int         `json:"added"`
-	Removed   int         `json:"removed"`
-	Binary    bool        `json:"binary"`
-	Untracked bool        `json:"untracked,omitempty"`
-	Index     *ChangeStat `json:"index,omitempty"`
-	Worktree  *ChangeStat `json:"worktree,omitempty"`
-	Source    string      `json:"source,omitempty"`
-	Revision  string      `json:"revision,omitempty"`
-	BaseSource string     `json:"base_source,omitempty"`
-	BaseRevision string   `json:"base_revision,omitempty"`
+	Repo         string      `json:"repo"`
+	Path         string      `json:"path"`
+	OldPath      string      `json:"old_path,omitempty"`
+	Status       string      `json:"status"`
+	Added        int         `json:"added"`
+	Removed      int         `json:"removed"`
+	Binary       bool        `json:"binary"`
+	Untracked    bool        `json:"untracked,omitempty"`
+	Index        *ChangeStat `json:"index,omitempty"`
+	Worktree     *ChangeStat `json:"worktree,omitempty"`
+	Source       string      `json:"source,omitempty"`
+	Revision     string      `json:"revision,omitempty"`
+	BaseSource   string      `json:"base_source,omitempty"`
+	BaseRevision string      `json:"base_revision,omitempty"`
 }
 
 type ChangeStat struct {
