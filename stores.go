@@ -14,8 +14,6 @@ func (a *App) defineStores() {
 	pair := map[string]ochazuke.Parameter{
 		"repo": repo,
 		"pair": {Type: "string", Description: "comparison as in comparison.inspect; --pair excludes --from/--to"},
-		"from": {Type: "string", Description: "from endpoint; excludes --pair"},
-		"to":   {Type: "string", Description: "to endpoint; excludes --pair"},
 	}
 	a.r.DefineListFacts([]ochazuke.ListFacts{
 		{Noun: "repo", Sample: Repo{}, ListParams: map[string]ochazuke.Parameter{"path": directoriesParameter()}, List: a.repoList},

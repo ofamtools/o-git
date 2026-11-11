@@ -98,6 +98,8 @@ File paths remain repository-relative in Git records. File actions resolve them 
 
 `change export` and `diff-file export` write exact content from the selected side. Use `--side from` for a deleted file. Export a historical snapshot before opening it in another application. Git-side content streams through a reader into a writer; it is not reconstructed from displayed diff lines. Exports refuse an existing destination unless `--force` is given, and a failed read never replaces it. A row's source and revision travel as declared parameters when a host forwards an action, so the same path in a different revision cannot silently become a working file.
 
+Symlink content is the link's literal target text, matching Git's symlink blob. Export does not follow the symlink or copy a target file outside the repository.
+
 `diff-file list [--repo REPO] [--pair NAME | --from REF --to REF]` returns structured file rows with typed `oldPath`/`newPath`, hunks and source revisions. Files already shown in the Compare diff modal remain change rows and have the same filesystem actions.
 
 `change diff` and `commit diff` accept `--destination FILE [--force]`. Their existing `--output plain|json` still chooses the representation. Without a destination they keep their original stdout result. Destination handling is writer-shaped for the shared output-sink parameter kind; Git path selectors are not input streams.
