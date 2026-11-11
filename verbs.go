@@ -27,7 +27,7 @@ func (a *App) registerVerbs() {
 	r.Define("repo").Main() // the tool's main noun: `o-git list` is `repo list`
 	r.Define("repo").
 		Verb("list", a.repoList, "every repository o-proj lists, plus --path directories, with its status: rows {noun, id: repo/DIR, label, data: {name, path, status, branch, head, upstream, ahead, behind, staged, unstaged, untracked, conflicts}, cells}").Rows("repo").Fetch().Quiet().Positional("path").
-		Verb("show", a.repoShow, "one repository's status, worktrees and branches: {repo, worktrees, branches}; the TUI shows them and moves to its worktrees").Fetch().Quiet().Positional("repo").
+		Verb("inspect", a.repoShow, "one repository's status, worktrees and branches: {repo, worktrees, branches}; the TUI shows them and moves to its worktrees").Fetch().Quiet().Positional("repo").
 		Verb("lists", a.repoLists, "every list's rows in one answer, JSON Lines {noun, id, label, data, cells}: each repository, then every repository's worktrees, then its branches (the catalog's state source)").Lists().Fetch().Quiet().Positional("path")
 	r.Define("worktree").
 		Verb("list", a.worktreeList, "a repository's worktrees, the main one first: rows {noun, id: worktree/PATH, label, data: {repo, path, head, branch, detached, bare, main, locked, prunable, status, changes}, cells}").Rows("worktree").Fetch().Quiet().Positional("repo").
@@ -41,8 +41,8 @@ func (a *App) registerVerbs() {
 		Verb("delete", a.branchDelete, "delete branch NAME in REPO; refuses the checked-out one, and an unmerged one unless --force").Destructive().Confirm("Delete branch {{label}}?").Positional("name")
 	setHistory(r, ochazuke.HistoryChange, "worktree.add", "worktree.remove", "branch.create", "branch.switch", "branch.delete")
 
-	repo := ochazuke.Parameter{Type: "string", Description: "a repository directory or a name o-proj lists (default: the row's, else the current directory)"}
-	paths := ochazuke.Parameter{Type: "string", Description: "extra repository directories, comma-separated, listed after o-proj's"}
+	repo := repoParameter()
+	paths := directoriesParameter()
 	force := func(what string) ochazuke.Parameter {
 		return ochazuke.Parameter{Type: "boolean", Description: what}
 	}
@@ -52,7 +52,7 @@ func (a *App) registerVerbs() {
 		r.Operations.Set(op)
 	}
 	set("repo.list", "row[]", map[string]ochazuke.Parameter{"path": paths})
-	set("repo.show", "{repo, worktrees, branches}", map[string]ochazuke.Parameter{"repo": repo})
+	set("repo.inspect", "{repo, worktrees, branches}", map[string]ochazuke.Parameter{"repo": repo})
 	set("repo.lists", ochazuke.ResultLists, map[string]ochazuke.Parameter{"path": paths})
 	set("worktree.list", "row[]", map[string]ochazuke.Parameter{"repo": repo})
 	set("worktree.add", "{repo, path, branch, created}", map[string]ochazuke.Parameter{
@@ -62,7 +62,7 @@ func (a *App) registerVerbs() {
 		"from":   {Type: "string", Description: "the commit a new branch starts at (default HEAD)", Source: "branch.names", SourceArgs: map[string]string{"repo": "repo"}, Free: true},
 	})
 	set("worktree.remove", "{repo, removed, force}", map[string]ochazuke.Parameter{
-		"path":  {Type: "string", Description: "the worktree's directory (default: the --target row's; from a key, the help or the palette, the focused row's)", From: "row:path"},
+		"path":  {Type: "path", Path: "dir", Description: "the worktree's directory (default: the --target row's; from a key, the help or the palette, the focused row's)", From: "row:path"},
 		"force": force("remove it even with uncommitted changes or untracked files"),
 	})
 	set("branch.list", "row[]", map[string]ochazuke.Parameter{"repo": repo})
