@@ -31,9 +31,9 @@
   │ A ne│ ┃                                                          ┃ │     │
   │ +1 -│ ┃                                                          ┃ │     │
   │     │ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │     │
-  │     │ q modal.close · : palette.open · ? binding.help              │     │
+  │     │ q modal.close · : palette.open · ? binding.help · g o open … │     │
   │     ╰──────────────────────────────────────────────────────────────╯     │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  q modal.close · : palette.open · ? binding.help
+  q modal.close · : palette.open · ? binding.help · g o open · g . actions

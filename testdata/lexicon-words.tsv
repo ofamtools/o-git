@@ -942,3 +942,5 @@ open-with	action	seed	ochazuke v0.122.1
 opener	noun	yes	ochazuke v0.122.1
 previous-scope	action	seed	ochazuke v0.122.1
 relation-kind	noun	yes	ochazuke v0.122.1
+thing	noun	ua11	the registered thing walk graph picker
+walk	action	ua11	follow a thing's values and relations in a picker

@@ -6,8 +6,8 @@ require (
 	charm.land/bubbletea/v2 v2.1.0
 	charm.land/lipgloss/v2 v2.0.6
 	github.com/charmbracelet/x/ansi v0.11.9
-	ofam.dev/ochazuke v0.122.1
-	ofam.dev/oden v0.5.0
+	ofam.dev/ochazuke v0.124.0
+	ofam.dev/oden v0.5.1
 )
 
 require (
