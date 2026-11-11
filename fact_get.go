@@ -14,38 +14,45 @@ func (a *App) scopeFactGets() {
 	for _, spec := range []struct {
 		noun, scope string
 		compound    bool
+		read        func(ochazuke.Ctx, string) (ochazuke.Thing, error)
 	}{
-		{"repo", "path", false}, {"worktree", "repo", false},
-		{"branch", "repo", true}, {"commit", "repo", true},
-		{"change", "repo", true}, {"diff-file", "repo", true},
-		{"endpoint", "repo", true}, {"comparison", "repo", true},
+		{noun: "repo", read: a.repoFact},
+		{noun: "worktree", scope: "repo"},
+		{noun: "branch", scope: "repo", compound: true},
+		{noun: "commit", read: a.commitFact},
+		{noun: "change", scope: "repo", compound: true},
+		{noun: "diff-file", scope: "repo", compound: true},
+		{noun: "endpoint", scope: "repo", compound: true},
+		{noun: "comparison", scope: "repo", compound: true},
 	} {
-		n := a.r.Noun(spec.noun)
-		store := *n.Store
-		get := store.Get
-		store.Get = func(c ochazuke.Ctx, key string) (ochazuke.Thing, error) {
-			repo := strings.TrimPrefix(key, spec.noun+"/")
-			if spec.compound {
-				repo, _, _ = strings.Cut(repo, ":")
+		store := *a.r.Noun(spec.noun).Store
+		if spec.read != nil {
+			store.Get = spec.read
+		} else {
+			get := store.Get
+			store.Get = func(c ochazuke.Ctx, key string) (ochazuke.Thing, error) {
+				repo := strings.TrimPrefix(key, spec.noun+"/")
+				if spec.compound {
+					repo, _, _ = strings.Cut(repo, ":")
+				}
+				args := ochazuke.Arguments{}
+				for name, value := range c.Args {
+					args[name] = value
+				}
+				if args[spec.scope] == nil {
+					args[spec.scope] = repo
+				}
+				c.Args = args
+				return get(c, key)
 			}
-			args := ochazuke.Arguments{}
-			for name, value := range c.Args {
-				args[name] = value
-			}
-			if args[spec.scope] == nil {
-				args[spec.scope] = repo
-			}
-			c.Args = args
-			return get(c, key)
 		}
 		a.r.Define(spec.noun).Store(store)
+		for _, verb := range []string{"get", "show"} {
+			op := a.r.Operations.At(ochazuke.Key(a.r.CanonicalKey(spec.noun + "." + verb)))
+			op.Quiet = true
+			a.r.Operations.Set(op)
+		}
 	}
-	store := *a.r.Noun("commit").Store
-	store.Get = a.commitFact
-	a.r.Define("commit").Store(store)
-	repoStore := *a.r.Noun("repo").Store
-	repoStore.Get = a.repoFact
-	a.r.Define("repo").Store(repoStore)
 }
 
 func (a *App) commitFact(c ochazuke.Ctx, key string) (ochazuke.Thing, error) {

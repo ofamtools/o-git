@@ -46,7 +46,7 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 			if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
 				return oden.ErrNotFound
 			}
-			return a.Shell().Run(context.Background(), append([]string{"repo", "view"}, args...))
+			return a.viewCLI(context.Background(), args)
 		}))
 	ocli.Mount(app, a.Shell())
 	app.Add(viewCommand(a))

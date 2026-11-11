@@ -22,7 +22,7 @@ func viewCommand(a *App) oden.Command {
 		Usage: "[--page git|compare] [--repo DIR] [--path DIR,...] [--smoke] [--width N] [--height N]", Source: "o-git",
 		Details: "o-git with no command opens it too. Keys (the family key map): enter shows a repo or switches to a branch, n adds a worktree or branch, d d removes or deletes (confirm), d D forces, R reloads, q quits; ? on the page lists them all.",
 		Run: func(ctx context.Context, args []string) error {
-			return a.Shell().Run(ctx, append([]string{"repo", "view"}, args...))
+			return a.viewCLI(ctx, args)
 		},
 	}
 }
@@ -35,7 +35,7 @@ func runTUI(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		return err
 	}
 	a.Stdin, a.Stdout, a.Stderr = stdin, stdout, stderr
-	return a.Shell().Run(context.Background(), append([]string{"repo", "view"}, args...))
+	return a.viewCLI(context.Background(), args)
 }
 
 func (a *App) view(opt viewOptions) error {

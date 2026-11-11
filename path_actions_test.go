@@ -287,14 +287,21 @@ func TestEditorCommandKeepsFilenameOutsideShellText(t *testing.T) {
 func TestScopedFactGetFindsAnExplicitRepository(t *testing.T) {
 	isolateCompare(t)
 	dir := newRepo(t, "r")
-	data := decode[map[string]any](t, run(t, "", "repo", "get", repoID(dir)))
-	if data["path"] != dir || data["name"] != "r" {
-		t.Fatal(data)
-	}
 	sha := sh(t, dir, "rev-parse", "HEAD")
-	commit := decode[map[string]any](t, run(t, "", "commit", "get", "commit/"+dir+":"+sha))
-	if commit["sha"] != sha {
-		t.Fatal(commit)
+	for _, tc := range []struct{ noun, key, field, want string }{
+		{"repo", repoID(dir), "path", dir},
+		{"commit", "commit/" + dir + ":" + sha, "sha", sha},
+	} {
+		for _, verb := range []string{"get", "show"} {
+			stdout, stderr, err := try("", tc.noun, verb, tc.key)
+			if err != nil || stderr != "" {
+				t.Fatalf("%s.%s read was not quiet: %q %v", tc.noun, verb, stderr, err)
+			}
+			data := decode[map[string]any](t, stdout)
+			if data[tc.field] != tc.want {
+				t.Fatal(data)
+			}
+		}
 	}
 }
 
@@ -342,5 +349,48 @@ func TestFileExportKeepsSymlinkBytesAndNeverReadsTheOutsideTarget(t *testing.T) 
 				}
 			})
 		}
+	}
+}
+
+func TestBareViewPreservesMultipleDirectoryArguments(t *testing.T) {
+	isolateCompare(t)
+	first, second := newRepo(t, "first repo"), newRepo(t, "second repo")
+	want := run(t, "", "repo", "view", "--smoke", "--width", "200", "--path", first+","+second)
+	for _, args := range [][]string{
+		{"view", "--smoke", "--width", "200", first, second},
+		{"view", "--smoke", "--width", "200", "--path", first, second},
+		{"--smoke", "--width", "200", first, second},
+	} {
+		if got := run(t, "", args...); got != want || !strings.Contains(got, "Repos 2") {
+			t.Fatalf("%v lost directory argv boundaries:\n%s\nwant:\n%s", args, got, want)
+		}
+	}
+}
+
+func TestReadableFactHistoryContainsItsRealPriorAction(t *testing.T) {
+	isolateCompare(t)
+	first, second := newRepo(t, "first"), newRepo(t, "second")
+	a, out, _, _ := fileActionApp(t)
+	for _, dir := range []string{first, second} {
+		if err := a.Shell().Run(t.Context(), []string{"worktree", "show", worktreeID(dir)}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	out.Reset()
+	if err := a.Shell().Run(t.Context(), []string{"worktree", "history", worktreeID(first)}); err != nil {
+		t.Fatal(err)
+	}
+	entries := decode[[]ochazuke.HistoryEntry](t, out.String())
+	found := false
+	for _, entry := range entries {
+		if entry.Request.Args["id"] == worktreeID(second) {
+			t.Fatal("history included another fact's action")
+		}
+		if entry.Request.Verb == "show" && entry.Request.Args["id"] == worktreeID(first) {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("readable fact lost its prior show action: %+v", entries)
 	}
 }
