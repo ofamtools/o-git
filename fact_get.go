@@ -33,7 +33,11 @@ func (a *App) scopeFactGets() {
 			store.Get = func(c ochazuke.Ctx, key string) (ochazuke.Thing, error) {
 				repo := strings.TrimPrefix(key, spec.noun+"/")
 				if spec.compound {
-					repo, _, _ = strings.Cut(repo, ":")
+					var encoded bool
+					repo, _, encoded = strings.Cut(repo, ":")
+					if !encoded {
+						return get(c, key)
+					}
 				}
 				args := ochazuke.Arguments{}
 				for name, value := range c.Args {

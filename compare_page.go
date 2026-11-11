@@ -300,13 +300,13 @@ func (a *App) applyComparePairs(data comparePageData, selectCustom bool) {
 }
 
 func (a *App) compareOpen(c ochazuke.Ctx) ochazuke.Result {
-	if a.r.Page == comparePageID && ochazuke.StringArg(c.Args, "repo", "") == "" {
+	repo := a.repoWord(c)
+	if a.r.Page == comparePageID && (repo == "" || repo == a.compare.repo) {
 		if err := a.compare.commits.Focus(); err != nil {
 			return ochazuke.Failed(err)
 		}
 		return ochazuke.Done(nil)
 	}
-	repo := a.repoWord(c)
 	changed := a.compare.repo != repo
 	a.compare.repo = repo
 	if err := a.r.OpenPage(comparePageID); err != nil {

@@ -30,7 +30,15 @@ func (a *App) registerViewVerb() {
 		}
 		opt := viewOptions{Page: ochazuke.StringArg(c.Args, "page", "git"), Repo: ochazuke.StringArg(c.Args, "repo", ""), Paths: ochazuke.StringArg(c.Args, "path", ""), Smoke: boolArg(c.Args, "smoke"), Width: ochazuke.IntArg(c.Args, "width", 100), Height: ochazuke.IntArg(c.Args, "height", 30)}
 		return ochazuke.Pending(func(context.Context) (any, error) {
-			return ochazuke.Verbatim(""), a.view(opt)
+			// Page jobs report to their model, not the invoking shell.
+			// A read failure remains a rendered row, not a failed view.
+			view, err := New()
+			if err != nil {
+				return nil, err
+			}
+			view.Stdin, view.Stdout, view.Stderr = a.Stdin, a.Stdout, a.Stderr
+			view.Now, view.fetchRun = a.Now, a.fetchRun
+			return ochazuke.Verbatim(""), view.view(opt)
 		})
 	}, "open the Git or Compare page, or render one frame with --smoke; bare view and bare flags call this verb").Foreground().Quiet().Positional("path")
 	op := a.r.Operations.At(ochazuke.Key(a.r.CanonicalKey("repo.view")))

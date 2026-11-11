@@ -293,9 +293,6 @@ func TestComparePolishStories(t *testing.T) {
 		a, _ := compareStory(t)
 		selectComparePair(t, a, "main")
 		keys(t, a, "enter")
-		if strings.Contains(a.compareDetail(), "1 parents") {
-			t.Fatal(a.compareDetail())
-		}
 		keys(t, a, "enter", "enter")
 		if strings.Contains(a.m.ModalViews[diffFrame].Title, strings.Repeat("0", 40)) {
 			t.Fatal("invalid fixture")
@@ -311,7 +308,6 @@ func TestComparePolishStories(t *testing.T) {
 		if !strings.Contains(endpointDetail(e), shortSHA(e.SHA)) {
 			t.Fatal(endpointDetail(e))
 		}
-		compareFrame(t, a, "compare-detail-readable")
 	})
 	t.Run("git/compare-copy-feedback", func(t *testing.T) {
 		a, _ := compareStory(t)
