@@ -19,7 +19,7 @@
   │     │ ›                              regex │ <sha> feat: next    │     │
   ╰─────│   <sha>  HEAD -> topic  feat: next │ <sha> │─────╯
   ╭─ Fil│   <sha>  main           first      │ <sha>   │─────╮
-  │ XY  │ esc normal · enter picker.pick · ctrl+o picker.next-source … │     │
+  │ XY  │ esc normal │ picker: enter pick · ctrl+o next-source · alt+… │     │
   │  M  ╰──────────────────────────────────────────────────────────────╯     │
   │ t…  1 file  +1     -1                                                    │
   │                                                                          │
@@ -36,4 +36,4 @@
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.p…
+  esc normal │ picker: enter pick · ctrl+o next-source · alt+o previous-sourc…

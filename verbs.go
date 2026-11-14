@@ -26,15 +26,15 @@ func (a *App) registerVerbs() {
 	r := a.r
 	r.Define("repo").Main() // the tool's main noun: `o-git list` is `repo list`
 	r.Define("repo").
-		Verb("list", a.repoList, "every repository o-proj lists, plus --path directories, with its status: rows {noun, id: repo/DIR, label, data: {name, path, status, branch, head, upstream, ahead, behind, staged, unstaged, untracked, conflicts}, cells}").Rows("repo").Fetch().Quiet().Positional("path").
+		Verb("list", a.repoList, "every repository o-proj lists, plus --path directories, with its status: rows {noun, id: repo/DIR, label, data: {name, path, status, branch, head, upstream, ahead, behind, staged, unstaged, untracked, conflicts}, cells}").Rows("repo").Fetch().Quiet().Table().Positional("path").
 		Verb("inspect", a.repoShow, "one repository's status, worktrees and branches: {repo, worktrees, branches}; the TUI shows them and moves to its worktrees").Fetch().Quiet().Positional("repo").
 		Verb("lists", a.repoLists, "every list's rows in one answer, JSON Lines {noun, id, label, data, cells}: each repository, then every repository's worktrees, then its branches (the catalog's state source)").Lists().Fetch().Quiet().Positional("path")
 	r.Define("worktree").
-		Verb("list", a.worktreeList, "a repository's worktrees, the main one first: rows {noun, id: worktree/PATH, label, data: {repo, path, head, branch, detached, bare, main, locked, prunable, status, changes}, cells}").Rows("worktree").Fetch().Quiet().Positional("repo").
+		Verb("list", a.worktreeList, "a repository's worktrees, the main one first: rows {noun, id: worktree/PATH, label, data: {repo, path, head, branch, detached, bare, main, locked, prunable, status, changes}, cells}").Rows("worktree").Fetch().Quiet().Table().Positional("repo").
 		Verb("add", a.worktreeAdd, "add a worktree for BRANCH (created from --from, else HEAD, when it does not exist) at PATH, default REPO-BRANCH beside the main worktree").Positional("branch", "path").
 		Verb("remove", a.worktreeRemove, "remove the worktree at PATH; refuses the main one, and a dirty one unless --force").Destructive().Confirm("Remove worktree {{label}}?").Positional("path")
 	r.Define("branch").
-		Verb("list", a.branchList, "a repository's local branches, newest commit first: rows {noun, id: branch/REPO:NAME, label, data: {repo, name, current, worktree, upstream, gone, ahead, behind, merged, commit, subject, author, date}, cells}").Rows("branch").Fetch().Quiet().Positional("repo").
+		Verb("list", a.branchList, "a repository's local branches, newest commit first: rows {noun, id: branch/REPO:NAME, label, data: {repo, name, current, worktree, upstream, gone, ahead, behind, merged, commit, subject, author, date}, cells}").Rows("branch").Fetch().Quiet().Table().Positional("repo").
 		Verb("names", a.branchNames, "a repository's local branch names, newest commit first: the choices of a branch parameter (rows are branch list's)").Fetch().Quiet().Positional("repo").
 		Verb("create", a.branchCreate, "create branch NAME at FROM (default HEAD) without checking it out; --switch checks it out").Positional("name", "from").
 		Verb("switch", a.branchSwitch, "check out NAME (default: the targeted branch) in REPO's worktree").Positional("name").

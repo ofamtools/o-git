@@ -1,0 +1,129 @@
+# refusecheck baseline: file, function, class, template, count, reason (tab separated).
+# A row with a reason (E1..E5: rights, loses, failure, declaration, cancel) is a legitimate refusal that stays.
+# A row without one is debt that may only shrink: REFUSECHECK_UPDATE=1 removes rows and lowers counts, never adds.
+# Adding a row is a reviewed edit.
+changes.go	parseChangeStatus	K15	"git status: short path record %q"	1
+changes.go	parseChangeStatus	K3	"git status: missing rename/copy source"	1
+changes.go	parseRawNumstat	K15	"invalid added count %q"	1
+changes.go	parseRawNumstat	K15	"invalid removed count %q"	1
+changes.go	parseRawNumstat	K15	"numstat without raw path %q"	1
+changes.go	parseRawNumstat	K15	"unexpected numstat record %q"	1
+changes.go	parseRawNumstat	K15	"unexpected raw diff record %q"	1
+changes.go	parseRawNumstat	K3	"missing numstat rename/copy paths"	1
+changes.go	parseRawNumstat	K3	"missing rename/copy destination"	1
+commits.go	ReadCommit	K15	"no commit %q"	1
+commits.go	ReadCommits	K13	"commit limit must not be negative"	1	declaration
+commits.go	parseCommits	K14	"git log: invalid author date: %w"	1	failure
+compare.go	EndpointResolver.count	K15	"invalid rev-list count: %q"	1
+compare.go	EndpointResolver.count	K15	"invalid rev-list counts: %q"	1
+compare_page.go	App.compareOpen	K15	"Failed(…)"	2
+compare_page.go	App.compareSave	K15	"Failed(…)"	1
+compare_page.go	App.compareSave	K2	"expected a pair name without = or newline"	1
+compare_page.go	App.compareSave	K5	"no comparison selected"	1
+compare_page.go	App.compareSave	K8	"pair %s already exists"	1
+compare_page.go	App.compareSet	K15	"side must be from or to"	1
+compare_page.go	App.editComparison	K15	"no default comparison"	1
+compare_page.go	App.registerComparePage	K2	"Enum without Accept: <expr>"	1
+compare_page.go	readCustomPairs	K14	"compare.json: %w"	1	failure
+compare_page_data.go	App.followCompare	K15	"no comparison"	1
+compare_page_picker.go	App.pickCompareSide	K15	"Failed(…)"	1
+compare_page_picker.go	loadSideChoices	K1	"other side is unavailable"	1
+compare_page_views.go	App.compareCommitOpen	K5	"no commit selected"	1
+compare_page_views.go	App.compareFileOpen	K5	"no file selected"	1
+compare_page_views.go	App.loadCompareDiff	K15	"comparison is still loading"	1
+compare_page_views.go	App.registerCompareViews	K15	"Failed(…)"	2
+compare_page_views.go	App.registerCompareViews	K15	"no file diff is open"	1
+compare_page_views.go	App.registerCompareViews	K2	"Enum without Accept: <expr>"	1
+compare_page_views.go	App.registerCompareViews	K2	"Enum without Accept: comparison.diff.layout"	1
+compare_page_views.go	App.registerCompareViews	K5	"no commit selected"	1
+compare_reasons.go	remoteEndpointError	K15	"remote name %q contains endpoint syntax"	1
+compare_settings.go	declareCompareSettings	K13	"commit-search-depth must not be negative"	1	declaration
+compare_settings.go	declareCompareSettings	K13	"stale-after must not be negative"	1	declaration
+compare_settings.go	declareCompareSettings	K15	"width-percent must be between 25 and 75"	1
+compare_verbs.go	App.compareCopy	K15	"%s"	1
+compare_verbs.go	App.compareCopy	K15	"Failed(…)"	1
+compare_verbs.go	App.compareShow	K15	"Failed(…)"	1
+compare_verbs.go	App.endpointCopy	K15	"%s: %s"	1
+compare_verbs.go	App.endpointCopy	K8	"%s is not a commit"	1
+compare_verbs.go	App.fetch	K15	"%s\n%s"	1
+compare_verbs.go	App.fetch	K15	"Failed(…)"	1
+compare_verbs.go	FetchRemotes	K15	"no configured remote %q"	1
+compare_verbs.go	FetchRemotes	K4	"this repository has no remotes"	1
+compare_verbs.go	comparisonArgs	K15	"use --pair or --from/--to"	1
+diff.go	BuildDiff	K15	"diff context must be nonnegative and max-lines positive"	1
+diff.go	diffHunkHeader	K15	"invalid hunk header %q"	1
+diff.go	diffRange	K15	"bad hunk range %q"	2
+diff.go	parseDiffMetadata	K15	"diff metadata has %d files but %d counts"	1
+diff.go	parseDiffMetadata	K15	"invalid numstat record %q"	1
+diff.go	parseDiffMetadata	K15	"invalid raw diff record %q"	1
+diff.go	parseDiffMetadata	K3	"missing numstat rename paths"	1
+diff.go	parseDiffMetadata	K3	"missing rename destination"	1
+diff.go	readDiffUnified	K15	"incomplete unified diff"	1
+diff.go	readDiffUnified	K15	"more patch files than metadata"	1
+diff_files.go	App.diffFileList	K15	"Failed(…)"	1
+diff_settings.go	declareDiffSettings	K13	"diff context must not be negative"	1	declaration
+diff_settings.go	declareDiffSettings	K15	"diff max-lines must be positive"	1
+diff_verbs.go	App.changeDiff	K15	"Failed(…)"	1
+diff_verbs.go	App.commitDiff	K8	"%s is not a commit"	1
+diff_verbs.go	App.registerDiffVerbs	K2	"Enum without Accept: <expr>"	1
+endpoints.go	EndpointResolver.expandAlias	K15	"endpoint holds a control character"	1
+endpoints.go	EndpointResolver.expandAlias	K8	"endpoint alias cycle at %s"	1
+endpoints.go	ValidRef	K15	"%q holds a space or a control character"	1
+endpoints.go	ValidRef	K15	"%q starts with a dash"	1
+endpoints.go	ValidRef	K15	"empty ref"	1
+endpoints.go	ValidRef	K15	"ref is longer than 256 bytes"	1
+endpoints.go	alternatives	K15	"unbalanced endpoint parentheses"	2
+endpoints.go	newEndpointResolver	K15	"invalid git directories: %q"	1
+fact_get.go	App.commitFact	K15	"commit key must contain REPO:SHA"	1
+file_exports.go	App.exportFile	K15	"Failed(…)"	3
+file_exports.go	App.registerFileExports	K2	"Enum without Accept: <expr>"	1
+file_exports.go	writeFileSide	K4	"the %s side has no file content"	1
+git.go	AddWorktree	K15	"branch %s exists; --from applies only to a new branch"	1
+git.go	DeleteBranch	K14	"branch %s is %w; --force deletes it anyway"	1	failure
+git.go	Toplevel	K14	"%s is not in a git worktree: %w"	1	failure
+git.go	Toplevel	K8	"%s is not a directory"	1
+git.go	checkBranchName	K15	"branch name %q starts with -"	1
+git.go	checkBranchName	K2	"%q is not a valid branch name"	1
+git.go	checkBranchName	K3	"a branch name is required"	1
+git.go	git	K15	"timed out after %s"	1
+git.go	parseBranches	K15	"git for-each-ref: unexpected line %q"	1
+git.go	parseStatus	K15	"git status: short record %q"	1
+git.go	parseStatus	K15	"git status: unknown record %q"	1
+git.go	var ErrUnmerged	K15	"not fully merged"	1
+lists_settings.go	declareListsSettings	K13	"commit limit must not be negative"	1	declaration
+lists_verbs.go	App.changeCopy	K15	"Failed(…)"	1
+lists_verbs.go	App.changeShow	K15	"Failed(…)"	1
+lists_verbs.go	App.commitList	K13	"commit limit must not be negative"	1	declaration
+lists_verbs.go	App.listRead	K15	"Failed(…)"	1
+lists_verbs.go	findChange	K15	"no changed path %q in this comparison"	1
+lists_verbs.go	findChange	K3	"give a changed path"	1
+path_actions.go	App.readPath	K15	"%s is a %s path, not a working file; export its content to a destination first"	1
+path_actions.go	App.readPath	K15	"Failed(…)"	2
+path_actions.go	App.registerPathVerbs	K2	"Enum without Accept: <expr>"	1
+path_actions.go	inspectPath	K14	"working path %s: %w"	1	failure
+path_actions.go	repositoryPath	K15	"file path contains NUL"	1
+path_actions.go	repositoryPath	K15	"file path must be inside repository %s"	1
+repos.go	detail	K15	"errors.New(…)"	1
+repos.go	listKnown	K14	"%w: %s"	1	failure
+repos.go	listKnown	K14	"o-proj list: %w"	2	failure
+repos.go	mainWorktree	K15	"%s: git lists no worktrees"	1
+repos.go	resolve	K14	"repo %s: %w"	1	failure
+repos.go	resolve	K15	"no repo %q: not a directory, and not a name o-proj lists"	1
+repos.go	var ErrNoProj	K1	"o-proj is not available (install it or set O_GIT_PROJ); pass --path DIR"	1
+rows.go	revealFile	K15	"file row id must contain REPO:PATH"	1
+rows.go	revealed	K15	"no branch name in %s"	1
+rows.go	revealed	K15	"not a row id: %s"	1
+rows.go	revealed	K15	"not a supported row id: %s"	1
+tui.go	App.view	K4	"unknown page %q"	1
+verbs.go	App.branchCreate	K14	"created %s, but: %w"	1	failure
+verbs.go	App.branchCreate	K3	"a name is required: branch create NAME [FROM]"	1
+verbs.go	App.branchDelete	K15	"branch %s is checked out in %s; switch to another branch first"	1
+verbs.go	App.branchDelete	K3	"a branch is required: branch delete NAME [--repo REPO]"	1
+verbs.go	App.branchSwitch	K3	"a branch is required: branch switch NAME [--repo REPO]"	1
+verbs.go	App.worktreeAdd	K15	"%s exists; pass another path"	1
+verbs.go	App.worktreeAdd	K3	"a branch is required: worktree add BRANCH [PATH]"	1
+verbs.go	App.worktreeRemove	K15	"%s is the main worktree; only a linked worktree can be removed"	1
+verbs.go	App.worktreeRemove	K15	"worktree %s has changes (%s); --force removes it anyway"	1
+verbs.go	App.worktreeRemove	K3	"a worktree is required: worktree remove PATH (worktree list prints them)"	1
+view_verb.go	App.registerViewVerb	K15	"Failed(…)"	2
+view_verb.go	App.registerViewVerb	K2	"Enum without Accept: <expr>"	1

@@ -22,7 +22,7 @@
   │         │                                                         │                                    │         │
   │         │                                                         │                                    │         │
   │         │                                                         │                                    │         │
-  │         │ esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source    │         │
+  │         │ esc normal │ picker: enter pick · ctrl+o next-source · alt+o previous-source                 │         │
   │         ╰──────────────────────────────────────────────────────────────────────────────────────────────╯─────────╯
   │                                            │ ╭─ Detail ──────────────────────────────────────────────────────────╮
   │                                            │ │ dirty                                                             │
@@ -36,4 +36,4 @@
   │                                            │ │                                                                   │
   ╰────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source
+  esc normal │ picker: enter pick · ctrl+o next-source · alt+o previous-source

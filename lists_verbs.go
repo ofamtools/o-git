@@ -11,17 +11,17 @@ func (a *App) registerListsVerbs() {
 	r := a.r
 	r.Define("commit").Columns(commitColumns(r.Settings().Bool("comparison.commits.split"))...).
 		Verb("diff", a.commitDiff, "content diff of SHA against its first parent (empty tree for a root commit)").Fetch().Quiet().Positional("sha").
-		Verb("list", a.commitList, "commits on each side in git's own order; section data or < / >; limit per side").Rows("commit").Fetch().Quiet().Positional("repo").
+		Verb("list", a.commitList, "commits on each side in git's own order; section data or < / >; limit per side").Rows("commit").Fetch().Quiet().Table().Positional("repo").
 		Verb("inspect", a.commitShow, "full commit message, parents and decorations for SHA (default HEAD or the focused row)").Fetch().Quiet().Positional("sha", "repo").
-		Verb("files", a.commitFiles, "changes against SHA's first parent, or the empty tree for a root commit").Rows("change").Fetch().Quiet().Positional("sha", "repo").
+		Verb("files", a.commitFiles, "changes against SHA's first parent, or the empty tree for a root commit").Rows("change").Fetch().Quiet().Table().Positional("sha", "repo").
 		Verb("yank", a.commitCopy, "copy the full SHA through the shared unnamed register").Quiet().Positional("sha", "repo")
 	r.Define("change").Columns(ochazuke.Column{Title: "status"}, ochazuke.Column{Title: "path"}, ochazuke.Column{Title: "added"}, ochazuke.Column{Title: "removed"}).
 		Verb("diff", a.changeDiff, "content diff of a literal repository-relative PATH; default pair is comparison.default-pair").Fetch().Quiet().Positional("path").
-		Verb("list", a.changeList, "changed paths and numstats; HEAD..WORKTREE has git status order and XY letters; ends with totals").Rows("change").Fetch().Quiet().Positional("repo").
+		Verb("list", a.changeList, "changed paths and numstats; HEAD..WORKTREE has git status order and XY letters; ends with totals").Rows("change").Fetch().Quiet().Table().Positional("repo").
 		Verb("inspect", a.changeShow, "one changed PATH with status, rename/copy source and numstats").Fetch().Quiet().Positional("path", "repo").
 		Verb("yank", a.changeCopy, "copy the changed path through the shared unnamed register").Quiet().Positional("path", "repo")
-	r.Define("comparison").Verb("commits", a.commitList, "commit.list for this comparison").Rows("commit").Fetch().Quiet().Positional("repo").
-		Verb("files", a.changeList, "change.list for this comparison").Rows("change").Fetch().Quiet().Positional("repo")
+	r.Define("comparison").Verb("commits", a.commitList, "commit.list for this comparison").Rows("commit").Fetch().Quiet().Table().Positional("repo").
+		Verb("files", a.changeList, "change.list for this comparison").Rows("change").Fetch().Quiet().Table().Positional("repo")
 	setHistory(r, ochazuke.HistoryAction, "commit.yank", "change.yank")
 	for _, key := range []string{"commit.list", "commit.inspect", "commit.files", "commit.yank", "change.list", "change.inspect", "change.yank", "comparison.commits", "comparison.files"} {
 		op := r.Operations.At(ochazuke.Key(r.CanonicalKey(key)))

@@ -20,7 +20,7 @@ func TestListNounsAreThingNouns(t *testing.T) {
 	if name := decode[string](t, run(t, "", "branch", "get", id, "name")); name != "topic" {
 		t.Fatalf("branch get name %q", name)
 	}
-	if _, _, err := try("", "branch", "get", "nope"); err == nil || !strings.Contains(err.Error(), "unknown") {
+	if _, _, err := try("", "branch", "get", "nope"); err == nil || !strings.Contains(err.Error(), "no branch") {
 		t.Fatalf("unknown branch: %v", err)
 	}
 	if _, _, err := try("", "branch", "archive", id); err == nil {

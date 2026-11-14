@@ -15,10 +15,10 @@ import (
 
 func (a *App) registerCompareVerbs() {
 	r := a.r
-	r.Define("endpoint").Verb("list", a.endpointList, "named endpoint specs resolved in REPO; unavailable specs retain their reason").Rows("endpoint").Fetch().Quiet().Positional("repo").
+	r.Define("endpoint").Verb("list", a.endpointList, "named endpoint specs resolved in REPO; unavailable specs retain their reason").Rows("endpoint").Fetch().Quiet().Table().Positional("repo").
 		Verb("resolve", a.endpointResolve, "resolve SPEC relative to --other (default HEAD); {remote} expands per remote").Fetch().Quiet().Positional("spec", "repo").
 		Verb("yank", a.endpointCopy, "copy the resolved SHA through the shared unnamed register").Quiet().Positional("spec", "repo")
-	r.Define("comparison").Verb("list", a.compareList, "saved comparisons with resolved endpoints, counts, fetch age and reasons; identical pairs collapse when configured").Rows("comparison").Fetch().Quiet().Positional("repo").
+	r.Define("comparison").Verb("list", a.compareList, "saved comparisons with resolved endpoints, counts, fetch age and reasons; identical pairs collapse when configured").Rows("comparison").Fetch().Quiet().Table().Positional("repo").
 		Verb("inspect", a.compareShow, "one saved --pair or ad hoc --from/--to comparison (default comparison.default-pair)").Fetch().Quiet().Positional("repo").
 		Verb("yank", a.compareCopy, "copy the resolved A..B range through the shared unnamed register").Quiet().Positional("repo").
 		Verb("fetch", func(c ochazuke.Ctx) ochazuke.Result { return a.fetch(c, true) }, "explicitly fetch --prune only the remotes the given comparison uses, then resolve it again").Positional("repo")

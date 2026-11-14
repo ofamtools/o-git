@@ -20,7 +20,7 @@
   │                 │   merge-base(main)  resolved <sha> (merge-base(main))                                       │ merge-base(main)                                             │                 │
   │                 │   + Use ref/spec merge-base(main)                                                             │                                                              │                 │
   │                 │   + Use ref/spec merge-base(main)                                                             │                                                              │                 │
-  │                 │ esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source                                                                    │                 │
+  │                 │ esc normal │ picker: enter pick · ctrl+o next-source · alt+o previous-source                                                                                 │                 │
   │                 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                 │
   │                                                                            │ │                                                                                                                   │
   │                                                                            │ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
@@ -36,4 +36,4 @@
   │                                                                            │ │                                                                                                                   │
   ╰────────────────────────────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.previous-source
+  esc normal │ picker: enter pick · ctrl+o next-source · alt+o previous-source

@@ -20,7 +20,7 @@
   ╰─────│   main   <sha>  first              │                       │─────╯
   ╭─ Fil│   topic  <sha>  feat: next         │                       │─────╮
   │ XY  │   v1.0   <sha>  feat: next         │                       │     │
-  │  M  │ esc normal · enter picker.pick · ctrl+o picker.next-source … │     │
+  │  M  │ esc normal │ picker: enter pick · ctrl+o next-source · alt+… │     │
   │ t…  ╰──────────────────────────────────────────────────────────────╯     │
   │                                                                          │
   │                                                                          │
@@ -36,4 +36,4 @@
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.p…
+  esc normal │ picker: enter pick · ctrl+o next-source · alt+o previous-source

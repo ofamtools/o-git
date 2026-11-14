@@ -20,7 +20,7 @@ type DiffFileRow struct {
 
 func (a *App) registerDiffFileVerbs() {
 	a.r.Define("diff-file").Columns(a.r.Noun("change").Columns...).
-		Verb("list", a.diffFileList, "structured files in a comparison, including repository, old/new paths, hunks and endpoint provenance").Rows("diff-file").Fetch().Quiet().Positional("repo")
+		Verb("list", a.diffFileList, "structured files in a comparison, including repository, old/new paths, hunks and endpoint provenance").Rows("diff-file").Fetch().Quiet().Table().Positional("repo")
 	op := a.r.Operations.At(ochazuke.Key(a.r.CanonicalKey("diff-file.list")))
 	op.Parameters = map[string]ochazuke.Parameter{"repo": repoParameter(), "path": changedPathParameter()}
 	for _, name := range []string{"pair", "from", "to"} {

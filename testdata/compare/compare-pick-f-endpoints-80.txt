@@ -22,7 +22,7 @@
   │ XY  │   upstream     -         no upstream │                       │     │
   │  M  │   origin/main  -         no ref nam… │                       │     │
   │ t…  │   {remote}/m…  -         no remotes  │                       │     │
-  │     │ esc normal · enter picker.pick · ctrl+o picker.next-source … │     │
+  │     │ esc normal │ picker: enter pick · ctrl+o next-source · alt+… │     │
   │     ╰──────────────────────────────────────────────────────────────╯     │
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
@@ -36,4 +36,4 @@
   │                                                                          │
   ╰──────────────────────────────────────────────────────────────────────────╯
   ────────────────────────────────────────────────────────────────────────────
-  esc normal · enter picker.pick · ctrl+o picker.next-source · alt+o picker.p…
+  esc normal │ picker: enter pick · ctrl+o next-source · alt+o previous-source
