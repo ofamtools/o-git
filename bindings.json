@@ -2,7 +2,6 @@
 {
   "bindings": [
     {"context": "branch/normal", "bindings": [
-      {"key": "d a", "action": "branch.archive", "hidden": true},
       {"key": "r", "action": "branch.edit", "hidden": true},
       {"key": "M", "action": "branch.get", "hidden": true},
       {"key": "U", "action": "branch.history", "hidden": true},
@@ -15,9 +14,7 @@
       {"key": "g j", "action": "branch.yank-path", "hidden": true}
     ]},
     {"context": "repo/normal", "bindings": [
-      {"key": "d a", "action": "repo.archive", "hidden": true},
       {"key": "e", "action": "repo.create", "hidden": true},
-      {"key": "d d", "action": "repo.delete", "hidden": true},
       {"key": "r", "action": "repo.edit", "hidden": true},
       {"key": "M", "action": "repo.get", "hidden": true},
       {"key": "U", "action": "repo.history", "hidden": true},
@@ -33,7 +30,6 @@
     ]},
     {"context": "worktree/normal", "bindings": [
       {"key": "O", "action": "worktree.add", "hidden": true},
-      {"key": "d a", "action": "worktree.archive", "hidden": true},
       {"key": "e", "action": "worktree.create", "hidden": true},
       {"key": "ctrl+s", "action": "worktree.delete", "hidden": true},
       {"key": "r", "action": "worktree.edit", "hidden": true},
