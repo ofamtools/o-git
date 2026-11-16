@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"time"
 
 	"ofam.dev/ochazuke"
@@ -57,6 +59,9 @@ type FileExport struct {
 	Source      string `json:"source"`
 }
 
+// fileSides are the sides of a changed file an export can write.
+var fileSides = []string{"to", "from"}
+
 func (a *App) exportFile(c ochazuke.Ctx) ochazuke.Result {
 	in := pathArguments(c, "path")
 	if in.path == "" {
@@ -74,6 +79,12 @@ func (a *App) exportFile(c ochazuke.Ctx) ochazuke.Result {
 		return ochazuke.Failed(c.Need("destination", "give the output file"))
 	}
 	side := ochazuke.StringArg(c.Args, "side", "to")
+	if !slices.Contains(fileSides, side) {
+		// Not a side this file has: nothing is written, the destination
+		// stays as it is, and the status line names the sides there are.
+		c.Info(fmt.Sprintf("no %q side to export: the sides are %s; nothing written", side, strings.Join(fileSides, " and ")))
+		return ochazuke.Done(nil)
+	}
 	force, _ := c.Args["force"].(bool)
 	cfg, now := a.compareConfig(), a.Now()
 	return ochazuke.Pending(func(ctx context.Context) (any, error) {

@@ -247,6 +247,34 @@ func TestRegisteredViewAndBareViewHaveTheSameOptions(t *testing.T) {
 	}
 }
 
+// A side the file does not have writes nothing (it used to write the to
+// side) and says so, with no error.
+func TestFileExportUnknownSideWritesNothing(t *testing.T) {
+	isolateCompare(t)
+	dir := newRepo(t, "r")
+	write(t, dir, "README", "changed\n")
+	a, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	sink := &ochazuke.RecordingSink{}
+	a.r.UI().Attach(sink)
+	destination := filepath.Join(t.TempDir(), "out")
+	if _, err := a.r.Execute(ochazuke.Request{Noun: "change", Verb: "export", Args: ochazuke.Arguments{"path": "README", "destination": destination, "side": "base", "repo": dir}}); err != nil {
+		t.Fatal(err)
+	}
+	if err := a.Settle(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(destination); !errors.Is(err, os.ErrNotExist) {
+		got, _ := os.ReadFile(destination)
+		t.Fatalf("side=base made the destination: %q %v", got, err)
+	}
+	if e, info := sink.LastError(), sink.LastInfo(); e != "" || !strings.Contains(info, "to and from") {
+		t.Fatalf("error %q info %q", e, info)
+	}
+}
+
 func TestFileExportFailureDoesNotCreateOrReplaceDestination(t *testing.T) {
 	dir := t.TempDir()
 	destination := filepath.Join(dir, "output")
