@@ -122,6 +122,9 @@ func New() (*App, error) {
 	if err := declarePickers(r); err != nil {
 		return nil, err
 	}
+	if err := loadDefaultBindings(r); err != nil {
+		return nil, err
+	}
 	return a, nil
 }
 

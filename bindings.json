@@ -1,0 +1,51 @@
+// default key rows from the run-3 key picker, hidden, loaded after the Go rows
+{
+  "bindings": [
+    {"context": "branch/normal", "bindings": [
+      {"key": "d a", "action": "branch.archive", "hidden": true},
+      {"key": "r", "action": "branch.edit", "hidden": true},
+      {"key": "M", "action": "branch.get", "hidden": true},
+      {"key": "U", "action": "branch.history", "hidden": true},
+      {"key": "m", "action": "branch.list", "hidden": true},
+      {"key": "g F", "action": "branch.open", "hidden": true},
+      {"key": "g X", "action": "branch.open-with", "hidden": true},
+      {"key": "*", "action": "branch.set", "hidden": true},
+      {"key": "v", "action": "branch.show", "hidden": true},
+      {"key": "p", "action": "branch.yank", "hidden": true},
+      {"key": "g j", "action": "branch.yank-path", "hidden": true}
+    ]},
+    {"context": "repo/normal", "bindings": [
+      {"key": "d a", "action": "repo.archive", "hidden": true},
+      {"key": "e", "action": "repo.create", "hidden": true},
+      {"key": "d d", "action": "repo.delete", "hidden": true},
+      {"key": "r", "action": "repo.edit", "hidden": true},
+      {"key": "M", "action": "repo.get", "hidden": true},
+      {"key": "U", "action": "repo.history", "hidden": true},
+      {"key": "m", "action": "repo.list", "hidden": true},
+      {"key": "b", "action": "repo.lists", "hidden": true},
+      {"key": "g F", "action": "repo.open", "hidden": true},
+      {"key": "g X", "action": "repo.open-with", "hidden": true},
+      {"key": "*", "action": "repo.set", "hidden": true},
+      {"key": "v", "action": "repo.show", "hidden": true},
+      {"key": "f", "action": "repo.view", "hidden": true},
+      {"key": "p", "action": "repo.yank", "hidden": true},
+      {"key": "g j", "action": "repo.yank-path", "hidden": true}
+    ]},
+    {"context": "worktree/normal", "bindings": [
+      {"key": "O", "action": "worktree.add", "hidden": true},
+      {"key": "d a", "action": "worktree.archive", "hidden": true},
+      {"key": "e", "action": "worktree.create", "hidden": true},
+      {"key": "ctrl+s", "action": "worktree.delete", "hidden": true},
+      {"key": "r", "action": "worktree.edit", "hidden": true},
+      {"key": "M", "action": "worktree.get", "hidden": true},
+      {"key": "U", "action": "worktree.history", "hidden": true},
+      {"key": "m", "action": "worktree.list", "hidden": true},
+      {"key": "enter", "action": "worktree.open", "hidden": true},
+      {"key": "g X", "action": "worktree.open-with", "hidden": true},
+      {"key": "*", "action": "worktree.set", "hidden": true},
+      {"key": "v", "action": "worktree.show", "hidden": true},
+      {"key": "p", "action": "worktree.yank", "hidden": true},
+      {"key": "g j", "action": "worktree.yank-path", "hidden": true}
+    ]}
+  ]
+}
