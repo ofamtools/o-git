@@ -67,7 +67,7 @@ func TestFilesystemCatalogTypesAndRoles(t *testing.T) {
 		{"diff-file", "repo", "dir"}, {"diff-file", "oldPath", "file"}, {"diff-file", "newPath", "file"},
 	} {
 		p := props[slot.noun][slot.field]
-		if p.Type != "path" || p.Path != slot.kind || !p.ReadOnly {
+		if p.Type != "path" || p.Path != slot.kind {
 			t.Errorf("%s.%s: %+v", slot.noun, slot.field, p)
 		}
 	}

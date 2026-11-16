@@ -23,7 +23,6 @@ compare_page.go	App.compareSave	K5	"no comparison selected"	1
 compare_page.go	App.compareSave	K8	"pair %s already exists"	1
 compare_page.go	App.compareSet	K15	"side must be from or to"	1
 compare_page.go	App.editComparison	K15	"no default comparison"	1
-compare_page.go	App.registerComparePage	K2	"Enum without Accept: <expr>"	1
 compare_page.go	readCustomPairs	K14	"compare.json: %w"	1	failure
 compare_page_data.go	App.followCompare	K15	"no comparison"	1
 compare_page_picker.go	App.pickCompareSide	K15	"Failed(…)"	1
@@ -33,8 +32,6 @@ compare_page_views.go	App.compareFileOpen	K5	"no file selected"	1
 compare_page_views.go	App.loadCompareDiff	K15	"comparison is still loading"	1
 compare_page_views.go	App.registerCompareViews	K15	"Failed(…)"	2
 compare_page_views.go	App.registerCompareViews	K15	"no file diff is open"	1
-compare_page_views.go	App.registerCompareViews	K2	"Enum without Accept: <expr>"	1
-compare_page_views.go	App.registerCompareViews	K2	"Enum without Accept: comparison.diff.layout"	1
 compare_page_views.go	App.registerCompareViews	K5	"no commit selected"	1
 compare_reasons.go	remoteEndpointError	K15	"remote name %q contains endpoint syntax"	1
 compare_settings.go	declareCompareSettings	K13	"commit-search-depth must not be negative"	1	declaration
@@ -65,7 +62,6 @@ diff_settings.go	declareDiffSettings	K13	"diff context must not be negative"	1	d
 diff_settings.go	declareDiffSettings	K15	"diff max-lines must be positive"	1
 diff_verbs.go	App.changeDiff	K15	"Failed(…)"	1
 diff_verbs.go	App.commitDiff	K8	"%s is not a commit"	1
-diff_verbs.go	App.registerDiffVerbs	K2	"Enum without Accept: <expr>"	1
 endpoints.go	EndpointResolver.expandAlias	K15	"endpoint holds a control character"	1
 endpoints.go	EndpointResolver.expandAlias	K8	"endpoint alias cycle at %s"	1
 endpoints.go	ValidRef	K15	"%q holds a space or a control character"	1
@@ -76,7 +72,6 @@ endpoints.go	alternatives	K15	"unbalanced endpoint parentheses"	2
 endpoints.go	newEndpointResolver	K15	"invalid git directories: %q"	1
 fact_get.go	App.commitFact	K15	"commit key must contain REPO:SHA"	1
 file_exports.go	App.exportFile	K15	"Failed(…)"	3
-file_exports.go	App.registerFileExports	K2	"Enum without Accept: <expr>"	1
 file_exports.go	writeFileSide	K4	"the %s side has no file content"	1
 git.go	AddWorktree	K15	"branch %s exists; --from applies only to a new branch"	1
 git.go	DeleteBranch	K14	"branch %s is %w; --force deletes it anyway"	1	failure
@@ -99,7 +94,6 @@ lists_verbs.go	findChange	K15	"no changed path %q in this comparison"	1
 lists_verbs.go	findChange	K3	"give a changed path"	1
 path_actions.go	App.readPath	K15	"%s is a %s path, not a working file; export its content to a destination first"	1
 path_actions.go	App.readPath	K15	"Failed(…)"	2
-path_actions.go	App.registerPathVerbs	K2	"Enum without Accept: <expr>"	1
 path_actions.go	inspectPath	K14	"working path %s: %w"	1	failure
 path_actions.go	repositoryPath	K15	"file path contains NUL"	1
 path_actions.go	repositoryPath	K15	"file path must be inside repository %s"	1
@@ -126,4 +120,3 @@ verbs.go	App.worktreeRemove	K15	"%s is the main worktree; only a linked worktree
 verbs.go	App.worktreeRemove	K15	"worktree %s has changes (%s); --force removes it anyway"	1
 verbs.go	App.worktreeRemove	K3	"a worktree is required: worktree remove PATH (worktree list prints them)"	1
 view_verb.go	App.registerViewVerb	K15	"Failed(…)"	2
-view_verb.go	App.registerViewVerb	K2	"Enum without Accept: <expr>"	1
